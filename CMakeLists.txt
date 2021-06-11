@@ -107,7 +107,7 @@ add_subdirectory(core/deps/xxHash/cmake_unofficial)
 target_link_libraries(${PROJECT_NAME} PRIVATE xxHash::xxhash)
 
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
-add_subdirectory(core/deps/glm)
+add_subdirectory(external/glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
 if(NOT APPLE)
