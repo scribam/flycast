@@ -981,9 +981,8 @@ elseif(WIN32)
 endif()
 
 if(BUILD_TESTING)
-    target_sources(${PROJECT_NAME} PRIVATE
-            core/deps/gtest/src/gtest-all.cc
-            core/deps/gtest/src/gtest_main.cc)
+    add_subdirectory(external/googletest)
+    target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main)
 
     target_sources(${PROJECT_NAME} PRIVATE
             tests/src/div32_test.cpp
