@@ -4,3 +4,6 @@
 [submodule "core/deps/libchdr"]
 	path = core/deps/libchdr
 	url = https://github.com/rtissera/libchdr.git
+[submodule "external/dirent"]
+	path = external/dirent
+	url = https://github.com/tronkko/dirent.git
