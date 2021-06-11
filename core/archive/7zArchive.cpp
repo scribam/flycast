@@ -23,6 +23,10 @@
 #include "deps/lzma/7zCrc.h"
 #include "deps/lzma/Alloc.h"
 
+#ifdef USE_WINDOWS_FILE
+#include <nowide/stackstring.hpp>
+#endif
+
 #define kInputBufSize ((size_t)1 << 18)
 
 static bool crc_tables_generated;
@@ -37,7 +41,7 @@ bool SzArchive::Open(const char* path)
 	nowide::wstackstring wpath;
 	if (!wpath.convert(path))
 		return false;
-	archiveStream.file.handle = CreateFileW(wpath.c_str(),
+	archiveStream.file.handle = CreateFileW(wpath.get(),
 			GENERIC_READ, FILE_SHARE_READ, NULL,
 			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (archiveStream.file.handle == INVALID_HANDLE_VALUE)

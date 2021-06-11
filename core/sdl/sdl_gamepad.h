@@ -3,6 +3,8 @@
 #include "sdl.h"
 #include "rend/gui.h"
 
+#include <algorithm>
+
 class DefaultInputMapping : public InputMapping
 {
 public:

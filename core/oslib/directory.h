@@ -48,7 +48,7 @@ inline DIR *opendir(char const *dirname)
         errno = EINVAL;
         return nullptr;
     }
-    return (DIR *)::_wopendir(wname.c_str());
+    return (DIR *)::_wopendir(wname.get());
 }
 
 inline dirent *readdir(DIR *dirstream)
@@ -70,7 +70,7 @@ inline dirent *readdir(DIR *dirstream)
 	d.d_type = wdirent->d_type;
 	d.d_reclen = sizeof(dirent);
 	d.d_namlen = wdirent->d_namlen;
-	strcpy(d.d_name, name.c_str());
+	strcpy(d.d_name, name.get());
 
 	return &d;
 }
@@ -88,7 +88,7 @@ inline int stat(const char *filename, struct stat *buf)
     	return -1;
     }
     struct _stat _st;
-    int rc = _wstat(wname.c_str(), &_st);
+    int rc = _wstat(wname.get(), &_st);
     buf->st_ctime = _st.st_ctime;
     buf->st_mtime = _st.st_mtime;
     buf->st_atime = _st.st_atime;
@@ -111,7 +111,7 @@ inline int access(const char *filename, int how)
     	errno = EINVAL;
     	return -1;
     }
-    return ::_waccess(wname.c_str(), how);
+    return ::_waccess(wname.get(), how);
 }
 
 inline int mkdir(const char *path, mode_t mode) {
@@ -120,7 +120,7 @@ inline int mkdir(const char *path, mode_t mode) {
     	errno = EINVAL;
     	return -1;
     }
-    return ::_wmkdir(wpath.c_str());
+    return ::_wmkdir(wpath.get());
 }
 #endif
 }

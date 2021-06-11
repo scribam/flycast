@@ -284,7 +284,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         core/deps/chdpsr/cdipsr.cpp
         core/deps/chdpsr/cdipsr.h)
 
-target_include_directories(${PROJECT_NAME} PRIVATE core/deps/nowide/include)
+add_subdirectory(external/nowide)
+target_link_libraries(${PROJECT_NAME} PRIVATE nowide::nowide)
 
 if(NOT MINIUPNP_FOUND)
 	option(UPNPC_BUILD_SHARED "Build shared library" FALSE)

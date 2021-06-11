@@ -20,6 +20,7 @@
 #include "../shell/windows/resource.h"
 #include "rawinput.h"
 
+#include <nowide/stackstring.hpp>
 #include <windows.h>
 #include <windowsx.h>
 
@@ -265,7 +266,7 @@ static void setupPath()
 	if (!path.convert(fname))
 		fn = ".\\";
 	else
-		fn = path.c_str();
+		fn = path.get();
 	size_t pos = get_last_slash_pos(fn);
 	if (pos != std::string::npos)
 		fn = fn.substr(0, pos) + "\\";
