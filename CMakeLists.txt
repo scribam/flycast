@@ -111,7 +111,8 @@ add_subdirectory(external/glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
 if(NOT APPLE)
-	add_subdirectory(core/deps/glslang)
+    option(BUILD_EXTERNAL "Build external dependencies in /External" OFF)
+	add_subdirectory(external/glslang)
 	target_link_libraries(${PROJECT_NAME} PRIVATE SPIRV)
 endif()
 
