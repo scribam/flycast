@@ -20,7 +20,7 @@
 #include <vector>
 #include <utility>
 #ifdef USE_MINIUPNPC
-#include <miniupnpc/miniupnpc.h>
+#include <miniupnpc.h>
 
 class MiniUPnP
 {

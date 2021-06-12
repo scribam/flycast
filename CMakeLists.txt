@@ -287,12 +287,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PRIVATE core/deps/nowide/include)
 
 if(NOT MINIUPNP_FOUND)
-	option(UPNPC_BUILD_SHARED "Build shared library" OFF)
-	option(UPNPC_BUILD_TESTS "Build test executables" OFF)
-	option(UPNPC_BUILD_SAMPLE "Build sample executables" OFF)
-	option(UPNPC_NO_INSTALL "Disable installation" ON)
-	add_subdirectory(core/deps/miniupnpc)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/miniupnpc)
+	option(UPNPC_BUILD_SHARED "Build shared library" FALSE)
+	option(UPNPC_BUILD_TESTS "Build test executables" FALSE)
+	option(UPNPC_BUILD_SAMPLE "Build sample executables" FALSE)
+	option(UPNPC_NO_INSTALL "Disable installation" TRUE)
+	add_subdirectory(external/miniupnp/miniupnpc)
+    target_include_directories(libminiupnpc-static INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/miniupnp/miniupnpc>)
 	target_link_libraries(${PROJECT_NAME} PRIVATE miniupnpc::miniupnpc)
 endif()
 
