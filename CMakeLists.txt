@@ -84,7 +84,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<BOOL:${TEST_AUTOMATION}>:TEST_AUTOMATION>
         $<$<BOOL:${ENABLE_LOG}>:DEBUGFAST>)
 
-target_include_directories(${PROJECT_NAME} PRIVATE core core/deps core/deps/stb core/khronos)
+target_include_directories(${PROJECT_NAME} PRIVATE core core/deps external/stb core/khronos)
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND AND NOT APPLE AND USE_OPENMP)
