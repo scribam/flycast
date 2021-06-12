@@ -742,8 +742,8 @@ if(USE_VULKAN AND NOT APPLE)
     endif()
 
     set(VOLK_PULL_IN_VULKAN OFF)
-    add_subdirectory(core/deps/volk)
-    target_include_directories(volk PRIVATE core/khronos)
+    add_subdirectory(external/volk)
+    target_include_directories(volk PUBLIC external/Vulkan-Headers/include)
     target_link_libraries(${PROJECT_NAME} PRIVATE volk)
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE USE_VULKAN)

@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <volk/volk.h>
+#include <volk.h>
 
 #define IMGUI_VK_QUEUED_FRAMES      3
 

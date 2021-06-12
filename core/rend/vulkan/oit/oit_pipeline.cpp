@@ -181,7 +181,7 @@ void OITPipelineManager::CreatePipeline(u32 listType, bool autosort, const PolyP
 	);
 
 	pipelines[hash(listType, autosort, &pp, pass, gpuPalette)] = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(),
-			graphicsPipelineCreateInfo);
+			graphicsPipelineCreateInfo).value;
 }
 
 void OITPipelineManager::CreateFinalPipeline()
@@ -267,7 +267,7 @@ void OITPipelineManager::CreateFinalPipeline()
 	  2                                           // subpass
 	);
 
-	finalPipeline = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(), graphicsPipelineCreateInfo);
+	finalPipeline = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(), graphicsPipelineCreateInfo).value;
 
 }
 
@@ -343,7 +343,7 @@ void OITPipelineManager::CreateClearPipeline()
 	  2                                           // subpass
 	);
 
-	clearPipeline = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(), graphicsPipelineCreateInfo);
+	clearPipeline = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(), graphicsPipelineCreateInfo).value;
 }
 
 void OITPipelineManager::CreateModVolPipeline(ModVolMode mode, int cullMode)
@@ -466,7 +466,7 @@ void OITPipelineManager::CreateModVolPipeline(ModVolMode mode, int cullMode)
 
 	modVolPipelines[hash(mode, cullMode)] =
 			GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(),
-					graphicsPipelineCreateInfo);
+					graphicsPipelineCreateInfo).value;
 }
 
 void OITPipelineManager::CreateTrModVolPipeline(ModVolMode mode, int cullMode)
@@ -561,5 +561,5 @@ void OITPipelineManager::CreateTrModVolPipeline(ModVolMode mode, int cullMode)
 
 	trModVolPipelines[hash(mode, cullMode)] =
 			GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(),
-					graphicsPipelineCreateInfo);
+					graphicsPipelineCreateInfo).value;
 }

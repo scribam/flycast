@@ -872,7 +872,7 @@ std::string VulkanContext::GetDriverName() const
 {
 	vk::PhysicalDeviceProperties props;
 	physicalDevice.getProperties(&props);
-	return std::string(props.deviceName);
+	return props.deviceName;
 }
 
 std::string VulkanContext::GetDriverVersion() const

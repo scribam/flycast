@@ -165,7 +165,7 @@ void PipelineManager::CreateModVolPipeline(ModVolMode mode, int cullMode)
 
 	modVolPipelines[hash(mode, cullMode)] =
 			GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(),
-					graphicsPipelineCreateInfo);
+					graphicsPipelineCreateInfo).value;
 }
 
 void PipelineManager::CreatePipeline(u32 listType, bool sortTriangles, const PolyParam& pp, bool gpuPalette)
@@ -329,7 +329,7 @@ void PipelineManager::CreatePipeline(u32 listType, bool sortTriangles, const Pol
 	);
 
 	pipelines[hash(listType, sortTriangles, &pp, gpuPalette)] = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(),
-			graphicsPipelineCreateInfo);
+			graphicsPipelineCreateInfo).value;
 }
 
 void OSDPipeline::CreatePipeline()
@@ -415,5 +415,5 @@ void OSDPipeline::CreatePipeline()
 	  0                                           // subpass
 	);
 
-	pipeline = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(), graphicsPipelineCreateInfo);
+	pipeline = GetContext()->GetDevice().createGraphicsPipelineUnique(GetContext()->GetPipelineCache(), graphicsPipelineCreateInfo).value;
 }
