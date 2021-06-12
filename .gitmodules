@@ -32,3 +32,6 @@
 [submodule "external/Vulkan-Headers"]
 	path = external/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "external/xbyak"]
+	path = external/xbyak
+	url = https://github.com/herumi/xbyak.git

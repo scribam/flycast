@@ -893,7 +893,7 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64.*|AARCH64.*)")
     	core/deps/vixl/utils-vixl.h)
     target_sources(${PROJECT_NAME} PRIVATE core/rec-ARM64/rec_arm64.cpp core/rec-ARM64/arm64_regalloc.h)
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i686.*|i386.*|x86.*|amd64.*|x86_64.*|AMD64.*")
-    add_subdirectory(core/deps/xbyak)
+    add_subdirectory(external/xbyak)
     target_link_libraries(${PROJECT_NAME} PRIVATE xbyak::xbyak)
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     	target_sources(${PROJECT_NAME} PRIVATE
