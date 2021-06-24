@@ -1,6 +1,3 @@
-[submodule "core/deps/SDL"]
-	path = core/deps/SDL
-	url = https://github.com/libsdl-org/SDL.git
 [submodule "external/dirent"]
 	path = external/dirent
 	url = https://github.com/tronkko/dirent.git
@@ -29,6 +26,9 @@
 	path = external/nowide
 	url = https://github.com/boostorg/nowide.git
 	branch = standalone
+[submodule "external/SDL"]
+	path = external/SDL
+	url = https://github.com/libsdl-org/SDL.git
 [submodule "external/volk"]
 	path = external/volk
 	url = https://github.com/zeux/volk.git

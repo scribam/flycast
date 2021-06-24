@@ -125,19 +125,19 @@ endif()
 
 if(WIN32)
 	# Build SDL
-	file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/core/deps/SDL")
+	file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external/SDL")
 	if(CMAKE_GENERATOR MATCHES "Visual Studio")
 		set(SDL_CMAKE_ARCH_ARG -A ${CMAKE_GENERATOR_PLATFORM})
 	endif()
 	execute_process(COMMAND ${CMAKE_COMMAND}
-		"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/core/deps/SDL"
+		"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external/SDL"
 		-DLIBC=ON
 		-DBUILD_SHARED_LIBS=OFF
 		-G "${CMAKE_GENERATOR}"
 		${SDL_CMAKE_ARCH_ARG}
-		"${CMAKE_CURRENT_SOURCE_DIR}/core/deps/SDL"
-    	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/core/deps/SDL")
-	execute_process(COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/core/deps/SDL" --config Release --target install)
+		"${CMAKE_CURRENT_SOURCE_DIR}/external/SDL"
+    	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external/SDL")
+	execute_process(COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/external/SDL" --config Release --target install)
 endif()
 
 if(MINGW)
@@ -145,7 +145,7 @@ if(MINGW)
 endif()
 
 if(APPLE OR WIN32)
-    find_package(SDL2 HINTS "${CMAKE_CURRENT_BINARY_DIR}/core/deps/SDL/cmake")
+    find_package(SDL2 HINTS "${CMAKE_CURRENT_BINARY_DIR}/external/SDL/cmake")
 elseif(NOT ANDROID)
     find_package(SDL2)
 endif()
