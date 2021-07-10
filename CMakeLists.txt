@@ -123,47 +123,26 @@ if(ALSA_FOUND AND NOT ANDROID)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${ALSA_LIBRARIES})
 endif()
 
-if(WIN32)
-	# Build SDL
-	file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external/SDL")
-	if(CMAKE_GENERATOR MATCHES "Visual Studio")
-		set(SDL_CMAKE_ARCH_ARG -A ${CMAKE_GENERATOR_PLATFORM})
-	endif()
-	execute_process(COMMAND ${CMAKE_COMMAND}
-		"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external/SDL"
-		-DLIBC=ON
-		-DBUILD_SHARED_LIBS=OFF
-		-G "${CMAKE_GENERATOR}"
-		${SDL_CMAKE_ARCH_ARG}
-		"${CMAKE_CURRENT_SOURCE_DIR}/external/SDL"
-    	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external/SDL")
-	execute_process(COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/external/SDL" --config Release --target install)
+if(NOT ANDROID)
+    find_package(SDL2 QUIET)
+    if(SDL2_FOUND)
+        target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2)
+    else()
+        if(MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+            set(OPT_DEF_LIBC ON)
+        endif()
+        add_subdirectory(external/SDL)
+        target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2-static)
+    endif()
+
+    if(TARGET SDL2::SDL2 OR TARGET SDL2::SDL2-static)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE USE_SDL USE_SDL_AUDIO)
+        target_sources(${PROJECT_NAME} PRIVATE core/sdl/sdl.cpp core/sdl/sdl.h core/sdl/sdl_gamepad.h core/sdl/sdl_keyboard.h)
+    endif()
 endif()
 
 if(MINGW)
 	target_link_libraries(${PROJECT_NAME} PRIVATE "-static-libgcc -static-libstdc++")
-endif()
-
-if(APPLE OR WIN32)
-    find_package(SDL2 HINTS "${CMAKE_CURRENT_BINARY_DIR}/external/SDL/cmake")
-elseif(NOT ANDROID)
-    find_package(SDL2)
-endif()
-if(SDL2_FOUND)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_SDL USE_SDL_AUDIO)
-    target_sources(${PROJECT_NAME} PRIVATE core/sdl/sdl.cpp core/sdl/sdl.h core/sdl/sdl_gamepad.h core/sdl/sdl_keyboard.h)
-    if(APPLE)
-        target_include_directories(${PROJECT_NAME} PRIVATE "${SDL2_INCLUDE_DIRS}/..")
-    else()
-        target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
-    endif()
-    if((APPLE OR WIN32) AND TARGET SDL2::SDL2-static)
-        target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2-static)
-    elseif(TARGET SDL2::SDL2)
-        target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2)
-    else()
-        target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
-    endif()
 endif()
 
 find_package(ZLIB)
