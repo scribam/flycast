@@ -220,7 +220,7 @@ std::string find_user_data_dir()
 #endif
 }
 
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && !defined(__vita__)
 static void addDirectoriesFromPath(std::vector<std::string>& dirs, const std::string& path, const std::string& suffix)
 {
 	std::string::size_type pos = 0;
@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if defined(__unix__)
+#if defined(__unix__) || defined (__vita__)
 	common_linux_setup();
 #endif
 

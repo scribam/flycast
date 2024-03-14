@@ -85,9 +85,10 @@ void fault_handler(int sn, siginfo_t * si, void *segfault_ctx)
 }
 #undef HOST_CTX_READY
 
+#if !defined(__vita__)
 void os_InstallFaultHandler()
 {
-#if !defined(__SWITCH__) && !defined(__vita__)
+#if !defined(__SWITCH__)
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	act.sa_sigaction = fault_handler;
@@ -103,13 +104,14 @@ void os_InstallFaultHandler()
 
 void os_UninstallFaultHandler()
 {
-#if !defined(__SWITCH__) && !defined(__vita__)
+#if !defined(__SWITCH__)
 	sigaction(SIGSEGV, &next_segv_handler, nullptr);
 #endif
 #if defined(__APPLE__)
 	sigaction(SIGBUS, &next_bus_handler, nullptr);
 #endif
 }
+#endif
 
 #elif !defined(__vita__)  // !defined(TARGET_NO_EXCEPTIONS)
 
