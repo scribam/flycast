@@ -1717,7 +1717,7 @@ if(NOT LIBRETRO)
 				COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>-${CMAKE_OSX_SYSROOT}/Flycast.ipa" --format=zip ${CMAKE_CURRENT_BINARY_DIR}/Payload)
 		else()
 
-			add_subdirectory(core/deps/Syphon)
+			add_subdirectory(external/Syphon-Framework)
 			target_link_libraries(${PROJECT_NAME} PRIVATE Syphon)
 			if(${CMAKE_GENERATOR} MATCHES "^Xcode.*")
 				add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
