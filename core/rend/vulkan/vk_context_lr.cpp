@@ -45,17 +45,18 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 		const char** required_device_layers, unsigned num_required_device_layers,
 		const VkPhysicalDeviceFeatures* required_features)
 {
+	verify(instance != VK_NULL_HANDLE);
+	vk::Instance vkinstance(instance);
+
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(get_instance_proc_addr);
-	VULKAN_HPP_DEFAULT_DISPATCHER.init(instance);
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkinstance);
 #endif
 
 	vk::PhysicalDevice physicalDevice(gpu);
 	if (gpu == VK_NULL_HANDLE)
 	{
 		// Choose a discrete gpu if there's one, otherwise just pick the first one
-		verify(instance != VK_NULL_HANDLE);
-		vk::Instance vkinstance(instance);
 		const auto devices = vkinstance.enumeratePhysicalDevices();
 		for (const auto& phyDev : devices)
 		{
@@ -164,10 +165,10 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 	vk::Device device = physicalDevice.createDevice(vk::DeviceCreateInfo(vk::DeviceCreateFlags(),
 			context->queue_family_index == context->presentation_queue_family_index ? 1 : 2, deviceQueueCreateInfos,
 					num_required_device_layers, required_device_layers, deviceExtensions.size(), &deviceExtensions[0], &features));
-	context->device = (VkDevice)device;
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1
-	VULKAN_HPP_DEFAULT_DISPATCHER.init(context->device);
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(device);
 #endif
+	context->device = (VkDevice)device;
 
 	// Queues
 	context->queue = (VkQueue)device.getQueue(context->queue_family_index, 0);
