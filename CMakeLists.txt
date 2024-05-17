@@ -658,7 +658,7 @@ if(NOT LIBZIP_FOUND OR NINTENDO_SWITCH)
 	option(BUILD_DOC "Build documentation" OFF)
 	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 	option(LIBZIP_DO_INSTALL "Install libzip and the related files" OFF)
-	add_subdirectory(core/deps/libzip)
+	add_subdirectory(external/libzip)
 	target_link_libraries(${PROJECT_NAME} PRIVATE libzip::zip)
 endif()
 
