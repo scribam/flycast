@@ -1,7 +1,3 @@
-[submodule "core/deps/libchdr"]
-	path = core/deps/libchdr
-	url = https://github.com/rtissera/libchdr.git
-	ignore = dirty
 [submodule "core/deps/breakpad"]
 	path = core/deps/breakpad
 	url = https://github.com/flyinghead/mingw-breakpad
@@ -62,3 +58,7 @@
 [submodule "external/libadrenotools"]
 	path = external/libadrenotools
 	url = https://github.com/bylaws/libadrenotools.git
+[submodule "external/libchdr"]
+	path = external/libchdr
+	url = https://github.com/rtissera/libchdr.git
+	ignore = dirty
