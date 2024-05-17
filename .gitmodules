@@ -50,3 +50,6 @@
 [submodule "external/dirent"]
 	path = external/dirent
 	url = https://github.com/tronkko/dirent.git
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git
