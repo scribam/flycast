@@ -117,7 +117,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 
 		ImGui::Text("%s", title.c_str());
 		ImGui::BeginChild(ImGui::GetID("dir_list"), ImVec2(0, - uiScaled(30) - ImGui::GetStyle().ItemSpacing.y),
-				ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling | ImGuiWindowFlags_NavFlattened);
+				ImGuiChildFlags_Border | ImGuiChildFlags_NavFlattened);
 		{
 			ImguiStyleVar _(ImGuiStyleVar_ItemSpacing, ScaledVec2(8, 20));
 
@@ -185,6 +185,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 // See https://github.com/ocornut/imgui/issues/3379
 void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
 {
+#if 0
 	ImGuiContext& g = *ImGui::GetCurrentContext();
 	ImGuiWindow* window = g.CurrentWindow;
 	while (window != nullptr
@@ -215,6 +216,7 @@ void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
     	window->DragScrolling = true;
     	window->ScrollSpeed = delta;
     }
+#endif
 }
 
 static void UnpackAccumulativeOffsetsIntoRanges(int base_codepoint, const short* accumulative_offsets, int accumulative_offsets_count, ImWchar* out_ranges)
@@ -672,6 +674,7 @@ static void computeScrollSpeed(float &v)
 
 void windowDragScroll()
 {
+#if 0
 	ImGuiWindow *window = ImGui::GetCurrentWindow();
 	if (window->DragScrolling)
 	{
@@ -700,6 +703,7 @@ void windowDragScroll()
 			ImGui::SetScrollY(window, window->Scroll.y - window->ScrollSpeed.y);
 		}
 	}
+#endif
 }
 
 static void setUV(float ar, ImVec2& uv0, ImVec2& uv1)
