@@ -6,8 +6,6 @@ if(CCACHE_PROGRAM)
 	set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM} CACHE STRING "Compiler launcher for CXX.")
 endif()
 
-set(SENTRY_UPLOAD_URL "" CACHE STRING "Sentry upload URL")
-
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/shell/cmake")
 
 if(APPLE)
@@ -254,10 +252,6 @@ if(UNIX AND NOT ANDROID AND NOT APPLE)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE PAGE_SIZE=${PAGE_SIZE})
 endif()
 
-if(NOT "${SENTRY_UPLOAD_URL}" STREQUAL "")
-	target_compile_definitions(${PROJECT_NAME} PRIVATE SENTRY_UPLOAD="${SENTRY_UPLOAD_URL}")
-endif()
-
 target_include_directories(${PROJECT_NAME} PRIVATE core core/deps core/deps/stb core/deps/json)
 if(LIBRETRO)
 	target_include_directories(${PROJECT_NAME} PRIVATE shell/libretro)
@@ -267,88 +261,17 @@ if(NINTENDO_SWITCH)
 endif()
 
 if(USE_BREAKPAD AND NOT LIBRETRO)
-	find_program(SH_EXECUTABLE sh)
-	if((ANDROID AND NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows") OR (MINGW AND SH_EXECUTABLE) OR (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
-		add_subdirectory(core/deps/breakpad)
-		if(WIN32)
-			target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--build-id")
+	if(NOT ANDROID AND NOT CMAKE_SYSTEM_NAME MATCHES "(FreeBSD|OpenBSD|NetBSD)" AND NOT IOS AND NOT NINTENDO_SWITCH)
+		set(SENTRY_UPLOAD_URL "" CACHE STRING "Sentry upload URL")
+		if(NOT "${SENTRY_UPLOAD_URL}" STREQUAL "")
+			target_compile_definitions(${PROJECT_NAME} PRIVATE SENTRY_UPLOAD="${SENTRY_UPLOAD_URL}")
 		endif()
-		target_link_libraries(${PROJECT_NAME} PUBLIC breakpad_client)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE USE_BREAKPAD)
-	elseif(APPLE AND NOT IOS)
-		target_sources(${PROJECT_NAME} PRIVATE
-			core/deps/breakpad/src/client/minidump_file_writer-inl.h
-			core/deps/breakpad/src/client/minidump_file_writer.cc
-			core/deps/breakpad/src/client/minidump_file_writer.h
-			core/deps/breakpad/src/client/mac/handler/breakpad_nlist_64.cc
-			core/deps/breakpad/src/client/mac/handler/breakpad_nlist_64.h
-			core/deps/breakpad/src/client/mac/handler/dynamic_images.cc
-			core/deps/breakpad/src/client/mac/handler/dynamic_images.h
-			core/deps/breakpad/src/client/mac/handler/exception_handler.cc
-			core/deps/breakpad/src/client/mac/handler/exception_handler.h
-			core/deps/breakpad/src/client/mac/handler/minidump_generator.cc
-			core/deps/breakpad/src/client/mac/handler/minidump_generator.h
-			core/deps/breakpad/src/client/mac/handler/protected_memory_allocator.cc
-			core/deps/breakpad/src/client/mac/handler/protected_memory_allocator.h
-			core/deps/breakpad/src/client/mac/crash_generation/ConfigFile.h
-			core/deps/breakpad/src/client/mac/crash_generation/ConfigFile.mm
-			core/deps/breakpad/src/client/mac/crash_generation/client_info.h
-			core/deps/breakpad/src/client/mac/crash_generation/crash_generation_client.h
-			core/deps/breakpad/src/client/mac/crash_generation/crash_generation_client.cc
-			core/deps/breakpad/src/common/convert_UTF.cc
-			core/deps/breakpad/src/common/convert_UTF.h
-			core/deps/breakpad/src/common/md5.cc
-			core/deps/breakpad/src/common/string_conversion.cc
-			core/deps/breakpad/src/common/string_conversion.h
-			core/deps/breakpad/src/common/mac/file_id.cc
-			core/deps/breakpad/src/common/mac/file_id.h
-			core/deps/breakpad/src/common/mac/MachIPC.mm
-			core/deps/breakpad/src/common/mac/MachIPC.h
-			core/deps/breakpad/src/common/mac/bootstrap_compat.cc
-			core/deps/breakpad/src/common/mac/bootstrap_compat.h
-			core/deps/breakpad/src/common/mac/macho_id.cc
-			core/deps/breakpad/src/common/mac/macho_id.h
-			core/deps/breakpad/src/common/mac/macho_utilities.cc
-			core/deps/breakpad/src/common/mac/macho_utilities.h
-			core/deps/breakpad/src/common/mac/macho_walker.cc
-			core/deps/breakpad/src/common/mac/macho_walker.h
-			core/deps/breakpad/src/common/mac/string_utilities.cc
-			core/deps/breakpad/src/common/mac/string_utilities.h
-		)
-		target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/core/deps/breakpad/src)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE USE_BREAKPAD)
-		add_custom_target(dump_syms COMMAND xcodebuild -project ${CMAKE_CURRENT_SOURCE_DIR}/core/deps/breakpad/src/tools/mac/dump_syms/dump_syms.xcodeproj -target dump_syms -configuration Release CONFIGURATION_BUILD_DIR=${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad)
-		ADD_DEPENDENCIES(${PROJECT_NAME} dump_syms)
 
-		if(${CMAKE_GENERATOR} MATCHES "^Xcode.*")
-			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-				COMMAND sleep 20
-				COMMAND mkdir -p ../symbols
-				COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad/dump_syms
-					-a x86_64
-					-g ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/Flycast.app.dSYM
-					$<TARGET_FILE:flycast> > ../symbols/Flycast-x64.sym
-				COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad/dump_syms
-					-a arm64
-					-g ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/Flycast.app.dSYM
-					$<TARGET_FILE:flycast> > ../symbols/Flycast-arm64.sym
-			)
-		else()
-			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-				COMMAND sleep 20
-				COMMAND mkdir -p ../symbols
-				COMMAND dsymutil $<TARGET_FILE:flycast>
-					-o ${CMAKE_CURRENT_BINARY_DIR}/Flycast.app.dSYM
-				COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad/dump_syms
-					-a x86_64
-					-g ${CMAKE_CURRENT_BINARY_DIR}/Flycast.app.dSYM
-					$<TARGET_FILE:flycast> > ../symbols/Flycast-x64.sym
-				COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad/dump_syms
-					-a arm64
-					-g ${CMAKE_CURRENT_BINARY_DIR}/Flycast.app.dSYM
-					$<TARGET_FILE:flycast> > ../symbols/Flycast-arm64.sym
-			)
-		endif()
+		set(SENTRY_BACKEND "breakpad")
+		set(SENTRY_BUILD_SHARED_LIBS OFF)
+		add_subdirectory(core/deps/sentry-native)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE USE_SENTRY_NATIVE)
+		target_link_libraries(${PROJECT_NAME} PRIVATE sentry::sentry)
 	endif()
 endif()
 

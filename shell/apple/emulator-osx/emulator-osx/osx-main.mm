@@ -106,7 +106,7 @@ extern "C" int SDL_main(int argc, char *argv[])
     CFRelease(mainBundle);
 
 	emu_flycast_init();
-	
+
 	int boardId = cfgLoadInt("naomi", "BoardId", 0);
 	if (boardId > 0)
 	{
@@ -126,15 +126,15 @@ extern "C" int SDL_main(int argc, char *argv[])
 		}
 		[[NSApp dockTile] setBadgeLabel:label];
 	}
-	
-#ifdef USE_BREAKPAD
-	auto async = std::async(std::launch::async, uploadCrashes, "/tmp");
-#endif
 
 	mainui_loop();
 
 	emu_flycast_term();
 	os_UninstallFaultHandler();
+
+#ifdef USE_SENTRY
+	sentry_close();
+#endif
 
 	return 0;
 }

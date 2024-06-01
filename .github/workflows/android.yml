@@ -43,7 +43,7 @@ jobs:
         working-directory: shell/android-studio
         run: ./gradlew assembleRelease bundleRelease --parallel
         env:
-          SENTRY_UPLOAD_URL: ${{ secrets.SENTRY_UPLOAD_URL }}
+          SENTRY_DSN: ${{ secrets.SENTRY_UPLOAD_URL }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
 
       - uses: actions/upload-artifact@v4

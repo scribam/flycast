@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.sentry)
 }
 
 def getVersionName = { ->
@@ -9,11 +10,6 @@ def getVersionName = { ->
         standardOutput = stdout
     }
     return stdout.toString().trim()
-}
-
-def getSentryUrl = { ->
-	def url = System.env.SENTRY_UPLOAD_URL
-	return url == null ? "" : url
 }
 
 android {
@@ -32,7 +28,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_ARM_MODE=arm", "-DSENTRY_UPLOAD_URL=" + getSentryUrl()
+                arguments "-DANDROID_ARM_MODE=arm"
             }
         }
 

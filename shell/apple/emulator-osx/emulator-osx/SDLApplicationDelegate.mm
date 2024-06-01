@@ -12,8 +12,8 @@
 #include "ui/gui.h"
 #include "oslib/oslib.h"
 
-#ifdef USE_BREAKPAD
-#include "client/mac/handler/exception_handler.h"
+#ifdef USE_SENTRY
+#include <sentry.h>
 #endif
 
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
@@ -296,20 +296,6 @@ static void CustomApplicationMain (int argc, char **argv)
     [pool release];
 }
 
-
-#ifdef USE_BREAKPAD
-static bool dumpCallback(const char *dump_dir, const char *minidump_id, void *context, bool succeeded)
-{
-	if (succeeded)
-	{
-	    char path[512];
-	    sprintf(path, "%s/%s.dmp", dump_dir, minidump_id);
-	    printf("Minidump saved to '%s'\n", path);
-	    registerCrash(dump_dir, path);
-	}
-    return succeeded;
-}
-#endif
 /*
  * Catch document open requests...this lets us notice files when the app
  *  was launched by double-clicking a document, or when a document was
@@ -338,9 +324,8 @@ static bool dumpCallback(const char *dump_dir, const char *minidump_id, void *co
 /* Called when the internal event loop has just started running */
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-#ifdef USE_BREAKPAD
-    google_breakpad::ExceptionHandler eh("/tmp", NULL, dumpCallback, NULL, true, NULL);
-    task_set_exception_ports(mach_task_self(), EXC_MASK_BAD_ACCESS, MACH_PORT_NULL, EXCEPTION_DEFAULT, 0);
+#ifdef USE_SENTRY
+    // TODO: init sentry
 #endif
     
     int status;

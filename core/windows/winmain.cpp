@@ -37,10 +37,7 @@
 #include "emulator.h"
 #include "ui/mainui.h"
 #include "oslib/directory.h"
-#ifdef USE_BREAKPAD
-#include "breakpad/client/windows/handler/exception_handler.h"
-#include "version.h"
-#endif
+#include "sentry-wrapper.h"
 #include "profiler/fc_profiler.h"
 
 #include <nowide/args.hpp>
@@ -213,35 +210,6 @@ static void findKeyboardLayout()
 #endif
 }
 
-#if defined(USE_BREAKPAD)
-static bool dumpCallback(const wchar_t* dump_path,
-		const wchar_t* minidump_id,
-		void* context,
-		EXCEPTION_POINTERS* exinfo,
-		MDRawAssertionInfo* assertion,
-		bool succeeded)
-{
-	if (succeeded)
-	{
-		wchar_t s[MAX_PATH + 32];
-		_snwprintf(s, std::size(s), L"Minidump saved to '%s\\%s.dmp'", dump_path, minidump_id);
-		::OutputDebugStringW(s);
-
-		nowide::stackstring path;
-		if (path.convert(dump_path))
-		{
-			std::string directory = path.get();
-			if (path.convert(minidump_id))
-			{
-				std::string fullPath = directory + '\\' + std::string(path.get()) + ".dmp";
-				registerCrash(directory.c_str(), fullPath.c_str());
-			}
-		}
-	}
-	return succeeded;
-}
-#endif
-
 #ifdef TARGET_UWP
 namespace nowide {
 
@@ -309,27 +277,7 @@ int main(int argc, char* argv[])
 {
 	nowide::args _(argc, argv);
 
-#ifdef USE_BREAKPAD
-	wchar_t tempDir[MAX_PATH + 1];
-	GetTempPathW(MAX_PATH + 1, tempDir);
-
-	static google_breakpad::CustomInfoEntry custom_entries[] = {
-			google_breakpad::CustomInfoEntry(L"prod", L"Flycast"),
-			google_breakpad::CustomInfoEntry(L"ver", L"" GIT_VERSION),
-	};
-	google_breakpad::CustomClientInfo custom_info = { custom_entries, std::size(custom_entries) };
-
-	google_breakpad::ExceptionHandler handler(tempDir,
-		nullptr,
-		dumpCallback,
-		nullptr,
-		google_breakpad::ExceptionHandler::HANDLER_ALL,
-		MiniDumpNormal,
-		INVALID_HANDLE_VALUE,
-		&custom_info);
-	// crash on die() and failing verify()
-	handler.set_handle_debug_exceptions(true);
-#endif
+	sentry::init();
 
 #if defined(_WIN32) && defined(LOG_TO_PTY)
 	setbuf(stderr, NULL);
@@ -343,14 +291,6 @@ int main(int argc, char* argv[])
 	if (flycast_init(argc, argv) != 0)
 		die("Flycast initialization failed");
 
-#ifdef USE_BREAKPAD
-	nowide::stackstring nws;
-	static std::string tempDir8;
-	if (nws.convert(tempDir))
-		tempDir8 = nws.get();
-	auto async = std::async(std::launch::async, uploadCrashes, tempDir8);
-#endif
-
 #ifdef TARGET_UWP
 	if (config::ContentPath.get().empty())
 		config::ContentPath.get().push_back(get_writable_config_path(""));
@@ -361,6 +301,8 @@ int main(int argc, char* argv[])
 
 	flycast_term();
 	os_UninstallFaultHandler();
+
+	sentry::close();
 
 	return 0;
 }

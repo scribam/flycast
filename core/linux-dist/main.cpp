@@ -24,8 +24,8 @@
 	#include "sdl/sdl.h"
 #endif
 
-#ifdef USE_BREAKPAD
-#include "breakpad/client/linux/handler/exception_handler.h"
+#ifdef USE_SENTRY_NATIVE
+#include <sentry.h>
 #endif
 
 void os_DoEvents()
@@ -219,22 +219,11 @@ void os_RunInstance(int argc, const char *argv[])
 	}
 }
 
-#if defined(USE_BREAKPAD)
-static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded)
-{
-	if (succeeded)
-		registerCrash(descriptor.directory().c_str(), descriptor.path());
-
-	return succeeded;
-}
-#endif
-
 int main(int argc, char* argv[])
 {
 	selfPath = argv[0];
-#if defined(USE_BREAKPAD)
-	google_breakpad::MinidumpDescriptor descriptor("/tmp");
-	google_breakpad::ExceptionHandler eh(descriptor, nullptr, dumpCallback, nullptr, true, -1);
+#ifdef USE_SENTRY_NATIVE
+	// TODO: init sentry
 #endif
 
 	LogManager::Init();
@@ -262,14 +251,14 @@ int main(int argc, char* argv[])
 	if (flycast_init(argc, argv))
 		die("Flycast initialization failed\n");
 
-#if defined(USE_BREAKPAD)
-	auto async = std::async(std::launch::async, uploadCrashes, "/tmp");
-#endif
-
 	mainui_loop();
 
 	flycast_term();
 	os_UninstallFaultHandler();
+
+#ifdef USE_SENTRY_NATIVE
+	sentry_close();
+#endif
 
 	return 0;
 }

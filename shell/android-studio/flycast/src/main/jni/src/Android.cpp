@@ -16,8 +16,8 @@
 #include "cfg/option.h"
 #include "stdclass.h"
 #include "oslib/oslib.h"
-#ifdef USE_BREAKPAD
-#include "client/linux/handler/exception_handler.h"
+#ifdef USE_SENTRY
+#include <sentry.h>
 #endif
 #include "jni_util.h"
 #include "android_storage.h"
@@ -99,28 +99,6 @@ void os_DoEvents()
 
 void common_linux_setup();
 
-#if defined(USE_BREAKPAD)
-static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded)
-{
-    if (succeeded)
-    {
-    	__android_log_print(ANDROID_LOG_ERROR, "Flycast", "Minidump saved to '%s'\n", descriptor.path());
-    	registerCrash(descriptor.directory().c_str(), descriptor.path());
-    }
-	return succeeded;
-}
-
-static void *uploadCrashThread(void *p)
-{
-	uploadCrashes(*(std::string *)p);
-
-	return nullptr;
-}
-
-static google_breakpad::ExceptionHandler *exceptionHandler;
-
-#endif
-
 extern "C" JNIEXPORT jstring JNICALL Java_com_flycast_emulator_emu_JNIdc_initEnvironment(JNIEnv *env, jobject obj, jobject emulator, jstring filesDirectory, jstring homeDirectory, jstring jlocale)
 {
     bool first_init = false;
@@ -137,17 +115,8 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_flycast_emulator_emu_JNIdc_initEnv
     if (first_init)
     	LogManager::Init();
 
-#if defined(USE_BREAKPAD)
-    if (exceptionHandler == nullptr)
-    {
-    	jni::String directory(homeDirectory, false);
-    	if (directory.empty())
-    		directory = jni::String(filesDirectory, false);
+	// TODO: init sentry but where to call sentry_close?
 
-        google_breakpad::MinidumpDescriptor descriptor(directory.to_string());
-        exceptionHandler = new google_breakpad::ExceptionHandler(descriptor, nullptr, dumpCallback, nullptr, true, -1);
-    }
-#endif
     // Initialize platform-specific stuff
     common_linux_setup();
 
@@ -186,15 +155,6 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_flycast_emulator_emu_JNIdc_initEnv
         int rc = flycast_init(0, NULL);
         if (rc == -1)
             msg = env->NewStringUTF("Memory initialization failed");
-#ifdef USE_BREAKPAD
-        else
-        {
-			static std::string crashPath;
-			static cThread uploadThread(uploadCrashThread, &crashPath, "SentryUpload");
-			crashPath = get_writable_config_path("");
-			uploadThread.Start();
-        }
-#endif
 
         return msg;
     }
