@@ -113,6 +113,11 @@ static void context_segfault(host_context_t* hostctx, void* segfault_ctx)
 		bicopy<ToSegfault>(hostctx->rsp, MCTX(.__gregs[_REG_RSP]));
 		bicopy<ToSegfault>(hostctx->r9, MCTX(.__gregs[_REG_R9]));
 		bicopy<ToSegfault>(hostctx->rdi, MCTX(.__gregs[_REG_RDI]));
+	#elif defined(__CYGWIN__)
+		bicopy<ToSegfault>(hostctx->pc, MCTX(.rip));
+		bicopy<ToSegfault>(hostctx->rsp, MCTX(.rsp));
+		bicopy<ToSegfault>(hostctx->r9, MCTX(.r9));
+		bicopy<ToSegfault>(hostctx->rdi, MCTX(.rdi));
 	#elif defined(__unix__)
 		bicopy<ToSegfault>(hostctx->pc, MCTX(.gregs[REG_RIP]));
 		bicopy<ToSegfault>(hostctx->rsp, MCTX(.gregs[REG_RSP]));

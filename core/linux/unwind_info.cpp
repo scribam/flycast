@@ -24,7 +24,7 @@
 
 extern "C"
 {
-#if HOST_CPU != CPU_ARM
+#if HOST_CPU != CPU_ARM && !defined(__CYGWIN__)
 	void __register_frame(const void*);
 	void __deregister_frame(const void*);
 #else

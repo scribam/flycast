@@ -11,6 +11,9 @@
 #include <windows.h>
 #include <io.h>
 #endif
+#ifdef __CYGWIN__
+#include <sys/socket.h>
+#endif
 #include "types.h"
 #include "hw/sh4/sh4_mmr.h"
 #include "hw/sh4/sh4_interrupts.h"

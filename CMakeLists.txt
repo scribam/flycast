@@ -44,7 +44,7 @@ endif()
 message(STATUS "Target architecture: ${ARCHITECTURE}")
 
 set(USE_HOST_SDL_DEFAULT OFF)
-if(NOT APPLE AND (NOT UNIX OR CMAKE_SYSTEM_NAME MATCHES "(FreeBSD|OpenBSD|NetBSD)"))
+if(NOT APPLE AND (NOT UNIX OR CMAKE_SYSTEM_NAME MATCHES "(FreeBSD|OpenBSD|NetBSD)" OR CYGWIN))
 	set(USE_HOST_SDL_DEFAULT ON)
 endif()
 
@@ -235,6 +235,7 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
 		$<$<BOOL:${APPLE}>:GL_SILENCE_DEPRECATION>
+		$<$<BOOL:${CYGWIN}>:_GNU_SOURCE>
 		$<$<BOOL:${ENABLE_LOG}>:DEBUGFAST>
 		$<$<BOOL:${IOS}>:TARGET_IPHONE>
 		$<$<BOOL:${TARGET_MAC}>:TARGET_MAC>
@@ -466,7 +467,9 @@ if(NOT LIBRETRO)
 	if(NOT APPLE AND LUA_FOUND)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE USE_LUA)
 		target_include_directories(${PROJECT_NAME} PRIVATE ${LUA_INCLUDE_DIR} core/deps/luabridge/Source)
-		list(TRANSFORM LUA_LIBRARIES REPLACE "\.dll" "")
+		if(NOT CYGWIN)
+			list(TRANSFORM LUA_LIBRARIES REPLACE "\.dll" "")
+		endif()
 		target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
 	endif()
 endif()
