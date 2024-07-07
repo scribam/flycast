@@ -23,60 +23,43 @@
 #include "7zArchive.h"
 #include "ZipArchive.h"
 #include "oslib/storage.h"
+#include "stdclass.h"
+
+#include <array>
 
 Archive *OpenArchive(const std::string& path)
 {
-	FILE *file = nullptr;
-	hostfs::FileInfo fileInfo;
 	try {
-		fileInfo = hostfs::storage().getFileInfo(path);
-		if (!fileInfo.isDirectory)
-			file = hostfs::storage().openFile(path, "rb");
+		if (hostfs::storage().getFileInfo(path).isDirectory)
+			return nullptr;
 	} catch (const hostfs::StorageException& e) {
 	}
-	if (file == nullptr)
-	{
-		file = hostfs::storage().openFile(path + ".7z", "rb");
-		if (file == nullptr)
-			file = hostfs::storage().openFile(path + ".7Z", "rb");
-	}
-	if (file != nullptr)
-	{
-		Archive *sz_archive = new SzArchive();
-		if (sz_archive->Open(file))
-			return sz_archive;
-		delete sz_archive;
-		file = nullptr;
-	}
-	// Retry as a zip file
-	try {
-		if (!fileInfo.isDirectory)
-			file = hostfs::storage().openFile(path, "rb");
-	} catch (const hostfs::StorageException& e) {
-	}
-	if (file == nullptr)
-	{
-		file = hostfs::storage().openFile(path + ".zip", "rb");
-		if (file == nullptr)
-		{
-			file = hostfs::storage().openFile(path + ".ZIP", "rb");
-			if (file == nullptr)
-				return nullptr;
+
+	std::string extension;
+	if (file_exists(path)) {
+		extension = get_file_extension(path);
+	} else {
+		for (const auto& ext : {"7z", "7Z", "zip", "ZIP"}) {
+			if (file_exists(path + "." + ext)) {
+				extension = ext;
+				string_tolower(extension);
+				break;
+			}
 		}
 	}
-	Archive *zip_archive = new ZipArchive();
-	if (zip_archive->Open(file))
-		return zip_archive;
-	delete zip_archive;
+
+	Archive* archive = nullptr;
+
+	if (extension == "7z")
+		archive = new SzArchive();
+	else if (extension == "zip")
+		archive = new ZipArchive();
+
+	if (archive != nullptr) {
+		if (archive->Open(path))
+			return archive;
+		delete archive;
+	}
 
 	return nullptr;
 }
-
-bool Archive::Open(const char* path)
-{
-	FILE *file = nowide::fopen(path, "rb");
-	if (file == nullptr)
-		return false;
-	return Open(file);
-}
-

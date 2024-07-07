@@ -39,11 +39,9 @@ public:
 	virtual ArchiveFile *OpenFileByCrc(u32 crc) = 0;
 
 protected:
-	virtual bool Open(FILE *file) = 0;
+	virtual bool Open(const std::string& path) = 0;
 
 private:
-	bool Open(const char *name);
-
 	friend Archive *OpenArchive(const std::string& path);
 };
 

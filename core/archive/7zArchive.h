@@ -21,8 +21,8 @@
 #pragma once
 
 #include "archive.h"
-#include "deps/lzma/7z.h"
-#include "deps/lzma/7zFile.h"
+#include <7z.h>
+#include <7zFile.h>
 
 #include <algorithm>
 #include <cstring>
@@ -40,7 +40,7 @@ public:
 	ArchiveFile *OpenFileByCrc(u32 crc) override;
 
 protected:
-	bool Open(FILE *file) override;
+	bool Open(const std::string& path) override;
 
 private:
 	CSzArEx szarchive;

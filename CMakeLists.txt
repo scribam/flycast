@@ -727,8 +727,36 @@ target_sources(${PROJECT_NAME} PRIVATE
 		core/deps/picotcp/stack/pico_stack.c
 		core/deps/picotcp/stack/pico_tree.c)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE _7ZIP_ST)
-target_sources(${PROJECT_NAME} PRIVATE core/deps/lzma/7zArcIn.c core/deps/lzma/7zBuf.c core/deps/lzma/7zCrc.c core/deps/lzma/7zCrcOpt.c core/deps/lzma/7zDec.c core/deps/lzma/7zFile.c core/deps/lzma/7zStream.c core/deps/lzma/Alloc.c core/deps/lzma/Bcj2.c core/deps/lzma/Bra86.c core/deps/lzma/Bra.c core/deps/lzma/BraIA64.c core/deps/lzma/CpuArch.c core/deps/lzma/Delta.c core/deps/lzma/LzFind.c core/deps/lzma/Lzma2Dec.c core/deps/lzma/Lzma86Dec.c core/deps/lzma/Lzma86Enc.c core/deps/lzma/LzmaDec.c core/deps/lzma/LzmaEnc.c core/deps/lzma/LzmaLib.c core/deps/lzma/Sort.c)
+add_library(7zip STATIC
+	external/7zip/C/7zArcIn.c
+	external/7zip/C/7zBuf.c
+	external/7zip/C/7zCrc.c
+	external/7zip/C/7zCrcOpt.c
+	external/7zip/C/7zDec.c
+	external/7zip/C/7zFile.c
+	external/7zip/C/7zStream.c
+	external/7zip/C/Alloc.c
+	external/7zip/C/Bcj2.c
+	external/7zip/C/Bra86.c
+	external/7zip/C/Bra.c
+	external/7zip/C/BraIA64.c
+	external/7zip/C/CpuArch.c
+	external/7zip/C/Delta.c
+	external/7zip/C/LzFind.c
+	external/7zip/C/LzFindMt.c
+	external/7zip/C/LzFindOpt.c
+	external/7zip/C/Lzma2Dec.c
+	external/7zip/C/Lzma86Dec.c
+	external/7zip/C/Lzma86Enc.c
+	external/7zip/C/LzmaDec.c
+	external/7zip/C/LzmaEnc.c
+	external/7zip/C/LzmaLib.c
+	external/7zip/C/Sort.c
+	external/7zip/C/Threads.c)
+target_compile_definitions(7zip PRIVATE _7ZIP_ST)
+target_include_directories(7zip PUBLIC external/7zip/C)
+target_link_libraries(${PROJECT_NAME} PRIVATE 7zip)
+
 if(NOT LIBRETRO)
 	add_library(imgui STATIC external/imgui/misc/cpp/imgui_stdlib.cpp external/imgui/imgui.cpp external/imgui/imgui_draw.cpp external/imgui/imgui_tables.cpp external/imgui/imgui_widgets.cpp)
 	target_compile_definitions(imgui PRIVATE IMGUI_DISABLE_DEMO_WINDOWS PUBLIC IMGUI_DEFINE_MATH_OPERATORS)

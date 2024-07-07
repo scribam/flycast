@@ -20,24 +20,40 @@
  */
 #include "ZipArchive.h"
 
+#include <nowide/stackstring.hpp>
+
 ZipArchive::~ZipArchive()
 {
 	zip_close(zip);
 }
 
-bool ZipArchive::Open(FILE *file)
+bool ZipArchive::Open(const std::string& path)
 {
 	zip_error_t error;
-	zip_source_t *source = zip_source_filep_create(file, 0, -1, &error);
-	if (source == nullptr)
-	{
-		std::fclose(file);
+	zip_source_t *src;
+
+	zip_error_init(&error);
+
+#ifndef _WIN32
+	const nowide::wstackstring wpath(path.c_str());
+	src = zip_source_win32w_create(wpath.get(), 0, -1, &error);
+#else
+	src = zip_source_file_create(path.c_str(), 0, -1, &error);
+#endif
+	if (src == nullptr) {
+		zip_error_fini(&error);
 		return false;
 	}
-	zip = zip_open_from_source(source, 0, nullptr);
-	if (zip == nullptr)
-		zip_source_free(source);
-	return zip != nullptr;
+
+	zip = zip_open_from_source(src, ZIP_RDONLY, &error);
+	if (zip == nullptr) {
+		zip_source_free(src);
+		zip_error_fini(&error);
+		return false;
+	}
+
+	zip_error_fini(&error);
+	return true;
 }
 
 ArchiveFile* ZipArchive::OpenFile(const char* name)

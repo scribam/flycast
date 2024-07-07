@@ -19,23 +19,31 @@
     along with reicast.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "7zArchive.h"
-#include "deps/lzma/7z.h"
-#include "deps/lzma/7zCrc.h"
-#include "deps/lzma/Alloc.h"
-
+#include <7z.h>
+#include <7zCrc.h>
+#include <Alloc.h>
+#include <nowide/stackstring.hpp>
 #include <cstring>
 
 #define kInputBufSize ((size_t)1 << 18)
 
 static bool crc_tables_generated;
 
-bool SzArchive::Open(FILE *file)
+bool SzArchive::Open(const std::string& path)
 {
 	SzArEx_Init(&szarchive);
 
 	File_Close(&archiveStream.file);
 	File_Construct(&archiveStream.file);
-	archiveStream.file.file = file;
+
+#ifdef _WIN32
+	const nowide::wstackstring wpath(path.c_str());
+	const WRes wres = InFile_OpenW(&archiveStream.file, wpath.get());
+#else
+	const WRes wres = InFile_Open(&archiveStream.file, path.c_str());
+#endif
+	if (wres != 0)
+		return false;
 
 	FileInStream_CreateVTable(&archiveStream);
 	LookToRead2_CreateVTable(&lookStream, 0);
@@ -47,7 +55,7 @@ bool SzArchive::Open(FILE *file)
 	}
 	lookStream.bufSize = kInputBufSize;
 	lookStream.realStream = &archiveStream.vt;
-	LookToRead2_Init(&lookStream);
+	LookToRead2_INIT(&lookStream);
 
 	if (!crc_tables_generated)
 	{
