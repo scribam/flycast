@@ -956,9 +956,9 @@ const ComPtr<ID3D11PixelShader>& DX11OITShaders::getFinalShader(bool dithering)
 	if (maxLayers != config::PerPixelLayers)
 	{
 		for (auto& shader : finalShaders)
-			shader.reset();
+			shader.Reset();
 		for (auto& shader : trModVolShaders)
-			shader.reset();
+			shader.Reset();
 		maxLayers = config::PerPixelLayers;
 	}
 	if (!finalShaders[dithering])
@@ -988,9 +988,9 @@ const ComPtr<ID3D11PixelShader>& DX11OITShaders::getTrModVolShader(int type)
 	if (maxLayers != config::PerPixelLayers)
 	{
 		for (auto& shader : finalShaders)
-			shader.reset();
+			shader.Reset();
 		for (auto& shader : trModVolShaders)
-			shader.reset();
+			shader.Reset();
 		maxLayers = config::PerPixelLayers;
 	}
 	bool divPosZ = !settings.platform.isNaomi2() && config::NativeDepthInterpolation;
@@ -1021,7 +1021,7 @@ ComPtr<ID3DBlob> DX11OITShaders::compileShader(const char* source, const char* f
 		ComPtr<ID3DBlob> errorBlob;
 		OITIncludeManager includeManager;
 
-		if (FAILED(this->D3DCompile(source, strlen(source), nullptr, pDefines, &includeManager, function, profile, 0, 0, &shaderBlob.get(), &errorBlob.get())))
+		if (FAILED(this->D3DCompile(source, strlen(source), nullptr, pDefines, &includeManager, function, profile, 0, 0, shaderBlob.GetAddressOf(), errorBlob.GetAddressOf())))
 			ERROR_LOG(RENDERER, "Shader compilation failed: %s", errorBlob->GetBufferPointer());
 		else
 			cacheShader(hash, shaderBlob);
@@ -1036,7 +1036,7 @@ ComPtr<ID3D11VertexShader> DX11OITShaders::compileVS(const char* source, const c
 	ComPtr<ID3D11VertexShader> shader;
 	if (blob)
 	{
-		if (FAILED(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader.get())))
+		if (FAILED(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, shader.GetAddressOf())))
 			ERROR_LOG(RENDERER, "Vertex shader creation failed");
 	}
 
@@ -1049,7 +1049,7 @@ ComPtr<ID3D11PixelShader> DX11OITShaders::compilePS(const char* source, const ch
 	ComPtr<ID3D11PixelShader> shader;
 	if (blob)
 	{
-		if (FAILED(device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader.get())))
+		if (FAILED(device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, shader.GetAddressOf())))
 			ERROR_LOG(RENDERER, "Pixel shader creation failed");
 	}
 

@@ -652,7 +652,7 @@ ComPtr<ID3DBlob> DX11Shaders::compileShader(const char* source, const char* func
 		ComPtr<ID3DBlob> errorBlob;
 		IncludeManager includeManager;
 
-		if (FAILED(this->D3DCompile(source, strlen(source), nullptr, pDefines, &includeManager, function, profile, 0, 0, &shaderBlob.get(), &errorBlob.get())))
+		if (FAILED(this->D3DCompile(source, strlen(source), nullptr, pDefines, &includeManager, function, profile, 0, 0, shaderBlob.GetAddressOf(), errorBlob.GetAddressOf())))
 			ERROR_LOG(RENDERER, "Shader compilation failed: %s", errorBlob->GetBufferPointer());
 		else
 			cacheShader(hash, shaderBlob);
@@ -667,7 +667,7 @@ ComPtr<ID3D11VertexShader> DX11Shaders::compileVS(const char* source, const char
 	ComPtr<ID3D11VertexShader> shader;
 	if (blob)
 	{
-		if (FAILED(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader.get())))
+		if (FAILED(device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, shader.GetAddressOf())))
 			ERROR_LOG(RENDERER, "Vertex shader creation failed");
 	}
 
@@ -680,7 +680,7 @@ ComPtr<ID3D11PixelShader> DX11Shaders::compilePS(const char* source, const char*
 	ComPtr<ID3D11PixelShader> shader;
 	if (blob)
 	{
-		if (FAILED(device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader.get())))
+		if (FAILED(device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, shader.GetAddressOf())))
 			ERROR_LOG(RENDERER, "Pixel shader creation failed");
 	}
 
@@ -727,14 +727,14 @@ void DX11Shaders::term()
 	saveCache(CacheFile);
 	shaders.clear();
 	for (auto& shader : vertexShaders)
-		shader.reset();
-	modVolShader.reset();
+		shader.Reset();
+	modVolShader.Reset();
 	for (auto& shader : modVolVertexShaders)
-		shader.reset();
-	quadVertexShader.reset();
-	quadRotateVertexShader.reset();
-	quadPixelShader.reset();
-	device.reset();
+		shader.Reset();
+	quadVertexShader.Reset();
+	quadRotateVertexShader.Reset();
+	quadPixelShader.Reset();
+	device.Reset();
 }
 
 void CachedDX11Shaders::saveCache(const std::string& filename)
@@ -797,7 +797,7 @@ bool CachedDX11Shaders::lookupShader(u64 hash, ComPtr<ID3DBlob>& blob)
 	if (it == shaderCache.end())
 		return false;
 
-	D3DCreateBlob(it->second.size, &blob.get());
+	D3DCreateBlob(it->second.size, blob.GetAddressOf());
 	memcpy(blob->GetBufferPointer(), &it->second.blob[0], it->second.size);
 
 	return true;

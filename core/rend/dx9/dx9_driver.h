@@ -65,8 +65,8 @@ public:
 	ImTextureID updateTexture(const std::string& name, const u8 *data, int width, int height, bool nearestSampling) override
 	{
 		Texture& texture = textures[name];
-		texture.tex.reset();
-		HRESULT hr = theDXContext.getDevice()->CreateTexture(width, height, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &texture.tex.get(), 0);
+		texture.tex.Reset();
+		HRESULT hr = theDXContext.getDevice()->CreateTexture(width, height, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, texture.tex.GetAddressOf(), 0);
 		if (FAILED(hr) || !texture.tex)
 		{
 			WARN_LOG(RENDERER, "CreateTexture failed (%d x %d): error %x", width, height, hr);
@@ -94,7 +94,7 @@ public:
 			src += width;
 		}
 		texture.tex->UnlockRect(0);
-		texture.imTexture.d3dTexture = texture.tex.get();
+		texture.imTexture.d3dTexture = texture.tex.Get();
 		texture.imTexture.pointSampling = nearestSampling;
 
 	    return (ImTextureID)&texture.imTexture;

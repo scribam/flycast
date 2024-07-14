@@ -65,8 +65,8 @@ public:
 	ImTextureID updateTexture(const std::string& name, const u8 *data, int width, int height, bool nearestSampling) override
 	{
 		Texture& texture = textures[name];
-		texture.texture.reset();
-		texture.textureView.reset();
+		texture.texture.Reset();
+		texture.textureView.Reset();
 
 		D3D11_TEXTURE2D_DESC desc{};
 		desc.Width = width;
@@ -77,16 +77,16 @@ public:
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		desc.MipLevels = 1;
-		theDX11Context.getDevice()->CreateTexture2D(&desc, nullptr, &texture.texture.get());
+		theDX11Context.getDevice()->CreateTexture2D(&desc, nullptr, texture.texture.GetAddressOf());
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 		viewDesc.Format = desc.Format;
 		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipLevels = desc.MipLevels;
-		theDX11Context.getDevice()->CreateShaderResourceView(texture.texture, &viewDesc, &texture.textureView.get());
+		theDX11Context.getDevice()->CreateShaderResourceView(texture.texture.Get(), &viewDesc, texture.textureView.GetAddressOf());
 
-		theDX11Context.getDeviceContext()->UpdateSubresource(texture.texture, 0, nullptr, data, width * 4, width * 4 * height);
-		texture.imTexture.shaderResourceView = texture.textureView.get();
+		theDX11Context.getDeviceContext()->UpdateSubresource(texture.texture.Get(), 0, nullptr, data, width * 4, width * 4 * height);
+		texture.imTexture.shaderResourceView = texture.textureView.Get();
 		texture.imTexture.pointSampling = nearestSampling;
 
 	    return (ImTextureID)&texture.imTexture;

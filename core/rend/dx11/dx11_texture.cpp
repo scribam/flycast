@@ -73,8 +73,8 @@ void DX11Texture::UploadToGPU(int width, int height, const u8* temp_tex_buffer, 
 		texture->GetDesc(&curDesc);
 		if (desc.Width != curDesc.Width || desc.Height != curDesc.Height || desc.Format != curDesc.Format || desc.MipLevels != curDesc.MipLevels)
 		{
-			textureView.reset();
-			texture.reset();
+			textureView.Reset();
+			texture.Reset();
 		}
 	}
 	if (texture == nullptr)
@@ -86,13 +86,13 @@ void DX11Texture::UploadToGPU(int width, int height, const u8* temp_tex_buffer, 
 			desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
 			mipmapLevels = 1;
 		}
-		if (SUCCEEDED(theDX11Context.getDevice()->CreateTexture2D(&desc, nullptr, &texture.get())))
+		if (SUCCEEDED(theDX11Context.getDevice()->CreateTexture2D(&desc, nullptr, texture.GetAddressOf())))
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 			viewDesc.Format = desc.Format;
 			viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			viewDesc.Texture2D.MipLevels = desc.MipLevels == 0 ? -1 : desc.MipLevels;
-			theDX11Context.getDevice()->CreateShaderResourceView(texture, &viewDesc, &textureView.get());
+			theDX11Context.getDevice()->CreateShaderResourceView(texture.Get(), &viewDesc, textureView.GetAddressOf());
 		}
 		else
 		{
@@ -106,11 +106,11 @@ void DX11Texture::UploadToGPU(int width, int height, const u8* temp_tex_buffer, 
 	{
 		u32 w = mipmapLevels == 1 ? width : 1 << i;
 		u32 h = mipmapLevels == 1 ? height : 1 << i;
-		theDX11Context.getDeviceContext()->UpdateSubresource(texture, mipmapLevels - i - 1, nullptr, temp_tex_buffer, w * bpp, w * bpp * h);
+		theDX11Context.getDeviceContext()->UpdateSubresource(texture.Get(), mipmapLevels - i - 1, nullptr, temp_tex_buffer, w * bpp, w * bpp * h);
 		temp_tex_buffer += (1 << (2 * i)) * bpp;
 	}
 	if (mipmapped && !mipmapsIncluded)
-		theDX11Context.getDeviceContext()->GenerateMips(textureView);
+		theDX11Context.getDeviceContext()->GenerateMips(textureView.Get());
 }
 
 #ifndef TARGET_UWP
@@ -131,8 +131,8 @@ bool DX11Texture::Delete()
 	if (!BaseTextureCacheData::Delete())
 		return false;
 
-	textureView.reset();
-	texture.reset();
+	textureView.Reset();
+	texture.Reset();
 	return true;
 }
 

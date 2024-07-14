@@ -32,10 +32,10 @@ public:
 	}
 
 	void term() {
-		device.reset();
-		xhairTexture.reset();
+		device.Reset();
+		xhairTexture.Reset();
 		for (auto& vmu : vmuTextures)
-			vmu.reset();
+			vmu.Reset();
 	}
 
 	void draw(u32 width, u32 height, bool vmu, bool crosshair);

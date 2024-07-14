@@ -83,13 +83,13 @@ public:
 
 	bool init() override
 	{
-		if (FAILED(DirectSoundCreate8(NULL, &dsound.get(), NULL))) {
+		if (FAILED(DirectSoundCreate8(NULL, dsound.GetAddressOf(), NULL))) {
 			ERROR_LOG(AUDIO, "DirectSound8 initialization failed");
 			return false;
 		}
 		if (FAILED(dsound->SetCooperativeLevel(getNativeHwnd(), DSSCL_PRIORITY))) {
 			ERROR_LOG(AUDIO, "DirectSound8 SetCooperativeLevel failed");
-			dsound.reset();
+			dsound.Reset();
 			return false;
 		}
 
@@ -113,17 +113,17 @@ public:
 
 		// Create the buffer
 		ComPtr<IDirectSoundBuffer> buffer_;
-		if (FAILED(dsound->CreateSoundBuffer(&desc, &buffer_.get(), 0))
-				|| FAILED(buffer_.as(buffer)))
+		if (FAILED(dsound->CreateSoundBuffer(&desc, buffer_.GetAddressOf(), 0))
+				|| FAILED(buffer_.As(&buffer)))
 		{
 			ERROR_LOG(AUDIO, "DirectSound8 CreateSoundBuffer failed");
-			dsound.reset();
+			dsound.Reset();
 			return false;
 		}
 
 		// Set up notifications
 		ComPtr<IDirectSoundNotify> bufferNotify;
-		verifyc(buffer.as(bufferNotify));
+		verifyc(buffer.As(&bufferNotify));
 		notificationEvents.clear();
 		std::vector<DSBPOSITIONNOTIFY> posNotify;
 		for (int i = 0; notificationOffset(i) < desc.dwBufferBytes; i++)
@@ -173,14 +173,14 @@ public:
 
 		for (HANDLE event : notificationEvents)
 			CloseHandle(event);
-		buffer.reset();
-		dsound.reset();
+		buffer.Reset();
+		dsound.Reset();
 		INFO_LOG(AUDIO, "DirectSound playback stopped");
 	}
 
 	bool initRecord(u32 sampling_freq) override
 	{
-		if (FAILED(DirectSoundCaptureCreate8(&DSDEVID_DefaultVoiceCapture, &dcapture.get(), NULL)))
+		if (FAILED(DirectSoundCaptureCreate8(&DSDEVID_DefaultVoiceCapture, dcapture.GetAddressOf(), NULL)))
 		{
 			ERROR_LOG(AUDIO, "DirectSound capture device creation failed");
 			return false;
@@ -201,13 +201,13 @@ public:
 		dscbd.lpDSCFXDesc = NULL;
 
 		ComPtr<IDirectSoundCaptureBuffer> pDSCB;
-		if (FAILED(hr = dcapture->CreateCaptureBuffer(&dscbd, &pDSCB.get(), NULL)))
+		if (FAILED(hr = dcapture->CreateCaptureBuffer(&dscbd, pDSCB.GetAddressOf(), NULL)))
 		{
 			ERROR_LOG(AUDIO, "DirectSound capture buffer creation failed");
-			dcapture.reset();
+			dcapture.Reset();
 			return false;
 		}
-		pDSCB.as(capture_buffer);
+		pDSCB.As(&capture_buffer);
 		capture_buffer->Start(DSCBSTART_LOOPING);
 		INFO_LOG(AUDIO, "DirectSound capture device and buffer created");
 
@@ -233,8 +233,8 @@ public:
 		if (!dcapture)
 			return;
 		capture_buffer->Stop();
-		capture_buffer.reset();
-		dcapture.reset();
+		capture_buffer.Reset();
+		dcapture.Reset();
 	}
 };
 static DirectSoundBackend directSoundBackend;

@@ -34,7 +34,7 @@ void DX11Overlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 		float vmu_width = 48.f / 32.f * vmu_height;
 
 		const float blend_factor[4] = { 0.75f, 0.75f, 0.75f, 0.75f };
-		deviceContext->OMSetBlendState(blendStates.getState(true, 8, 8), blend_factor, 0xffffffff);
+		deviceContext->OMSetBlendState(blendStates.getState(true, 8, 8).Get(), blend_factor, 0xffffffff);
 #else
 		float vmu_padding_x = 8.f * width / 640.f;
 		float vmu_padding_y = 8.f * height / 480.f;
@@ -52,14 +52,14 @@ void DX11Overlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 		{
 			if (!vmu_lcd_status[i])
 			{
-				vmuTextureViews[i].reset();
-				vmuTextures[i].reset();
+				vmuTextureViews[i].Reset();
+				vmuTextures[i].Reset();
 				continue;
 			}
 			if (vmuTextures[i] == nullptr || this->vmuLastChanged[i] != ::vmuLastChanged[i])
 			{
-				vmuTextureViews[i].reset();
-				vmuTextures[i].reset();
+				vmuTextureViews[i].Reset();
+				vmuTextures[i].Reset();
 				D3D11_TEXTURE2D_DESC desc{};
 				desc.Width = 48;
 				desc.Height = 32;
@@ -70,18 +70,18 @@ void DX11Overlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 				desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 				desc.MipLevels = 1;
 
-				if (SUCCEEDED(device->CreateTexture2D(&desc, nullptr, &vmuTextures[i].get())))
+				if (SUCCEEDED(device->CreateTexture2D(&desc, nullptr, vmuTextures[i].GetAddressOf())))
 				{
 					D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 					viewDesc.Format = desc.Format;
 					viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D.MipLevels = desc.MipLevels;
-					device->CreateShaderResourceView(vmuTextures[i], &viewDesc, &vmuTextureViews[i].get());
+					device->CreateShaderResourceView(vmuTextures[i].Get(), &viewDesc, vmuTextureViews[i].GetAddressOf());
 
 					u32 data[48 * 32];
 					for (int y = 0; y < 32; y++)
 						memcpy(&data[y * 48], &vmu_lcd_data[i][(31 - y) * 48], sizeof(u32) * 48);
-					deviceContext->UpdateSubresource(vmuTextures[i], 0, nullptr, data, 48 * 4, 48 * 4 * 32);
+					deviceContext->UpdateSubresource(vmuTextures[i].Get(), 0, nullptr, data, 48 * 4, 48 * 4 * 32);
 					this->vmuLastChanged[i] = ::vmuLastChanged[i];
 				}
 			}
@@ -157,15 +157,15 @@ void DX11Overlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			desc.MipLevels = 1;
 
-			if (SUCCEEDED(device->CreateTexture2D(&desc, nullptr, &xhairTexture.get())))
+			if (SUCCEEDED(device->CreateTexture2D(&desc, nullptr, xhairTexture.GetAddressOf())))
 			{
 				D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 				viewDesc.Format = desc.Format;
 				viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 				viewDesc.Texture2D.MipLevels = desc.MipLevels;
-				device->CreateShaderResourceView(xhairTexture, &viewDesc, &xhairTextureView.get());
+				device->CreateShaderResourceView(xhairTexture.Get(), &viewDesc, xhairTextureView.GetAddressOf());
 
-				deviceContext->UpdateSubresource(xhairTexture, 0, nullptr, texData, 16 * 4, 16 * 4 * 16);
+				deviceContext->UpdateSubresource(xhairTexture.Get(), 0, nullptr, texData, 16 * 4, 16 * 4 * 16);
 			}
 		}
 		for (u32 i = 0; i < config::CrosshairColor.size(); i++)
@@ -200,7 +200,7 @@ void DX11Overlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 					((config::CrosshairColor[i] >> 16) & 0xff) / 255.f,
 					((config::CrosshairColor[i] >> 24) & 0xff) / 255.f
 			};
-			deviceContext->OMSetBlendState(blendStates.getState(true, 4, 5), nullptr, 0xffffffff);
+			deviceContext->OMSetBlendState(blendStates.getState(true, 4, 5).Get(), nullptr, 0xffffffff);
 			quad.draw(xhairTextureView, samplers->getSampler(false), colors);
 		}
 	}

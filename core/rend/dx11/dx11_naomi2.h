@@ -32,9 +32,9 @@ public:
 
 	void term()
 	{
-		polyConstantsBuffer.reset();
-		lightConstantsBuffer.reset();
-		deviceContext.reset();
+		polyConstantsBuffer.Reset();
+		lightConstantsBuffer.Reset();
+		deviceContext.Reset();
 	}
 
 	void setConstants(const PolyParam& pp, u32 polyNumber, const rend_context& ctx);
@@ -49,9 +49,9 @@ private:
 	void setConstBuffer(const ComPtr<ID3D11Buffer>& buffer, const T& data)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubres;
-		deviceContext->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+		deviceContext->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 		memcpy(mappedSubres.pData, &data, sizeof(T));
-		deviceContext->Unmap(buffer, 0);
+		deviceContext->Unmap(buffer.Get(), 0);
 	}
 
 	ComPtr<ID3D11DeviceContext> deviceContext;

@@ -34,7 +34,7 @@ public:
 	ComPtr<ID3D11Texture2D> texture;
 	ComPtr<ID3D11ShaderResourceView> textureView;
 
-	std::string GetId() override { return std::to_string((uintptr_t)texture.get()); }
+	std::string GetId() override { return std::to_string((uintptr_t)texture.Get()); }
 	void UploadToGPU(int width, int height, const u8* temp_tex_buffer, bool mipmapped,
 			bool mipmapsIncluded = false) override;
 	bool Delete() override;
@@ -94,7 +94,7 @@ public:
 			desc.MaxAnisotropy = config::AnisotropicFiltering;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 			desc.MipLODBias = -1.5f;
-			createSampler(&desc, &sampler.get());
+			createSampler(&desc, sampler.GetAddressOf());
 		}
 		return sampler;
 	}

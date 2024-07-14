@@ -47,13 +47,13 @@ void D3DOverlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 			ComPtr<IDirect3DTexture9>& texture = vmuTextures[i];
 			if (!vmu_lcd_status[i])
 			{
-				texture.reset();
+				texture.Reset();
 				continue;
 			}
 			if (texture == nullptr || this->vmuLastChanged[i] != ::vmuLastChanged[i])
 			{
-				texture.reset();
-				device->CreateTexture(48, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture.get(), 0);
+				texture.Reset();
+				device->CreateTexture(48, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, texture.GetAddressOf(), 0);
 				D3DLOCKED_RECT rect;
 				if (SUCCEEDED(texture->LockRect(0, &rect, nullptr, 0)))
 				{
@@ -82,7 +82,7 @@ void D3DOverlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 				if (i & 1)
 					y += vmu_padding + vmu_height;
 			}
-			device->SetTexture(0, texture);
+			device->SetTexture(0, texture.Get());
 			RECT rect { (long)x, (long)y, (long)(x + vmu_width), (long)(y + vmu_height) };
 			drawQuad(rect, D3DCOLOR_ARGB(192, 255, 255, 255));
 		}
@@ -92,7 +92,7 @@ void D3DOverlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 		if (!xhairTexture)
 		{
 			const u32* texData = getCrosshairTextureData();
-			device->CreateTexture(16, 16, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &xhairTexture.get(), 0);
+			device->CreateTexture(16, 16, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, xhairTexture.GetAddressOf(), 0);
 			D3DLOCKED_RECT rect;
 			if (SUCCEEDED(xhairTexture->LockRect(0, &rect, nullptr, 0)))
 			{
@@ -107,7 +107,7 @@ void D3DOverlay::draw(u32 width, u32 height, bool vmu, bool crosshair)
 				xhairTexture->UnlockRect(0);
 			}
 		}
-		device->SetTexture(0, xhairTexture);
+		device->SetTexture(0, xhairTexture.Get());
 		for (u32 i = 0; i < config::CrosshairColor.size(); i++)
 		{
 			if (config::CrosshairColor[i] == 0)

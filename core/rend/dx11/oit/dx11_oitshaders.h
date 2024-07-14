@@ -48,16 +48,16 @@ public:
 		shaders.clear();
 		vertexShaders.clear();
 		for (auto& shader : modVolVertexShaders)
-			shader.reset();
+			shader.Reset();
 		for (auto& shader : modVolShaders)
-			shader.reset();
+			shader.Reset();
 		for (auto& shader : trModVolShaders)
-			shader.reset();
+			shader.Reset();
 		for (auto& shader : finalShaders)
-			shader.reset();
-		clearShader.reset();
-		finalVertexShader.reset();
-		device.reset();
+			shader.Reset();
+		clearShader.Reset();
+		finalVertexShader.Reset();
+		device.Reset();
 	}
 	ComPtr<ID3DBlob> getVertexShaderBlob();
 	ComPtr<ID3DBlob> getMVVertexShaderBlob();

@@ -405,12 +405,12 @@ void  Naomi2Helper::init(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContex
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	if (FAILED(device->CreateBuffer(&desc, nullptr, &polyConstantsBuffer.get())))
+	if (FAILED(device->CreateBuffer(&desc, nullptr, polyConstantsBuffer.GetAddressOf())))
 		WARN_LOG(RENDERER, "Per-polygon constants buffer creation failed");
 
 	desc.ByteWidth = sizeof(N2LightModel);
 	desc.ByteWidth = (((desc.ByteWidth - 1) >> 4) + 1) << 4;
-	if (FAILED(device->CreateBuffer(&desc, nullptr, &lightConstantsBuffer.get())))
+	if (FAILED(device->CreateBuffer(&desc, nullptr, lightConstantsBuffer.GetAddressOf())))
 		WARN_LOG(RENDERER, "Light constants buffer creation failed");
 	resetCache();
 }
@@ -431,13 +431,13 @@ void Naomi2Helper::setConstants(const PolyParam& pp, u32 polyNumber, const rend_
 		polyConstants.constantColor[i] = pp.constantColor[i];
 	}
 	setConstBuffer(polyConstantsBuffer, polyConstants);
-	deviceContext->VSSetConstantBuffers(1, 1, &polyConstantsBuffer.get());
+	deviceContext->VSSetConstantBuffers(1, 1, polyConstantsBuffer.GetAddressOf());
 
 	if (pp.lightModel != lastModel)
 	{
 		lastModel = pp.lightModel;
 		setConstBuffer(lightConstantsBuffer, ctx.lightModels[pp.lightModel]);
-		deviceContext->VSSetConstantBuffers(2, 1, &lightConstantsBuffer.get());
+		deviceContext->VSSetConstantBuffers(2, 1, lightConstantsBuffer.GetAddressOf());
 	}
 }
 
@@ -447,5 +447,5 @@ void Naomi2Helper::setConstants(const float *mvMatrix, const float *projMatrix)
 	memcpy(polyConstants.mvMat, mvMatrix, sizeof(polyConstants.mvMat));
 	memcpy(polyConstants.projMat, projMatrix, sizeof(polyConstants.projMat));
 	setConstBuffer(polyConstantsBuffer, polyConstants);
-	deviceContext->VSSetConstantBuffers(1, 1, &polyConstantsBuffer.get());
+	deviceContext->VSSetConstantBuffers(1, 1, polyConstantsBuffer.GetAddressOf());
 }

@@ -40,7 +40,7 @@ public:
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,   0, 2 * sizeof(float),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 		ComPtr<ID3DBlob> blob = shaders->getQuadVertexShaderBlob();
-		if (FAILED(device->CreateInputLayout(layout, std::size(layout), blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout.get())))
+		if (FAILED(device->CreateInputLayout(layout, std::size(layout), blob->GetBufferPointer(), blob->GetBufferSize(), inputLayout.GetAddressOf())))
 			WARN_LOG(RENDERER, "Input layout creation failed");
 
 		// Rasterizer state
@@ -50,7 +50,7 @@ public:
 			desc.CullMode = D3D11_CULL_NONE;
 			desc.ScissorEnable = false;
 			desc.DepthClipEnable = true;
-			device->CreateRasterizerState(&desc, &rasterizerState.get());
+			device->CreateRasterizerState(&desc, rasterizerState.GetAddressOf());
 		}
 		// Depth-stencil state
 		{
@@ -62,7 +62,7 @@ public:
 			desc.FrontFace.StencilFailOp = desc.FrontFace.StencilDepthFailOp = desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 			desc.BackFace = desc.FrontFace;
-			device->CreateDepthStencilState(&desc, &depthStencilState.get());
+			device->CreateDepthStencilState(&desc, depthStencilState.GetAddressOf());
 	    }
 		// Vertex buffer
 		{
@@ -71,7 +71,7 @@ public:
 			desc.Usage = D3D11_USAGE_DYNAMIC;
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		    device->CreateBuffer(&desc, nullptr, &vertexBuffer.get());
+		    device->CreateBuffer(&desc, nullptr, vertexBuffer.GetAddressOf());
 		}
 		// Constant buffer
 		{
@@ -80,7 +80,7 @@ public:
 			desc.Usage = D3D11_USAGE_DYNAMIC;
 			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		    device->CreateBuffer(&desc, nullptr, &constantBuffer.get());
+		    device->CreateBuffer(&desc, nullptr, constantBuffer.GetAddressOf());
 		}
 	}
 
@@ -95,20 +95,20 @@ public:
 			{ x + w, y + h, 1.f, 0.f },
 		};
 		D3D11_MAPPED_SUBRESOURCE mappedSubRes{};
-		deviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRes);
+		deviceContext->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRes);
 		memcpy(mappedSubRes.pData, vertices, sizeof(vertices));
-		deviceContext->Unmap(vertexBuffer, 0);
+		deviceContext->Unmap(vertexBuffer.Get(), 0);
 	    unsigned int stride = sizeof(Vertex);
 	    unsigned int offset = 0;
-		deviceContext->IASetInputLayout(inputLayout);
-		deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer.get(), &stride, &offset);
+		deviceContext->IASetInputLayout(inputLayout.Get());
+		deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
 
 		// Render states
-		deviceContext->OMSetDepthStencilState(depthStencilState, 0);
-		deviceContext->RSSetState(rasterizerState);
+		deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+		deviceContext->RSSetState(rasterizerState.Get());
 		deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		deviceContext->VSSetShader(rotate ? rotateVertexShader : vertexShader, nullptr, 0);
-		deviceContext->PSSetShader(pixelShader, nullptr, 0);
+		deviceContext->VSSetShader(rotate ? rotateVertexShader.Get() : vertexShader.Get(), nullptr, 0);
+		deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 		deviceContext->GSSetShader(nullptr, nullptr, 0);
 		deviceContext->HSSetShader(nullptr, nullptr, 0);
 		deviceContext->DSSetShader(nullptr, nullptr, 0);
@@ -118,14 +118,14 @@ public:
 		if (color == nullptr)
 			color = white;
 		D3D11_MAPPED_SUBRESOURCE mappedSubres;
-		deviceContext->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+		deviceContext->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 		memcpy(mappedSubres.pData, color, sizeof(float) * 4);
-		deviceContext->Unmap(constantBuffer, 0);
-		deviceContext->PSSetConstantBuffers(0, 1, &constantBuffer.get());
+		deviceContext->Unmap(constantBuffer.Get(), 0);
+		deviceContext->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
 		// Bind texture and draw
-        deviceContext->PSSetShaderResources(0, 1, &texView.get());
-        deviceContext->PSSetSamplers(0, 1, &sampler.get());
+        deviceContext->PSSetShaderResources(0, 1, texView.GetAddressOf());
+        deviceContext->PSSetSamplers(0, 1, sampler.GetAddressOf());
         deviceContext->Draw(4, 0);
 	}
 

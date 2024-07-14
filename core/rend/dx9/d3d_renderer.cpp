@@ -93,8 +93,8 @@ bool D3DRenderer::ensureVertexBufferSize(ComPtr<IDirect3DVertexBuffer9>& buffer,
 	else
 		while (currentSize < minSize)
 			currentSize *= 2;
-	buffer.reset();
-	return SUCCEEDED(device->CreateVertexBuffer(currentSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 0, D3DPOOL_DEFAULT, &buffer.get(), 0));
+	buffer.Reset();
+	return SUCCEEDED(device->CreateVertexBuffer(currentSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, 0, D3DPOOL_DEFAULT, buffer.GetAddressOf(), 0));
 }
 
 bool D3DRenderer::ensureIndexBufferSize(ComPtr<IDirect3DIndexBuffer9>& buffer, u32& currentSize, u32 minSize)
@@ -106,8 +106,8 @@ bool D3DRenderer::ensureIndexBufferSize(ComPtr<IDirect3DIndexBuffer9>& buffer, u
 	else
 		while (currentSize < minSize)
 			currentSize *= 2;
-	buffer.reset();
-	return SUCCEEDED(device->CreateIndexBuffer(currentSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFMT_INDEX32, D3DPOOL_DEFAULT, &buffer.get(), 0));
+	buffer.Reset();
+	return SUCCEEDED(device->CreateIndexBuffer(currentSize, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFMT_INDEX32, D3DPOOL_DEFAULT, buffer.GetAddressOf(), 0));
 }
 
 bool D3DRenderer::Init()
@@ -128,18 +128,18 @@ bool D3DRenderer::Init()
 	maxAnisotropy = caps.MaxAnisotropy;
 
 	device = theDXContext.getDevice();
-	devCache.setDevice(device);
+	devCache.setDevice(device.Get());
 
 	bool success = ensureVertexBufferSize(vertexBuffer, vertexBufferSize, 4_MB);
 	success &= ensureIndexBufferSize(indexBuffer, indexBufferSize, 120 * 1024 * 4);
 
-	success &= SUCCEEDED(device->CreateVertexDeclaration(MainVtxElement, &mainVtxDecl.get()));
-	success &= SUCCEEDED(device->CreateVertexDeclaration(ModVolVtxElement, &modVolVtxDecl.get()));
+	success &= SUCCEEDED(device->CreateVertexDeclaration(MainVtxElement, mainVtxDecl.GetAddressOf()));
+	success &= SUCCEEDED(device->CreateVertexDeclaration(ModVolVtxElement, modVolVtxDecl.GetAddressOf()));
 
 	shaders.init(device);
 	success &= (bool)shaders.getVertexShader(true);
-	success &= SUCCEEDED(device->CreateTexture(32, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &paletteTexture.get(), 0));
-	success &= SUCCEEDED(device->CreateTexture(128, 2, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8, D3DPOOL_DEFAULT, &fogTexture.get(), 0));
+	success &= SUCCEEDED(device->CreateTexture(32, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, paletteTexture.GetAddressOf(), 0));
+	success &= SUCCEEDED(device->CreateTexture(128, 2, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8, D3DPOOL_DEFAULT, fogTexture.GetAddressOf(), 0));
 	fog_needs_update = true;
 
 	if (!success)
@@ -156,26 +156,26 @@ bool D3DRenderer::Init()
 void D3DRenderer::preReset()
 {
 	texCache.Clear();
-	backbuffer.reset();
-	depthSurface.reset();
-	rttSurface.reset();
-	rttTexture.reset();
-	dcfbSurface.reset();
-	dcfbTexture.reset();
-	fbScaledTexture.reset();
-	fbScaledSurface.reset();
-	fogTexture.reset();
-	paletteTexture.reset();
-	modVolVtxDecl.reset();
-	mainVtxDecl.reset();
-	modvolBuffer.reset();
+	backbuffer.Reset();
+	depthSurface.Reset();
+	rttSurface.Reset();
+	rttTexture.Reset();
+	dcfbSurface.Reset();
+	dcfbTexture.Reset();
+	fbScaledTexture.Reset();
+	fbScaledSurface.Reset();
+	fogTexture.Reset();
+	paletteTexture.Reset();
+	modVolVtxDecl.Reset();
+	mainVtxDecl.Reset();
+	modvolBuffer.Reset();
 	modvolBufferSize = 0;
-	indexBuffer.reset();
+	indexBuffer.Reset();
 	indexBufferSize = 0;
-	vertexBuffer.reset();
+	vertexBuffer.Reset();
 	vertexBufferSize = 0;
-	framebufferSurface.reset();
-	framebufferTexture.reset();
+	framebufferSurface.Reset();
+	framebufferTexture.Reset();
 	frameRendered = false;
 	frameRenderedOnce = false;
 }
@@ -192,13 +192,13 @@ void D3DRenderer::postReset()
 	verify(rc);
 	rc = ensureIndexBufferSize(indexBuffer, indexBufferSize, 120 * 1024 * 4);
 	verify(rc);
-	rc = SUCCEEDED(device->CreateVertexDeclaration(MainVtxElement, &mainVtxDecl.get()));
+	rc = SUCCEEDED(device->CreateVertexDeclaration(MainVtxElement, mainVtxDecl.GetAddressOf()));
 	verify(rc);
-	rc = SUCCEEDED(device->CreateVertexDeclaration(ModVolVtxElement, &modVolVtxDecl.get()));
+	rc = SUCCEEDED(device->CreateVertexDeclaration(ModVolVtxElement, modVolVtxDecl.GetAddressOf()));
 	verify(rc);
-	rc = SUCCEEDED(device->CreateTexture(32, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &paletteTexture.get(), 0));
+	rc = SUCCEEDED(device->CreateTexture(32, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, paletteTexture.GetAddressOf(), 0));
 	verify(rc);
-	rc = SUCCEEDED(device->CreateTexture(128, 2, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8, D3DPOOL_DEFAULT, &fogTexture.get(), 0));
+	rc = SUCCEEDED(device->CreateTexture(128, 2, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8, D3DPOOL_DEFAULT, fogTexture.GetAddressOf(), 0));
 	verify(rc);
 	fog_needs_update = true;
 	palette_updated = true;
@@ -209,7 +209,7 @@ void D3DRenderer::Term()
 	preReset();
 	devCache.reset();
 	shaders.term();
-	device.reset();
+	device.Reset();
 }
 
 BaseTextureCacheData *D3DRenderer::GetTexture(TSP tsp, TCW tcw)
@@ -228,7 +228,7 @@ BaseTextureCacheData *D3DRenderer::GetTexture(TSP tsp, TCW tcw)
 	else if (tf->IsCustomTextureAvailable())
 	{
 		texCache.DeleteLater(tf->texture);
-		tf->texture.reset();
+		tf->texture.Reset();
 		tf->loadCustomTexture();
 	}
 	return tf;
@@ -242,8 +242,8 @@ void D3DRenderer::RenderFramebuffer(const FramebufferInfo& info)
 		return;
 	}
 
-	backbuffer.reset();
-	device->GetRenderTarget(0, &backbuffer.get());
+	backbuffer.Reset();
+	device->GetRenderTarget(0, backbuffer.GetAddressOf());
 
 	PixelBuffer<u32> pb;
 	int width;
@@ -270,13 +270,13 @@ void D3DRenderer::RenderFramebuffer(const FramebufferInfo& info)
 		D3DSURFACE_DESC desc;
 		dcfbTexture->GetLevelDesc(0, &desc);
 		if ((int)desc.Width != width || (int)desc.Height != height)
-			dcfbTexture.reset();
+			dcfbTexture.Reset();
 	}
 	if (!dcfbTexture)
 	{
-		device->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &dcfbTexture.get(), 0);
-		dcfbSurface.reset();
-		dcfbTexture->GetSurfaceLevel(0, &dcfbSurface.get());
+		device->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, dcfbTexture.GetAddressOf(), 0);
+		dcfbSurface.Reset();
+		dcfbTexture->GetSurfaceLevel(0, dcfbSurface.GetAddressOf());
 	}
 
 	D3DLOCKED_RECT rect;
@@ -295,8 +295,8 @@ void D3DRenderer::RenderFramebuffer(const FramebufferInfo& info)
 	devCache.reset();
 	devCache.SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
-	device->ColorFill(framebufferSurface, 0, D3DCOLOR_ARGB(255, info.vo_border_col._red, info.vo_border_col._green, info.vo_border_col._blue));
-	device->StretchRect(dcfbSurface, nullptr, framebufferSurface, nullptr, D3DTEXF_LINEAR);
+	device->ColorFill(framebufferSurface.Get(), 0, D3DCOLOR_ARGB(255, info.vo_border_col._red, info.vo_border_col._green, info.vo_border_col._blue));
+	device->StretchRect(dcfbSurface.Get(), nullptr, framebufferSurface.Get(), nullptr, D3DTEXF_LINEAR);
 
 	aspectRatio = getDCFramebufferAspectRatio();
 	displayFramebuffer();
@@ -379,7 +379,7 @@ void D3DRenderer::setGPState(const PolyParam *gp)
 			gpuPalette,
 			gp->pcw.Gouraud,
 			clipmode == TileClipping::Inside,
-			dithering));
+			dithering).Get());
 
 	if (trilinear_alpha != 1.f)
 	{
@@ -397,7 +397,7 @@ void D3DRenderer::setGPState(const PolyParam *gp)
 			paletteIndex[0] = (float)((gp->tcw.PalSelect >> 4) << 8);
 		device->SetPixelShaderConstantF(0, paletteIndex, 1);
 	}
-	devCache.SetVertexShader(shaders.getVertexShader(gp->pcw.Gouraud));
+	devCache.SetVertexShader(shaders.getVertexShader(gp->pcw.Gouraud).Get());
 	devCache.SetRenderState(D3DRS_SHADEMODE, gp->pcw.Gouraud == 1 ? D3DSHADE_GOURAUD : D3DSHADE_FLAT);
 
 	if (clipmode == TileClipping::Outside)
@@ -425,7 +425,7 @@ void D3DRenderer::setGPState(const PolyParam *gp)
 
 	if (texture != nullptr)
 	{
-		devCache.SetTexture(0, texture->texture);
+		devCache.SetTexture(0, texture->texture.Get());
 		setTexMode(D3DSAMP_ADDRESSU, gp->tsp.ClampU, gp->tsp.FlipU);
 		setTexMode(D3DSAMP_ADDRESSV, gp->tsp.ClampV, gp->tsp.FlipV);
 
@@ -537,7 +537,7 @@ void D3DRenderer::drawSorted(int first, int count, bool multipass)
 		devCache.SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
 		// We use the modifier volumes shader because it's fast. We don't need textures, etc.
-		devCache.SetPixelShader(shaders.getModVolShader());
+		devCache.SetPixelShader(shaders.getModVolShader().Get());
 
 		devCache.SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
 		devCache.SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -671,8 +671,8 @@ void D3DRenderer::drawModVols(int first, int count)
 	if (count == 0 || pvrrc.modtrig.empty() || !config::ModifierVolumes)
 		return;
 
-	device->SetVertexDeclaration(modVolVtxDecl);
-	device->SetStreamSource(0, modvolBuffer, 0, 3 * sizeof(float));
+	device->SetVertexDeclaration(modVolVtxDecl.Get());
+	device->SetStreamSource(0, modvolBuffer.Get(), 0, 3 * sizeof(float));
 
 	devCache.SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
 	devCache.SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
@@ -682,7 +682,7 @@ void D3DRenderer::drawModVols(int first, int count)
 	if (scissorEnable)
 		device->SetScissorRect(&scissorRect);
 
-	devCache.SetPixelShader(shaders.getModVolShader());
+	devCache.SetPixelShader(shaders.getModVolShader().Get());
 
 	ModifierVolumeParam* params = &pvrrc.global_param_mvo[first];
 
@@ -740,9 +740,9 @@ void D3DRenderer::drawModVols(int first, int count)
 	//don't do depth testing
 	devCache.SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
-	device->SetVertexDeclaration(mainVtxDecl);
-	device->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
-	device->SetIndices(indexBuffer);
+	device->SetVertexDeclaration(mainVtxDecl.Get());
+	device->SetStreamSource(0, vertexBuffer.Get(), 0, sizeof(Vertex));
+	device->SetIndices(indexBuffer.Get());
 
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, 4, 0, 2);
 
@@ -893,12 +893,12 @@ void D3DRenderer::prepareRttRenderTarget(u32 texAddress, int& vpWidth, int& vpHe
 	u32 fbh2;
 	getRenderToTextureDimensions(fbw, fbh, fbw2, fbh2);
 
-	rttTexture.reset();
-	device->CreateTexture(fbw2, fbh2, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &rttTexture.get(), NULL);
+	rttTexture.Reset();
+	device->CreateTexture(fbw2, fbh2, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, rttTexture.GetAddressOf(), NULL);
 
-	rttSurface.reset();
-	rttTexture->GetSurfaceLevel(0, &rttSurface.get());
-	device->SetRenderTarget(0, rttSurface);
+	rttSurface.Reset();
+	rttTexture->GetSurfaceLevel(0, rttSurface.GetAddressOf());
+	device->SetRenderTarget(0, rttSurface.Get());
 
 	if (fbw2 > width || fbh2 > height || !depthSurface)
 	{
@@ -907,11 +907,11 @@ void D3DRenderer::prepareRttRenderTarget(u32 texAddress, int& vpWidth, int& vpHe
 			D3DSURFACE_DESC desc;
 			depthSurface->GetDesc(&desc);
 			if (fbw2 > desc.Width || fbh2 > desc.Height)
-				depthSurface.reset();
+				depthSurface.Reset();
 		}
 		if (!depthSurface)
 		{
-			HRESULT rc = SUCCEEDED(device->CreateDepthStencilSurface(std::max(fbw2, width), std::max(fbh2, height), D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, TRUE, &depthSurface.get(), nullptr));
+			HRESULT rc = SUCCEEDED(device->CreateDepthStencilSurface(std::max(fbw2, width), std::max(fbh2, height), D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, TRUE, depthSurface.GetAddressOf(), nullptr));
 			verify(rc);
 		}
 	}
@@ -936,9 +936,9 @@ void D3DRenderer::readRttRenderTarget(u32 texAddress)
 		D3DSURFACE_DESC rttDesc;
 		rttSurface->GetDesc(&rttDesc);
 		ComPtr<IDirect3DSurface9> offscreenSurface;
-		bool rc = SUCCEEDED(device->CreateOffscreenPlainSurface(rttDesc.Width, rttDesc.Height, rttDesc.Format, D3DPOOL_SYSTEMMEM, &offscreenSurface.get(), nullptr));
+		bool rc = SUCCEEDED(device->CreateOffscreenPlainSurface(rttDesc.Width, rttDesc.Height, rttDesc.Format, D3DPOOL_SYSTEMMEM, offscreenSurface.GetAddressOf(), nullptr));
 		verify(rc);
-		rc = SUCCEEDED(device->GetRenderTargetData(rttSurface, offscreenSurface));
+		rc = SUCCEEDED(device->GetRenderTargetData(rttSurface.Get(), offscreenSurface.Get()));
 		verify(rc);
 
 		PixelBuffer<u32> tmp_buf;
@@ -987,8 +987,8 @@ bool D3DRenderer::Render()
 
 	bool is_rtt = pvrrc.isRTT;
 
-	backbuffer.reset();
-	bool rc = SUCCEEDED(device->GetRenderTarget(0, &backbuffer.get()));
+	backbuffer.Reset();
+	bool rc = SUCCEEDED(device->GetRenderTarget(0, backbuffer.GetAddressOf()));
 	verify(rc);
 	u32 texAddress = pvrrc.fb_W_SOF1 & VRAM_MASK;
 	int vpWidth, vpHeight;
@@ -1000,8 +1000,8 @@ bool D3DRenderer::Render()
 	{
 		resize(pvrrc.framebufferWidth, pvrrc.framebufferHeight);
 		if (pvrrc.clearFramebuffer)
-			device->ColorFill(framebufferSurface, 0, D3DCOLOR_ARGB(255, VO_BORDER_COL._red, VO_BORDER_COL._green, VO_BORDER_COL._blue));
-		rc = SUCCEEDED(device->SetRenderTarget(0, framebufferSurface));
+			device->ColorFill(framebufferSurface.Get(), 0, D3DCOLOR_ARGB(255, VO_BORDER_COL._red, VO_BORDER_COL._green, VO_BORDER_COL._blue));
+		rc = SUCCEEDED(device->SetRenderTarget(0, framebufferSurface.Get()));
 		verify(rc);
 		D3DVIEWPORT9 viewport;
 		viewport.X = viewport.Y = 0;
@@ -1014,7 +1014,7 @@ bool D3DRenderer::Render()
 		vpWidth = width;
 		vpHeight = height;
 	}
-	rc = SUCCEEDED(device->SetDepthStencilSurface(depthSurface));
+	rc = SUCCEEDED(device->SetDepthStencilSurface(depthSurface.Get()));
 	verify(rc);
 	matrices.CalcMatrices(&pvrrc, width, height);
 	// infamous DX9 half-pixel viewport shift
@@ -1077,7 +1077,7 @@ bool D3DRenderer::Render()
 	updateFogTexture();
 	updatePaletteTexture();
 
-	devCache.SetVertexShader(shaders.getVertexShader(true));
+	devCache.SetVertexShader(shaders.getVertexShader(true).Get());
 
 	// VERT and RAM fog color constants
 	float ps_FOG_COL_VERT[4];
@@ -1128,9 +1128,9 @@ bool D3DRenderer::Render()
 
 	devCache.SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 
-	device->SetVertexDeclaration(mainVtxDecl);
-	device->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
-	device->SetIndices(indexBuffer);
+	device->SetVertexDeclaration(mainVtxDecl.Get());
+	device->SetStreamSource(0, vertexBuffer.Get(), 0, sizeof(Vertex));
+	device->SetIndices(indexBuffer.Get());
 
 	devCache.SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	devCache.SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -1152,7 +1152,7 @@ bool D3DRenderer::Render()
 	device->EndScene();
 	devCache.SetRenderState(D3DRS_CLIPPLANEENABLE, 0);
 
-	rc = SUCCEEDED(device->SetRenderTarget(0, backbuffer));
+	rc = SUCCEEDED(device->SetRenderTarget(0, backbuffer.Get()));
 	verify(rc);
 
 	if (is_rtt)
@@ -1185,17 +1185,17 @@ void D3DRenderer::resize(int w, int h)
 		NOTICE_LOG(RENDERER, "D3DRenderer::resize: %d x %d -> %d x %d", width, height, w, h);
 	width = w;
 	height = h;
-	framebufferTexture.reset();
-	framebufferSurface.reset();
-	HRESULT hr = device->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &framebufferTexture.get(), NULL);
+	framebufferTexture.Reset();
+	framebufferSurface.Reset();
+	HRESULT hr = device->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, framebufferTexture.GetAddressOf(), NULL);
 	if (FAILED(hr)) {
 		ERROR_LOG(RENDERER, "Framebuffer texture (%d x %d) creation failed: %x", w, h, hr);
 		die("Framebuffer texture creation failed");
 	}
-	bool rc = SUCCEEDED(framebufferTexture->GetSurfaceLevel(0, &framebufferSurface.get()));
+	bool rc = SUCCEEDED(framebufferTexture->GetSurfaceLevel(0, framebufferSurface.GetAddressOf()));
 	verify(rc);
-	depthSurface.reset();
-	rc = SUCCEEDED(device->CreateDepthStencilSurface(width, height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, TRUE, &depthSurface.get(), nullptr));
+	depthSurface.Reset();
+	rc = SUCCEEDED(device->CreateDepthStencilSurface(width, height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, TRUE, depthSurface.GetAddressOf(), nullptr));
 	verify(rc);
 	frameRendered = false;
 	frameRenderedOnce = false;
@@ -1204,7 +1204,7 @@ void D3DRenderer::resize(int w, int h)
 void D3DRenderer::displayFramebuffer()
 {
 	devCache.SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	device->ColorFill(backbuffer, 0, D3DCOLOR_ARGB(255, VO_BORDER_COL._red, VO_BORDER_COL._green, VO_BORDER_COL._blue));
+	device->ColorFill(backbuffer.Get(), 0, D3DCOLOR_ARGB(255, VO_BORDER_COL._red, VO_BORDER_COL._green, VO_BORDER_COL._blue));
 	float screenAR = (float)settings.display.width / settings.display.height;
 	int dx = 0;
 	int dy = 0;
@@ -1219,7 +1219,7 @@ void D3DRenderer::displayFramebuffer()
 	{
 		RECT rs { 0, 0, (long)width, (long)height };
 		RECT rd { dx, dy, settings.display.width - dx, settings.display.height - dy };
-		device->StretchRect(framebufferSurface, &rs, backbuffer, &rd,
+		device->StretchRect(framebufferSurface.Get(), &rs, backbuffer.Get(), &rd,
 				config::TextureFiltering == 1 ? D3DTEXF_POINT : D3DTEXF_LINEAR);	// This can fail if window is minimized
 	}
 	else
@@ -1263,7 +1263,7 @@ void D3DRenderer::displayFramebuffer()
 		coords[1] = coords[11] = 1.f - shiftY * 2.f / height;
 		coords[6] = coords[16] = coords[1] - 2;
 
-		device->SetTexture(0, framebufferTexture);
+		device->SetTexture(0, framebufferTexture.Get());
 		device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, coords, sizeof(float) * 5);
 	}
 }
@@ -1272,8 +1272,8 @@ bool D3DRenderer::RenderLastFrame()
 {
 	if (!frameRenderedOnce || !theDXContext.isReady())
 		return false;
-	backbuffer.reset();
-	bool rc = SUCCEEDED(device->GetRenderTarget(0, &backbuffer.get()));
+	backbuffer.Reset();
+	bool rc = SUCCEEDED(device->GetRenderTarget(0, backbuffer.GetAddressOf()));
 	verify(rc);
 	devCache.reset();
 	displayFramebuffer();
@@ -1300,7 +1300,7 @@ void D3DRenderer::updatePaletteTexture()
 	}
 
 	paletteTexture->UnlockRect(0);
-	device->SetTexture(1, paletteTexture);
+	device->SetTexture(1, paletteTexture.Get());
 	device->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	device->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 }
@@ -1325,7 +1325,7 @@ void D3DRenderer::updateFogTexture()
 			memcpy(dst + y * rect.Pitch, temp_tex_buffer + y * 128, 128);
 	}
 	fogTexture->UnlockRect(0);
-	device->SetTexture(2, fogTexture);
+	device->SetTexture(2, fogTexture.Get());
 	device->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	device->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 }
@@ -1362,16 +1362,16 @@ void D3DRenderer::writeFramebufferToVRAM()
 			fbScaledTexture->GetLevelDesc(0, &desc);
 			if (desc.Width != scaledW || desc.Height != scaledH)
 			{
-				fbScaledTexture.reset();
-				fbScaledSurface.reset();
+				fbScaledTexture.Reset();
+				fbScaledSurface.Reset();
 			}
 		}
 		if (!fbScaledTexture)
 		{
-			device->CreateTexture(scaledW, scaledH, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &fbScaledTexture.get(), NULL);
-			fbScaledTexture->GetSurfaceLevel(0, &fbScaledSurface.get());
+			device->CreateTexture(scaledW, scaledH, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, fbScaledTexture.GetAddressOf(), NULL);
+			fbScaledTexture->GetSurfaceLevel(0, fbScaledSurface.GetAddressOf());
 		}
-		device->StretchRect(framebufferSurface, nullptr, fbScaledSurface, nullptr, D3DTEXF_LINEAR);
+		device->StretchRect(framebufferSurface.Get(), nullptr, fbScaledSurface.Get(), nullptr, D3DTEXF_LINEAR);
 
 		width = scaledW;
 		height = scaledH;
@@ -1386,9 +1386,9 @@ void D3DRenderer::writeFramebufferToVRAM()
 	u32 linestride = pvrrc.fb_W_LINESTRIDE * 8;
 
 	ComPtr<IDirect3DSurface9> offscreenSurface;
-	bool rc = SUCCEEDED(device->CreateOffscreenPlainSurface(width, height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &offscreenSurface.get(), nullptr));
+	bool rc = SUCCEEDED(device->CreateOffscreenPlainSurface(width, height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, offscreenSurface.GetAddressOf(), nullptr));
 	verify(rc);
-	rc = SUCCEEDED(device->GetRenderTargetData(fbSurface, offscreenSurface));
+	rc = SUCCEEDED(device->GetRenderTargetData(fbSurface.Get(), offscreenSurface.Get()));
 	verify(rc);
 
 	PixelBuffer<u32> tmp_buf;
@@ -1446,15 +1446,15 @@ bool D3DRenderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 			width = w;
 	}
 
-	backbuffer.reset();
-	device->GetRenderTarget(0, &backbuffer.get());
+	backbuffer.Reset();
+	device->GetRenderTarget(0, backbuffer.GetAddressOf());
 
 	// Target texture and surface
 	ComPtr<IDirect3DTexture9> target;
-	device->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &target.get(), NULL);
+	device->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, target.GetAddressOf(), NULL);
 	ComPtr<IDirect3DSurface9> surface;
-	target->GetSurfaceLevel(0, &surface.get());
-	device->SetRenderTarget(0, surface);
+	target->GetSurfaceLevel(0, surface.GetAddressOf());
+	device->SetRenderTarget(0, surface.Get());
 	// Draw
 	devCache.SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	device->SetPixelShader(NULL);
@@ -1488,14 +1488,14 @@ bool D3DRenderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 		 1,  1, 0.5f,  1, 0,
 		 1, -1, 0.5f,  1, 1,
 	};
-	device->SetTexture(0, framebufferTexture);
+	device->SetTexture(0, framebufferTexture.Get());
 	device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, coords, sizeof(float) * 5);
 
 	// Copy back
 	ComPtr<IDirect3DSurface9> offscreenSurface;
-	rc = SUCCEEDED(device->CreateOffscreenPlainSurface(width, height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &offscreenSurface.get(), nullptr));
+	rc = SUCCEEDED(device->CreateOffscreenPlainSurface(width, height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, offscreenSurface.GetAddressOf(), nullptr));
 	verify(rc);
-	rc = SUCCEEDED(device->GetRenderTargetData(surface, offscreenSurface));
+	rc = SUCCEEDED(device->GetRenderTargetData(surface.Get(), offscreenSurface.Get()));
 	verify(rc);
 
 	D3DLOCKED_RECT rect;
@@ -1515,7 +1515,7 @@ bool D3DRenderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 		}
 	}
 	rc = SUCCEEDED(offscreenSurface->UnlockRect());
-	device->SetRenderTarget(0, backbuffer);
+	device->SetRenderTarget(0, backbuffer.Get());
 
 	return true;
 }

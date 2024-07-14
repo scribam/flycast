@@ -65,21 +65,21 @@ bool DX11Context::init(bool keepCurrentWindow)
 	ComPtr<IDXGIAdapter> dxgiAdapter;
 	HRESULT hr;
 	allowTearing = false;
-	hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)&dxgiFactory.get());
+	hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)dxgiFactory.GetAddressOf());
 	if (SUCCEEDED(hr))
 	{
-		dxgiFactory.as(dxgiFactory6);
+		dxgiFactory.As(&dxgiFactory6);
 		if (dxgiFactory6) 
 		{
-			dxgiFactory6->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, __uuidof(IDXGIAdapter), (void **)&dxgiAdapter.get());
+			dxgiFactory6->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, __uuidof(IDXGIAdapter), (void **)dxgiAdapter.GetAddressOf());
 			UINT tearing;
 			if (SUCCEEDED(dxgiFactory6->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &tearing,
 			                                                 sizeof(tearing))) && tearing != 0)
 				allowTearing = true;
-			dxgiFactory6.reset();
+			dxgiFactory6.Reset();
 		}
 	}
-	dxgiFactory.reset();
+	dxgiFactory.Reset();
 
 	D3D_FEATURE_LEVEL featureLevels[] =
 	{
@@ -89,26 +89,26 @@ bool DX11Context::init(bool keepCurrentWindow)
 		D3D_FEATURE_LEVEL_10_0,
 	};
 	hr = D3D11CreateDevice(
-	    dxgiAdapter.get(), // High performance GPU, or fallback to use the default adapter.
-	    dxgiAdapter.get() == nullptr ? D3D_DRIVER_TYPE_HARDWARE : D3D_DRIVER_TYPE_UNKNOWN, // D3D_DRIVER_TYPE_UNKNOWN is required when providing an adapter.
+	    dxgiAdapter.Get(), // High performance GPU, or fallback to use the default adapter.
+	    dxgiAdapter.Get() == nullptr ? D3D_DRIVER_TYPE_HARDWARE : D3D_DRIVER_TYPE_UNKNOWN, // D3D_DRIVER_TYPE_UNKNOWN is required when providing an adapter.
 	    nullptr,
 		D3D11_CREATE_DEVICE_BGRA_SUPPORT, // | D3D11_CREATE_DEVICE_DEBUG,
 	    featureLevels,
 	    ARRAYSIZE(featureLevels),
 	    D3D11_SDK_VERSION,
-	    &pDevice.get(),
+	    pDevice.GetAddressOf(),
 	    &featureLevel,
-	    &pDeviceContext.get());
+	    pDeviceContext.GetAddressOf());
 	if (FAILED(hr)) {
 		WARN_LOG(RENDERER, "D3D11 device creation failed: %x", hr);
 		return false;
 	}
 
 	ComPtr<IDXGIDevice2> dxgiDevice;
-	pDevice.as(dxgiDevice);
+	pDevice.As(&dxgiDevice);
 
-	dxgiAdapter.reset();
-	dxgiDevice->GetAdapter(&dxgiAdapter.get());
+	dxgiAdapter.Reset();
+	dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf());
 	DXGI_ADAPTER_DESC desc;
 	dxgiAdapter->GetDesc(&desc);
 	nowide::stackstring wdesc;
@@ -117,10 +117,10 @@ bool DX11Context::init(bool keepCurrentWindow)
 	adapterVersion = std::to_string(desc.Revision);
 	vendorId = desc.VendorId;
 
-	dxgiAdapter->GetParent(__uuidof(IDXGIFactory1), (void **)&dxgiFactory.get());
+	dxgiAdapter->GetParent(__uuidof(IDXGIFactory1), (void **)dxgiFactory.GetAddressOf());
 
 	ComPtr<IDXGIFactory2> dxgiFactory2;
-	dxgiFactory.as(dxgiFactory2);
+	dxgiFactory.As(&dxgiFactory2);
 
 	if (dxgiFactory2)
 	{
@@ -140,15 +140,15 @@ bool DX11Context::init(bool keepCurrentWindow)
 		desc.Height = settings.display.height;
 		hr = dxgiFactory2->CreateSwapChainForCoreWindow(pDevice, (IUnknown *)window, &desc, nullptr, &swapchain1.get());
 #else
-		hr = dxgiFactory2->CreateSwapChainForHwnd(pDevice, (HWND)window, &desc, nullptr, nullptr, &swapchain1.get());
+		hr = dxgiFactory2->CreateSwapChainForHwnd(pDevice.Get(), (HWND)window, &desc, nullptr, nullptr, swapchain1.GetAddressOf());
 #endif
 		if (SUCCEEDED(hr))
-			swapchain1.as(swapchain);
+			swapchain1.As(&swapchain);
 	}
 	else
 	{
 		// DX 11.0
-		swapchain1.reset();
+		swapchain1.Reset();
 #ifdef TARGET_UWP
 		return false;
 #endif
@@ -167,11 +167,11 @@ bool DX11Context::init(bool keepCurrentWindow)
 		if (allowTearing)
 			desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
-		hr = dxgiFactory->CreateSwapChain(pDevice, &desc, &swapchain.get());
+		hr = dxgiFactory->CreateSwapChain(pDevice.Get(), &desc, swapchain.GetAddressOf());
 	}
 	if (FAILED(hr)) {
 		WARN_LOG(RENDERER, "D3D11 swap chain creation failed: %x", hr);
-		pDevice.reset();
+		pDevice.Reset();
 		return false;
 	}
 
@@ -187,7 +187,7 @@ bool DX11Context::init(bool keepCurrentWindow)
 			NOTICE_LOG(RENDERER, "No system-provided shader cache");
 	}
 
-	imguiDriver = std::unique_ptr<ImGuiDriver>(new DX11Driver(pDevice, pDeviceContext));
+	imguiDriver = std::unique_ptr<ImGuiDriver>(new DX11Driver(pDevice.Get(), pDeviceContext.Get()));
 	resize();
 	shaders.init(pDevice, &D3DCompile);
 	overlay.init(pDevice, pDeviceContext, &shaders, &samplers);
@@ -205,16 +205,16 @@ void DX11Context::term()
 	samplers.term();
 	shaders.term();
 	imguiDriver.reset();
-	renderTargetView.reset();
-	swapchain1.reset();
-	swapchain.reset();
+	renderTargetView.Reset();
+	swapchain1.Reset();
+	swapchain.Reset();
 	if (pDeviceContext)
 	{
 		pDeviceContext->ClearState();
 		pDeviceContext->Flush();
 	}
-	pDeviceContext.reset();
-	pDevice.reset();
+	pDeviceContext.Reset();
+	pDevice.Reset();
 	d3dcompiler = nullptr;
 	if (d3dcompilerHandle != NULL)
 	{
@@ -255,9 +255,9 @@ void DX11Context::EndImGuiFrame()
 	{
 		if (!overlayOnly)
 		{
-			pDeviceContext->OMSetRenderTargets(1, &renderTargetView.get(), nullptr);
+			pDeviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);
 			const FLOAT black[4] { 0.f, 0.f, 0.f, 1.f };
-			pDeviceContext->ClearRenderTargetView(renderTargetView, black);
+			pDeviceContext->ClearRenderTargetView(renderTargetView.Get(), black);
 			if (renderer != nullptr)
 				renderer->RenderLastFrame();
 		}
@@ -279,7 +279,7 @@ void DX11Context::resize()
 	{
 		ID3D11RenderTargetView *nullRTV = nullptr;
 		pDeviceContext->OMSetRenderTargets(1, &nullRTV, nullptr);
-		renderTargetView.reset();
+		renderTargetView.Reset();
 #ifdef TARGET_UWP
 		HRESULT hr = swapchain->ResizeBuffers(2, settings.display.width, settings.display.height, DXGI_FORMAT_R8G8B8A8_UNORM, allowTearing ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
 #else
@@ -298,20 +298,20 @@ void DX11Context::resize()
 
 		// Create a render target view
 		ComPtr<ID3D11Texture2D> backBuffer;
-		hr = swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)&backBuffer.get());
+		hr = swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)backBuffer.GetAddressOf());
 		if (FAILED(hr))
 		{
 			WARN_LOG(RENDERER, "swapChain->GetBuffer() failed: %x", hr);
 			return;
 		}
 
-		hr = pDevice->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView.get());
+		hr = pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
 		if (FAILED(hr))
 		{
 			WARN_LOG(RENDERER, "CreateRenderTargetView failed: %x", hr);
 			return;
 		}
-		pDeviceContext->OMSetRenderTargets(1, &renderTargetView.get(), nullptr);
+		pDeviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);
 
 		if (swapchain1)
 		{

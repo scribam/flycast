@@ -422,7 +422,7 @@ ComPtr<ID3DXBuffer> D3DShaders::compileShader(const char* source, const char* fu
 	ComPtr<ID3DXBuffer> errors;
 	ComPtr<ID3DXBuffer> shader;
 	ComPtr<ID3DXConstantTable> constants;
-	pD3DXCompileShader(source, strlen(source), pDefines, NULL, function, profile, SHADER_DEBUG, &shader.get(), &errors.get(), &constants.get());
+	pD3DXCompileShader(source, strlen(source), pDefines, NULL, function, profile, SHADER_DEBUG, shader.GetAddressOf(), errors.GetAddressOf(), constants.GetAddressOf());
 	if (errors) {
 		char *text = (char *) errors->GetBufferPointer();
 		WARN_LOG(RENDERER, "%s", text);
@@ -432,20 +432,20 @@ ComPtr<ID3DXBuffer> D3DShaders::compileShader(const char* source, const char* fu
 
 ComPtr<IDirect3DVertexShader9> D3DShaders::compileVS(const char* source, const char* function, const D3DXMACRO* pDefines)
 {
-	ComPtr<ID3DXBuffer> buffer = compileShader(source, function, pD3DXGetVertexShaderProfile(device), pDefines);
+	ComPtr<ID3DXBuffer> buffer = compileShader(source, function, pD3DXGetVertexShaderProfile(device.Get()), pDefines);
 	ComPtr<IDirect3DVertexShader9> shader;
 	if (buffer)
-		device->CreateVertexShader((DWORD *)buffer->GetBufferPointer(), &shader.get());
+		device->CreateVertexShader((DWORD *)buffer->GetBufferPointer(), shader.GetAddressOf());
 
 	return shader;
 }
 
 ComPtr<IDirect3DPixelShader9> D3DShaders::compilePS(const char* source, const char* function, const D3DXMACRO* pDefines)
 {
-	ComPtr<ID3DXBuffer> buffer = compileShader(source, function, pD3DXGetPixelShaderProfile(device), pDefines);
+	ComPtr<ID3DXBuffer> buffer = compileShader(source, function, pD3DXGetPixelShaderProfile(device.Get()), pDefines);
 	ComPtr<IDirect3DPixelShader9> shader;
 	if (buffer)
-		device->CreatePixelShader((DWORD *)buffer->GetBufferPointer(), &shader.get());
+		device->CreatePixelShader((DWORD *)buffer->GetBufferPointer(), shader.GetAddressOf());
 
 	return shader;
 }
@@ -480,10 +480,10 @@ void D3DShaders::term()
 {
 	shaders.clear();
 	for (auto& shader : vertexShaders)
-		shader.reset();
+		shader.Reset();
 	for (auto& shader : modVolShaders)
-		shader.reset();
-	device.reset();
+		shader.Reset();
+	device.Reset();
 	if (d3dx9Library != NULL)
 		FreeLibrary(d3dx9Library);
 	d3dx9Library = NULL;

@@ -68,7 +68,7 @@ void D3DTexture::UploadToGPU(int width, int height, const u8* temp_tex_buffer, b
 				levels = 0;
 				usage = D3DUSAGE_AUTOGENMIPMAP;
 			}
-			theDXContext.getDevice()->CreateTexture(width, height, levels, usage, d3dFormat, D3DPOOL_MANAGED, &texture.get(), 0); // TODO the managed pool persists between device resets
+			theDXContext.getDevice()->CreateTexture(width, height, levels, usage, d3dFormat, D3DPOOL_MANAGED, texture.GetAddressOf(), 0); // TODO the managed pool persists between device resets
 			verify(texture != nullptr);
 		}
 		if (SUCCEEDED(texture->LockRect(mipmapLevels - 1, &rect, nullptr, 0)))
@@ -79,7 +79,7 @@ void D3DTexture::UploadToGPU(int width, int height, const u8* temp_tex_buffer, b
 			// it should be lockable so error out
 			return;
 		// RTT targets are created in the default pool and aren't lockable, so delete it and recreate it in the managed pool
-		texture.reset();
+		texture.Reset();
 	}
 	for (int i = 0; i < mipmapLevels; i++)
 	{
@@ -111,7 +111,7 @@ bool D3DTexture::Delete()
 	if (!BaseTextureCacheData::Delete())
 		return false;
 
-	texture.reset();
+	texture.Reset();
 	return true;
 }
 

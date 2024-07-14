@@ -67,31 +67,31 @@ struct DX11OITRenderer : public DX11Renderer
 	{
 		if (!DX11Renderer::Init())
 			return false;
-		pxlPolyConstants.reset();
+		pxlPolyConstants.Reset();
 		D3D11_BUFFER_DESC desc{};
 		desc.Usage = D3D11_USAGE_DYNAMIC;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		desc.ByteWidth = sizeof(PixelPolyConstants);
 		desc.ByteWidth = (((desc.ByteWidth - 1) >> 4) + 1) << 4;
-		bool success = SUCCEEDED(device->CreateBuffer(&desc, nullptr, &pxlPolyConstants.get()));
+		bool success = SUCCEEDED(device->CreateBuffer(&desc, nullptr, pxlPolyConstants.GetAddressOf()));
 
 		shaders.init(device, theDX11Context.getCompiler());
 		buffers.init(device, deviceContext);
 		pixelBufferSize = config::PixelBufferSize;
 		ComPtr<ID3DBlob> blob = shaders.getVertexShaderBlob();
-		mainInputLayout.reset();
-		success = SUCCEEDED(device->CreateInputLayout(MainLayout, std::size(MainLayout), blob->GetBufferPointer(), blob->GetBufferSize(), &mainInputLayout.get())) && success;
+		mainInputLayout.Reset();
+		success = SUCCEEDED(device->CreateInputLayout(MainLayout, std::size(MainLayout), blob->GetBufferPointer(), blob->GetBufferSize(), mainInputLayout.GetAddressOf())) && success;
 
 		blob = shaders.getFinalVertexShaderBlob();
-		success = SUCCEEDED(device->CreateInputLayout(MainLayout, 0, blob->GetBufferPointer(), blob->GetBufferSize(), &finalInputLayout.get())) && success;
+		success = SUCCEEDED(device->CreateInputLayout(MainLayout, 0, blob->GetBufferPointer(), blob->GetBufferSize(), finalInputLayout.GetAddressOf())) && success;
 
 		desc.ByteWidth = sizeof(int);
 		desc.ByteWidth = (((desc.ByteWidth - 1) >> 4) + 1) << 4;
 		desc.Usage = D3D11_USAGE_DYNAMIC;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		success = SUCCEEDED(device->CreateBuffer(&desc, nullptr, &vtxPolyConstants.get())) && success;
+		success = SUCCEEDED(device->CreateBuffer(&desc, nullptr, vtxPolyConstants.GetAddressOf())) && success;
 
 		return success;
 	}
@@ -105,25 +105,25 @@ struct DX11OITRenderer : public DX11Renderer
 			buffers.resize(maxWidth, maxHeight);
 
 			createTexAndRenderTarget(opaqueTex, opaqueRenderTarget, maxWidth, maxHeight);
-			multipassTex.reset();
-			multipassRenderTarget.reset();
-			multipassTextureView.reset();
-			opaqueTextureView.reset();
+			multipassTex.Reset();
+			multipassRenderTarget.Reset();
+			multipassTextureView.Reset();
+			opaqueTextureView.Reset();
 			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 			viewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 			viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			viewDesc.Texture2D.MipLevels = 1;
-			device->CreateShaderResourceView(opaqueTex, &viewDesc, &opaqueTextureView.get());
+			device->CreateShaderResourceView(opaqueTex.Get(), &viewDesc, opaqueTextureView.GetAddressOf());
 
 			// For depth pass. Use a 32-bit format for depth to avoid loss of precision
 			createDepthTexAndView(depthStencilTex2, depthStencilView2, maxWidth, maxHeight, DXGI_FORMAT_R32G8X24_TYPELESS, D3D11_BIND_SHADER_RESOURCE);
-			stencilView.reset();
+			stencilView.Reset();
 			viewDesc.Format = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
-			device->CreateShaderResourceView(depthStencilTex2, &viewDesc, &stencilView.get());
+			device->CreateShaderResourceView(depthStencilTex2.Get(), &viewDesc, stencilView.GetAddressOf());
 
-			depthView.reset();
+			depthView.Reset();
 			viewDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
-			device->CreateShaderResourceView(depthStencilTex2, &viewDesc, &depthView.get());
+			device->CreateShaderResourceView(depthStencilTex2.Get(), &viewDesc, depthView.GetAddressOf());
 
 			createDepthTexAndView(depthTex, depthTexView, maxWidth, maxHeight, DXGI_FORMAT_R32G8X24_TYPELESS);
 		}
@@ -134,8 +134,8 @@ struct DX11OITRenderer : public DX11Renderer
 	void resize(int width, int height) override
 	{
 		DX11Renderer::resize(width, height);
-		depthTexView.reset();
-		depthTex.reset();
+		depthTexView.Reset();
+		depthTex.Reset();
 		resizeInternal(width, height);
 	}
 
@@ -146,15 +146,15 @@ struct DX11OITRenderer : public DX11Renderer
 
 	void Term() override
 	{
-		vtxPolyConstants.reset();
-		finalInputLayout.reset();
-		mainInputLayout.reset();
-		multipassTextureView.reset();
-		multipassRenderTarget.reset();
-		multipassTex.reset();
-		opaqueTextureView.reset();
-		opaqueRenderTarget.reset();
-		opaqueTex.reset();
+		vtxPolyConstants.Reset();
+		finalInputLayout.Reset();
+		mainInputLayout.Reset();
+		multipassTextureView.Reset();
+		multipassRenderTarget.Reset();
+		multipassTex.Reset();
+		opaqueTextureView.Reset();
+		opaqueRenderTarget.Reset();
+		opaqueTex.Reset();
 		shaders.term();
 		buffers.term();
 		maxWidth = maxHeight = 0;
@@ -165,7 +165,7 @@ struct DX11OITRenderer : public DX11Renderer
 	void setRenderState(const PolyParam *gp, int polyNumber)
 	{
 		ComPtr<ID3D11VertexShader> vertexShader = shaders.getVertexShader(gp->pcw.Gouraud, gp->isNaomi2(), false, pass != DX11OITShaders::Depth);
-		deviceContext->VSSetShader(vertexShader, nullptr, 0);
+		deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
 
 		PixelPolyConstants constants;
 		if (gp->pcw.Texture && gp->tsp.FilterMode > 1 && Type != ListType_Punch_Through && gp->tcw.MipMapped == 1)
@@ -238,7 +238,7 @@ struct DX11OITRenderer : public DX11Renderer
 					pass);
 
 		}
-		deviceContext->PSSetShader(pixelShader, nullptr, 0);
+		deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
 		if (gpuPalette != 0)
 		{
@@ -280,21 +280,21 @@ struct DX11OITRenderer : public DX11Renderer
 			constants.ignore_tex_alpha1 = gp->tsp1.IgnoreTexA;
 		}
 		D3D11_MAPPED_SUBRESOURCE mappedSubres;
-		deviceContext->Map(pxlPolyConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+		deviceContext->Map(pxlPolyConstants.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 		memcpy(mappedSubres.pData, &constants, sizeof(constants));
-		deviceContext->Unmap(pxlPolyConstants, 0);
+		deviceContext->Unmap(pxlPolyConstants.Get(), 0);
 
 		if (!gp->isNaomi2())
 		{
-			deviceContext->Map(vtxPolyConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+			deviceContext->Map(vtxPolyConstants.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 			memcpy(mappedSubres.pData, &polyNumber, sizeof(polyNumber));
-			deviceContext->Unmap(vtxPolyConstants, 0);
-			deviceContext->VSSetConstantBuffers(1, 1, &vtxPolyConstants.get());
+			deviceContext->Unmap(vtxPolyConstants.Get(), 0);
+			deviceContext->VSSetConstantBuffers(1, 1, vtxPolyConstants.GetAddressOf());
 		}
 
 		if (pass == DX11OITShaders::Color)
 			// Apparently punch-through polys support blending, or at least some combinations
-			deviceContext->OMSetBlendState(blendStates.getState(true, gp->tsp.SrcInstr, gp->tsp.DstInstr), nullptr, 0xffffffff);
+			deviceContext->OMSetBlendState(blendStates.getState(true, gp->tsp.SrcInstr, gp->tsp.DstInstr).Get(), nullptr, 0xffffffff);
 
 		if (useTexture)
 		{
@@ -304,7 +304,7 @@ struct DX11OITRenderer : public DX11Renderer
 				if (texture == nullptr)
 					continue;
 				int slot = i == 0 ? 0 : 3;
-				deviceContext->PSSetShaderResources(slot, 1, &texture->textureView.get());
+				deviceContext->PSSetShaderResources(slot, 1, texture->textureView.GetAddressOf());
 				TSP tsp = i == 0 ? gp->tsp : gp->tsp1;
 				bool linearFiltering;
 				if (gpuPalette != 0)
@@ -316,7 +316,7 @@ struct DX11OITRenderer : public DX11Renderer
 				else
 					linearFiltering = true;
 		        auto sampler = samplers->getSampler(linearFiltering, tsp.ClampU, tsp.ClampV, tsp.FlipU, tsp.FlipV, Type == ListType_Punch_Through);
-		        deviceContext->PSSetSamplers(slot, 1, &sampler.get());
+		        deviceContext->PSSetSamplers(slot, 1, sampler.GetAddressOf());
 			}
 		}
 
@@ -339,7 +339,7 @@ struct DX11OITRenderer : public DX11Renderer
 
 		bool needStencil = config::ModifierVolumes && pass == DX11OITShaders::Depth && Type != ListType_Translucent;
 		const u32 stencil = (gp->pcw.Shadow != 0) ? 0x80 : 0;
-		deviceContext->OMSetDepthStencilState(depthStencilStates.getState(true, zwriteEnable, zfunc, needStencil), stencil);
+		deviceContext->OMSetDepthStencilState(depthStencilStates.getState(true, zwriteEnable, zfunc, needStencil).Get(), stencil);
 
 		if (gp->isNaomi2())
 			n2Helper.setConstants(*gp, polyNumber, pvrrc);
@@ -379,13 +379,13 @@ struct DX11OITRenderer : public DX11Renderer
 		if (count == 0 || pvrrc.modtrig.empty() || !config::ModifierVolumes)
 			return;
 
-		deviceContext->IASetInputLayout(modVolInputLayout);
+		deviceContext->IASetInputLayout(modVolInputLayout.Get());
 	    unsigned int stride = 3 * sizeof(float);
 	    unsigned int offset = 0;
-		deviceContext->IASetVertexBuffers(0, 1, &modvolBuffer.get(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 1, modvolBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		if (!Transparent)
-			deviceContext->PSSetShader(shaders.getModVolShader(), nullptr, 0);
+			deviceContext->PSSetShader(shaders.getModVolShader().Get(), nullptr, 0);
 		deviceContext->RSSetScissorRects(1, &scissorRect);
 
 		const ModifierVolumeParam *params = &modVolParams[first];
@@ -410,24 +410,24 @@ struct DX11OITRenderer : public DX11Renderer
 					curProjMat = param.projMatrix;
 					n2Helper.setConstants(pvrrc.matrices[param.mvMatrix].mat, pvrrc.matrices[param.projMatrix].mat);
 				}
-				deviceContext->VSSetShader(shaders.getMVVertexShader(param.isNaomi2()), nullptr, 0);
+				deviceContext->VSSetShader(shaders.getMVVertexShader(param.isNaomi2()).Get(), nullptr, 0);
 				if (Transparent)
 				{
 					if (!param.isp.VolumeLast && mv_mode > 0)
 						// OR'ing (open volume or quad)
-						deviceContext->PSSetShader(shaders.getTrModVolShader(DepthStencilStates::Or), nullptr, 0);
+						deviceContext->PSSetShader(shaders.getTrModVolShader(DepthStencilStates::Or).Get(), nullptr, 0);
 					else
 						// XOR'ing (closed volume)
-						deviceContext->PSSetShader(shaders.getTrModVolShader(DepthStencilStates::Xor), nullptr, 0);
+						deviceContext->PSSetShader(shaders.getTrModVolShader(DepthStencilStates::Xor).Get(), nullptr, 0);
 				}
 				else
 				{
 					if (!param.isp.VolumeLast && mv_mode > 0)
 						// OR'ing (open volume or quad)
-						deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Or), 2);
+						deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Or).Get(), 2);
 					else
 						// XOR'ing (closed volume)
-						deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Xor), 0);
+						deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Xor).Get(), 0);
 				}
 				setCullMode(param.isp.CullMode);
 				deviceContext->Draw(param.count * 3, param.first * 3);
@@ -437,41 +437,41 @@ struct DX11OITRenderer : public DX11Renderer
 			{
 				// Sum the area
 				if (Transparent)
-					deviceContext->PSSetShader(shaders.getTrModVolShader(mv_mode == 1 ? DepthStencilStates::Inclusion : DepthStencilStates::Exclusion), nullptr, 0);
+					deviceContext->PSSetShader(shaders.getTrModVolShader(mv_mode == 1 ? DepthStencilStates::Inclusion : DepthStencilStates::Exclusion).Get(), nullptr, 0);
 				else
-					deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(mv_mode == 1 ? DepthStencilStates::Inclusion : DepthStencilStates::Exclusion), 1);
+					deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(mv_mode == 1 ? DepthStencilStates::Inclusion : DepthStencilStates::Exclusion).Get(), 1);
 				deviceContext->Draw((param.first + param.count - mod_base) * 3, mod_base * 3);
 				mod_base = -1;
 			}
 		}
 
 		// Restore main input layout and vertex buffers
-		deviceContext->IASetInputLayout(mainInputLayout);
+		deviceContext->IASetInputLayout(mainInputLayout.Get());
 	    stride = sizeof(Vertex);
 	    offset = 0;
-		deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer.get(), &stride, &offset);
-		deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	}
 
 	void renderABuffer(bool lastPass)
 	{
 		if (!lastPass)
-			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &multipassRenderTarget.get(), nullptr, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, multipassRenderTarget.GetAddressOf(), nullptr, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
 		else if (pvrrc.isRTT)
-			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &rttRenderTarget.get(), nullptr, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, rttRenderTarget.GetAddressOf(), nullptr, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
 		else
-			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &fbRenderTarget.get(), nullptr, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
-		deviceContext->OMSetBlendState(blendStates.getState(false), nullptr, 0xffffffff);
-		deviceContext->PSSetShaderResources(0, 1, &opaqueTextureView.get());
+			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, fbRenderTarget.GetAddressOf(), nullptr, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+		deviceContext->OMSetBlendState(blendStates.getState(false).Get(), nullptr, 0xffffffff);
+		deviceContext->PSSetShaderResources(0, 1, opaqueTextureView.GetAddressOf());
         auto sampler = samplers->getSampler(false);
-        deviceContext->PSSetSamplers(0, 1, &sampler.get());
+        deviceContext->PSSetSamplers(0, 1, sampler.GetAddressOf());
 		deviceContext->RSSetScissorRects(1, &scissorRect);
-		deviceContext->OMSetDepthStencilState(depthStencilStates.getState(false, false, 0, false), 0);
+		deviceContext->OMSetDepthStencilState(depthStencilStates.getState(false, false, 0, false).Get(), 0);
 		setCullMode(0);
 
-		deviceContext->IASetInputLayout(finalInputLayout);
-		deviceContext->VSSetShader(shaders.getFinalVertexShader(), nullptr, 0);
-		deviceContext->PSSetShader(shaders.getFinalShader(dithering && lastPass), nullptr, 0);
+		deviceContext->IASetInputLayout(finalInputLayout.Get());
+		deviceContext->VSSetShader(shaders.getFinalVertexShader().Get(), nullptr, 0);
+		deviceContext->PSSetShader(shaders.getFinalShader(dithering && lastPass).Get(), nullptr, 0);
 
 		deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		deviceContext->Draw(4, 0);
@@ -493,8 +493,8 @@ struct DX11OITRenderer : public DX11Renderer
 			{
 				if (!trPolyParamsBuffer || trPolyParamsBufferSize < newSize)
 				{
-					trPolyParamsBufferView.reset();
-					trPolyParamsBuffer.reset();
+					trPolyParamsBufferView.Reset();
+					trPolyParamsBuffer.Reset();
 					D3D11_BUFFER_DESC desc{};
 					desc.ByteWidth = newSize;
 					desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -503,7 +503,7 @@ struct DX11OITRenderer : public DX11Renderer
 					desc.StructureByteStride = sizeof(u32) * 2;	// sizeof(struct PolyParam)
 					desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-					HRESULT hr = device->CreateBuffer(&desc, nullptr, &trPolyParamsBuffer.get());
+					HRESULT hr = device->CreateBuffer(&desc, nullptr, trPolyParamsBuffer.GetAddressOf());
 					if (FAILED(hr))
 						WARN_LOG(RENDERER, "TR poly params buffer creation failed");
 					else
@@ -514,29 +514,29 @@ struct DX11OITRenderer : public DX11Renderer
 						viewDesc.Format = DXGI_FORMAT_UNKNOWN;
 						viewDesc.Buffer.NumElements = desc.ByteWidth / desc.StructureByteStride;
 
-						hr = device->CreateShaderResourceView(trPolyParamsBuffer, &viewDesc, &trPolyParamsBufferView.get());
+						hr = device->CreateShaderResourceView(trPolyParamsBuffer.Get(), &viewDesc, trPolyParamsBufferView.GetAddressOf());
 						if (FAILED(hr))
 							WARN_LOG(RENDERER, "TR poly params buffer view creation failed");
 					}
 				}
 				D3D11_MAPPED_SUBRESOURCE mappedSubres;
-				deviceContext->Map(trPolyParamsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+				deviceContext->Map(trPolyParamsBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 				memcpy(mappedSubres.pData, trPolyParams.data(), newSize);
-				deviceContext->Unmap(trPolyParamsBuffer, 0);
+				deviceContext->Unmap(trPolyParamsBuffer.Get(), 0);
 
-				deviceContext->PSSetShaderResources(5, 1, &trPolyParamsBufferView.get());
+				deviceContext->PSSetShaderResources(5, 1, trPolyParamsBufferView.GetAddressOf());
 			}
 		}
 
 		buffers.bind();
-		deviceContext->ClearDepthStencilView(depthTexView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
-		deviceContext->ClearDepthStencilView(depthStencilView2, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
+		deviceContext->ClearDepthStencilView(depthTexView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
+		deviceContext->ClearDepthStencilView(depthStencilView2.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
 		if (pvrrc.clearFramebuffer && !pvrrc.isRTT)
 		{
 			float colors[4];
 			VO_BORDER_COL.getRGBColor(colors);
 			colors[3] = 1.f;
-			deviceContext->ClearRenderTargetView(opaqueRenderTarget, colors);
+			deviceContext->ClearRenderTargetView(opaqueRenderTarget.Get(), colors);
 		}
 
 		RenderPass previous_pass {};
@@ -560,8 +560,8 @@ struct DX11OITRenderer : public DX11Renderer
 			ID3D11ShaderResourceView * const nullView = nullptr;
 		    deviceContext->PSSetShaderResources(4, 1, &nullView);
 		    // disable color writes
-			deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true), nullptr, 0xffffffff);
-			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &opaqueRenderTarget.get(), depthStencilView2, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+			deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true).Get(), nullptr, 0xffffffff);
+			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, opaqueRenderTarget.GetAddressOf(), depthStencilView2.Get(), 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
 
 			drawList<ListType_Opaque, false, DX11OITShaders::Depth>(pvrrc.global_param_op, previous_pass.op_count, op_count);
 			drawList<ListType_Punch_Through, false, DX11OITShaders::Depth>(pvrrc.global_param_pt, previous_pass.pt_count, pt_count);
@@ -570,8 +570,8 @@ struct DX11OITRenderer : public DX11Renderer
 			//
 			// PASS 2: Render OP and PT to opaque render target
 			//
-			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &opaqueRenderTarget.get(), depthTexView, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
-		    deviceContext->PSSetShaderResources(4, 1, &stencilView.get());
+			deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, opaqueRenderTarget.GetAddressOf(), depthTexView.Get(), 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+		    deviceContext->PSSetShaderResources(4, 1, stencilView.GetAddressOf());
 
 			drawList<ListType_Opaque, false, DX11OITShaders::Color>(pvrrc.global_param_op, previous_pass.op_count, op_count);
 			drawList<ListType_Punch_Through, false, DX11OITShaders::Color>(pvrrc.global_param_pt, previous_pass.pt_count, pt_count);
@@ -582,10 +582,10 @@ struct DX11OITRenderer : public DX11Renderer
 			//
 			if (current_pass.autosort)
 			{
-				deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &opaqueRenderTarget.get(), depthTexView, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
-			    deviceContext->PSSetShaderResources(4, 1, &depthView.get());
+				deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, opaqueRenderTarget.GetAddressOf(), depthTexView.Get(), 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+			    deviceContext->PSSetShaderResources(4, 1, depthView.GetAddressOf());
 			    // disable color writes
-				deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true), nullptr, 0xffffffff);
+				deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true).Get(), nullptr, 0xffffffff);
 				drawList<ListType_Translucent, true, DX11OITShaders::OIT>(pvrrc.global_param_tr, previous_pass.tr_count, tr_count);
 				// unbind depth tex
 			    deviceContext->PSSetShaderResources(4, 1, &nullView);
@@ -600,7 +600,7 @@ struct DX11OITRenderer : public DX11Renderer
 			}
 			else
 			{
-				deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &opaqueRenderTarget.get(), depthTexView, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+				deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, opaqueRenderTarget.GetAddressOf(), depthTexView.Get(), 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
 				drawList<ListType_Translucent, false, DX11OITShaders::Color>(pvrrc.global_param_tr, previous_pass.tr_count, tr_count);
 			}
 			if (render_pass < render_pass_count - 1)
@@ -608,7 +608,7 @@ struct DX11OITRenderer : public DX11Renderer
 				//
 				// PASS 3b: Geometry pass with TR to update the depth for the next TA render pass
 				//
-				deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, &opaqueRenderTarget.get(), depthStencilView2, 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
+				deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(1, opaqueRenderTarget.GetAddressOf(), depthStencilView2.Get(), 0, D3D11_KEEP_UNORDERED_ACCESS_VIEWS, nullptr, nullptr);
 				if (current_pass.autosort)
 					drawList<ListType_Translucent, true, DX11OITShaders::Depth>(pvrrc.global_param_tr, previous_pass.tr_count, tr_count);
 				else
@@ -619,12 +619,12 @@ struct DX11OITRenderer : public DX11Renderer
 				if (!multipassTex)
 				{
 					createTexAndRenderTarget(multipassTex, multipassRenderTarget, width, height);
-					multipassTextureView.reset();
+					multipassTextureView.Reset();
 					D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 					viewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 					viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D.MipLevels = 1;
-					device->CreateShaderResourceView(multipassTex, &viewDesc, &multipassTextureView.get());
+					device->CreateShaderResourceView(multipassTex.Get(), &viewDesc, multipassTextureView.GetAddressOf());
 				}
 
 				renderABuffer(false);
@@ -632,10 +632,10 @@ struct DX11OITRenderer : public DX11Renderer
 				std::swap(opaqueRenderTarget, multipassRenderTarget);
 				std::swap(opaqueTextureView, multipassTextureView);
 			    deviceContext->PSSetShaderResources(0, 1, &nullView);
-				deviceContext->IASetInputLayout(mainInputLayout);
+				deviceContext->IASetInputLayout(mainInputLayout.Get());
 
 				// Clear the stencil from this pass
-				deviceContext->ClearDepthStencilView(depthStencilView2, D3D11_CLEAR_STENCIL, 0.f, 0);
+				deviceContext->ClearDepthStencilView(depthStencilView2.Get(), D3D11_CLEAR_STENCIL, 0.f, 0);
 			}
 
 			previous_pass = current_pass;
@@ -664,10 +664,10 @@ struct DX11OITRenderer : public DX11Renderer
 		ID3D11ShaderResourceView *p = nullptr;
 	    deviceContext->PSSetShaderResources(0, 1, &p);
 	    // To avoid DEVICE_DRAW_RENDERTARGETVIEW_NOT_SET warnings
-		deviceContext->OMSetRenderTargets(1, &fbRenderTarget.get(), nullptr);
+		deviceContext->OMSetRenderTargets(1, fbRenderTarget.GetAddressOf(), nullptr);
 		configVertexShader();
 
-		deviceContext->IASetInputLayout(mainInputLayout);
+		deviceContext->IASetInputLayout(mainInputLayout.Get());
 
 		n2Helper.resetCache();
 		uploadGeometryBuffers();
@@ -691,7 +691,7 @@ struct DX11OITRenderer : public DX11Renderer
 		{
 			aspectRatio = getOutputFramebufferAspectRatio();
 #ifndef LIBRETRO
-			deviceContext->OMSetRenderTargets(1, &theDX11Context.getRenderTarget().get(), nullptr);
+			deviceContext->OMSetRenderTargets(1, theDX11Context.getRenderTarget().GetAddressOf(), nullptr);
 			displayFramebuffer();
 			DrawOSD(false);
 			renderVideoRouting();

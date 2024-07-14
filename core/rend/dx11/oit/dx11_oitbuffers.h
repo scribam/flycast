@@ -26,8 +26,8 @@ public:
 	{
 		this->device = device;
 		this->deviceContext = deviceContext;
-		pixelsBufferView.reset();
-		pixelsBuffer.reset();
+		pixelsBufferView.Reset();
+		pixelsBuffer.Reset();
 		D3D11_BUFFER_DESC desc{};
 		desc.ByteWidth = (UINT)std::min<u64>(config::PixelBufferSize, UINT_MAX);
 		desc.Usage = D3D11_USAGE_DEFAULT;
@@ -35,13 +35,13 @@ public:
 		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 		desc.StructureByteStride = 16;	// sizeof(struct Pixel)
 
-		HRESULT hr = device->CreateBuffer(&desc, nullptr, &pixelsBuffer.get());
+		HRESULT hr = device->CreateBuffer(&desc, nullptr, pixelsBuffer.GetAddressOf());
 		if (FAILED(hr))
 		{
 			if (desc.ByteWidth > D3D11_REQ_RESOURCE_SIZE_IN_MEGABYTES_EXPRESSION_C_TERM * 1024u * 1024u)
 			{
 				desc.ByteWidth = D3D11_REQ_RESOURCE_SIZE_IN_MEGABYTES_EXPRESSION_C_TERM * 1024u * 1024u;
-				hr = device->CreateBuffer(&desc, nullptr, &pixelsBuffer.get());
+				hr = device->CreateBuffer(&desc, nullptr, pixelsBuffer.GetAddressOf());
 			}
 			if (FAILED(hr))
 			{
@@ -57,7 +57,7 @@ public:
 		uaView.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_COUNTER;
 		uaView.Buffer.NumElements = desc.ByteWidth / desc.StructureByteStride;
 
-		hr = device->CreateUnorderedAccessView(pixelsBuffer, &uaView, &pixelsBufferView.get());
+		hr = device->CreateUnorderedAccessView(pixelsBuffer.Get(), &uaView, pixelsBufferView.GetAddressOf());
 		if (FAILED(hr))
 			WARN_LOG(RENDERER, "Pixels buffer UAV creation failed: %x", hr);
 	}
@@ -69,8 +69,8 @@ public:
 
 		this->width = std::max(this->width, width);
 		this->height = std::max(this->height, height);
-		abufferPointersView.reset();
-		abufferPointersTex.reset();
+		abufferPointersView.Reset();
+		abufferPointersTex.Reset();
 		D3D11_TEXTURE2D_DESC desc{};
 		desc.Width = this->width;
 		desc.Height = this->height;
@@ -85,7 +85,7 @@ public:
 		initialData.SysMemPitch = this->width * sizeof(int);
 		initialData.pSysMem = malloc(initialData.SysMemPitch * this->height);
 		memset((void *)initialData.pSysMem, 0xff, initialData.SysMemPitch * this->height);
-		HRESULT hr = device->CreateTexture2D(&desc, &initialData, &abufferPointersTex.get());
+		HRESULT hr = device->CreateTexture2D(&desc, &initialData, abufferPointersTex.GetAddressOf());
 		free((void *)initialData.pSysMem);
 		if (FAILED(hr))
 		{
@@ -96,14 +96,14 @@ public:
 		uaView.Format = DXGI_FORMAT_UNKNOWN;
 		uaView.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
 
-		hr = device->CreateUnorderedAccessView(abufferPointersTex, &uaView, &abufferPointersView.get());
+		hr = device->CreateUnorderedAccessView(abufferPointersTex.Get(), &uaView, abufferPointersView.GetAddressOf());
 		if (FAILED(hr))
 			WARN_LOG(RENDERER, "A-buffer texture UAV creation failed: %x", hr);
 	}
 
 	void bind()
 	{
-		ID3D11UnorderedAccessView *uavs[] { pixelsBufferView, abufferPointersView };
+		ID3D11UnorderedAccessView *uavs[] { pixelsBufferView.Get(), abufferPointersView.Get() };
 		UINT initialCounts[] { 0, (UINT)-1 };
 		deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(D3D11_KEEP_RENDER_TARGETS_AND_DEPTH_STENCIL, nullptr, nullptr, 1, std::size(uavs), uavs, initialCounts);
 	}
@@ -112,12 +112,12 @@ public:
 	{
 		width = 0;
 		height = 0;
-		abufferPointersView.reset();
-		abufferPointersTex.reset();
-		pixelsBufferView.reset();
-		pixelsBuffer.reset();
-		deviceContext.reset();
-		device.reset();
+		abufferPointersView.Reset();
+		abufferPointersTex.Reset();
+		pixelsBufferView.Reset();
+		pixelsBuffer.Reset();
+		deviceContext.Reset();
+		device.Reset();
 	}
 
 private:

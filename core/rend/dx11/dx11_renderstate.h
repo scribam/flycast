@@ -108,7 +108,7 @@ public:
 			desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 			desc.BackFace = desc.FrontFace;
 			desc.StencilWriteMask = 0xFF;
-			createDepthStencilState(&desc, &state.get());
+			createDepthStencilState(&desc, state.GetAddressOf());
 		}
 		return state;
 	}
@@ -162,7 +162,7 @@ public:
 				break;
 			}
 			desc.BackFace = desc.FrontFace;
-			createDepthStencilState(&desc, &state.get());
+			createDepthStencilState(&desc, state.GetAddressOf());
 		}
 		return state;
 	}
@@ -171,7 +171,7 @@ public:
 	{
 		states.clear();
 		for (auto& state : mvStates)
-			state.reset();
+			state.Reset();
 	}
 
 private:
@@ -199,7 +199,7 @@ public:
 			desc.RenderTarget[0].SrcBlendAlpha =  SrcBlendAlpha[srcBlend];
 			desc.RenderTarget[0].DestBlendAlpha = DestBlendAlpha[destBlend];
 			desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-			createBlendState(&desc, &state.get());
+			createBlendState(&desc, state.GetAddressOf());
 		}
 		return state;
 	}

@@ -56,9 +56,9 @@ bool DX11Renderer::Init()
 	samplers = &theDX11Context.getSamplers();
 	bool success = (bool)shaders->getVertexShader(true, true);
 	ComPtr<ID3DBlob> blob = shaders->getVertexShaderBlob();
-	success = success && SUCCEEDED(device->CreateInputLayout(MainLayout, std::size(MainLayout), blob->GetBufferPointer(), blob->GetBufferSize(), &mainInputLayout.get()));
+	success = success && SUCCEEDED(device->CreateInputLayout(MainLayout, std::size(MainLayout), blob->GetBufferPointer(), blob->GetBufferSize(), mainInputLayout.GetAddressOf()));
 	blob = shaders->getMVVertexShaderBlob();
-	success = success && SUCCEEDED(device->CreateInputLayout(ModVolLayout, std::size(ModVolLayout), blob->GetBufferPointer(), blob->GetBufferSize(), &modVolInputLayout.get()));
+	success = success && SUCCEEDED(device->CreateInputLayout(ModVolLayout, std::size(ModVolLayout), blob->GetBufferPointer(), blob->GetBufferSize(), modVolInputLayout.GetAddressOf()));
 
 	// Constants buffers
 	{
@@ -68,15 +68,15 @@ bool DX11Renderer::Init()
 		desc.Usage = D3D11_USAGE_DYNAMIC;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		success = success && SUCCEEDED(device->CreateBuffer(&desc, nullptr, &vtxConstants.get()));
+		success = success && SUCCEEDED(device->CreateBuffer(&desc, nullptr, vtxConstants.GetAddressOf()));
 
 		desc.ByteWidth = sizeof(PixelConstants);
 		desc.ByteWidth = (((desc.ByteWidth - 1) >> 4) + 1) << 4;
-		success = success && SUCCEEDED(device->CreateBuffer(&desc, nullptr, &pxlConstants.get()));
+		success = success && SUCCEEDED(device->CreateBuffer(&desc, nullptr, pxlConstants.GetAddressOf()));
 
 		desc.ByteWidth = sizeof(PixelPolyConstants);
 		desc.ByteWidth = (((desc.ByteWidth - 1) >> 4) + 1) << 4;
-		success = success && SUCCEEDED(device->CreateBuffer(&desc, nullptr, &pxlPolyConstants.get()));
+		success = success && SUCCEEDED(device->CreateBuffer(&desc, nullptr, pxlPolyConstants.GetAddressOf()));
 	}
 
 	// Rasterizer state
@@ -87,11 +87,11 @@ bool DX11Renderer::Init()
 		desc.FrontCounterClockwise = true;
 		desc.ScissorEnable = true;
 		desc.DepthClipEnable = false;
-		device->CreateRasterizerState(&desc, &rasterCullNone.get());
+		device->CreateRasterizerState(&desc, rasterCullNone.GetAddressOf());
 		desc.CullMode = D3D11_CULL_FRONT;
-		device->CreateRasterizerState(&desc, &rasterCullFront.get());
+		device->CreateRasterizerState(&desc, rasterCullFront.GetAddressOf());
 		desc.CullMode = D3D11_CULL_BACK;
-		device->CreateRasterizerState(&desc, &rasterCullBack.get());
+		device->CreateRasterizerState(&desc, rasterCullBack.GetAddressOf());
 	}
 	// Palette texture
 	{
@@ -104,13 +104,13 @@ bool DX11Renderer::Init()
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		desc.MipLevels = 1;
-		device->CreateTexture2D(&desc, nullptr, &paletteTexture.get());
+		device->CreateTexture2D(&desc, nullptr, paletteTexture.GetAddressOf());
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 		viewDesc.Format = desc.Format;
 		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(paletteTexture, &viewDesc, &paletteTextureView.get());
+		device->CreateShaderResourceView(paletteTexture.Get(), &viewDesc, paletteTextureView.GetAddressOf());
 	}
 	// Fog texture
 	{
@@ -123,13 +123,13 @@ bool DX11Renderer::Init()
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc.Format = DXGI_FORMAT_A8_UNORM;
 		desc.MipLevels = 1;
-		device->CreateTexture2D(&desc, nullptr, &fogTexture.get());
+		device->CreateTexture2D(&desc, nullptr, fogTexture.GetAddressOf());
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 		viewDesc.Format = desc.Format;
 		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(fogTexture, &viewDesc, &fogTextureView.get());
+		device->CreateShaderResourceView(fogTexture.Get(), &viewDesc, fogTextureView.GetAddressOf());
 	}
 	// White texture
 	{
@@ -142,17 +142,17 @@ bool DX11Renderer::Init()
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		desc.MipLevels = 1;
-		device->CreateTexture2D(&desc, nullptr, &whiteTexture.get());
+		device->CreateTexture2D(&desc, nullptr, whiteTexture.GetAddressOf());
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 		viewDesc.Format = desc.Format;
 		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(whiteTexture, &viewDesc, &whiteTextureView.get());
+		device->CreateShaderResourceView(whiteTexture.Get(), &viewDesc, whiteTextureView.GetAddressOf());
 
 		u32 texData[8 * 8];
 		memset(texData, 0xff, sizeof(texData));
-		deviceContext->UpdateSubresource(whiteTexture, 0, nullptr, texData, 8 * sizeof(u32), 8 * sizeof(u32) * 8);
+		deviceContext->UpdateSubresource(whiteTexture.Get(), 0, nullptr, texData, 8 * sizeof(u32), 8 * sizeof(u32) * 8);
 	}
 
 	quad = std::make_unique<Quad>();
@@ -178,27 +178,27 @@ void DX11Renderer::Term()
 	os_VideoRoutingTermDX();
 #endif
 	n2Helper.term();
-	vtxConstants.reset();
-	pxlConstants.reset();
-	fbTex.reset();
-	fbTextureView.reset();
-	fbRenderTarget.reset();
-	fbScaledRenderTarget.reset();
-	fbScaledTextureView.reset();
-	fbScaledTexture.reset();
+	vtxConstants.Reset();
+	pxlConstants.Reset();
+	fbTex.Reset();
+	fbTextureView.Reset();
+	fbRenderTarget.Reset();
+	fbScaledRenderTarget.Reset();
+	fbScaledTextureView.Reset();
+	fbScaledTexture.Reset();
 	quad.reset();
-	deviceContext.reset();
-	device.reset();
-	vrStagingTexture.reset();
-	vrStagingTextureSRV.reset();
-	vrScaledTexture.reset();
-	vrScaledRenderTarget.reset();
+	deviceContext.Reset();
+	device.Reset();
+	vrStagingTexture.Reset();
+	vrStagingTextureSRV.Reset();
+	vrScaledTexture.Reset();
+	vrScaledRenderTarget.Reset();
 }
 
 void DX11Renderer::createDepthTexAndView(ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11DepthStencilView>& view, int width, int height, DXGI_FORMAT format, UINT bindFlags)
 {
-	view.reset();
-	texture.reset();
+	view.Reset();
+	texture.Reset();
 	D3D11_TEXTURE2D_DESC desc{};
 	desc.Width = width;
 	desc.Height = height;
@@ -208,7 +208,7 @@ void DX11Renderer::createDepthTexAndView(ComPtr<ID3D11Texture2D>& texture, ComPt
 	desc.SampleDesc.Count = 1;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | bindFlags;
-	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &texture.get());
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, texture.GetAddressOf());
 	if (FAILED(hr))
 		WARN_LOG(RENDERER, "Depth/stencil creation failed");
 
@@ -216,15 +216,15 @@ void DX11Renderer::createDepthTexAndView(ComPtr<ID3D11Texture2D>& texture, ComPt
 	D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc{};
 	viewDesc.Format = format == DXGI_FORMAT_R32G8X24_TYPELESS ? DXGI_FORMAT_D32_FLOAT_S8X24_UINT : DXGI_FORMAT_D24_UNORM_S8_UINT;
 	viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	hr = device->CreateDepthStencilView(texture, &viewDesc, &view.get());
+	hr = device->CreateDepthStencilView(texture.Get(), &viewDesc, view.GetAddressOf());
 	if (FAILED(hr))
 		WARN_LOG(RENDERER, "Depth/stencil view creation failed");
 }
 
 void DX11Renderer::createTexAndRenderTarget(ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11RenderTargetView>& renderTarget, int width, int height)
 {
-	texture.reset();
-	renderTarget.reset();
+	texture.Reset();
+	renderTarget.Reset();
 	D3D11_TEXTURE2D_DESC desc{};
 	desc.Width = width;
 	desc.Height = height;
@@ -235,21 +235,21 @@ void DX11Renderer::createTexAndRenderTarget(ComPtr<ID3D11Texture2D>& texture, Co
 	desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	desc.MipLevels = 1;
 
-	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &texture.get());
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, texture.GetAddressOf());
 	if (FAILED(hr))
 	{
 		WARN_LOG(RENDERER, "Framebuffer texture creation failed");
 		return;
 	}
 
-	hr = device->CreateRenderTargetView(texture, nullptr, &renderTarget.get());
+	hr = device->CreateRenderTargetView(texture.Get(), nullptr, renderTarget.GetAddressOf());
 	if (FAILED(hr))
 	{
 		WARN_LOG(RENDERER, "Framebuffer render target creation failed");
 		return;
 	}
 	FLOAT black[4] = { 0.f, 0.f, 0.f, 0.f };
-	deviceContext->ClearRenderTargetView(renderTarget, black);
+	deviceContext->ClearRenderTargetView(renderTarget.Get(), black);
 }
 
 void DX11Renderer::resize(int w, int h)
@@ -261,14 +261,14 @@ void DX11Renderer::resize(int w, int h)
 
 	// Create framebuffer texture
 	{
-		fbTextureView.reset();
+		fbTextureView.Reset();
 		createTexAndRenderTarget(fbTex, fbRenderTarget, width, height);
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 		viewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(fbTex, &viewDesc, &fbTextureView.get());
+		device->CreateShaderResourceView(fbTex.Get(), &viewDesc, fbTextureView.GetAddressOf());
 	}
 
 	// Create depth stencil texture
@@ -287,13 +287,13 @@ bool DX11Renderer::ensureBufferSize(ComPtr<ID3D11Buffer>& buffer, D3D11_BIND_FLA
 	else
 		while (currentSize < minSize)
 			currentSize *= 2;
-	buffer.reset();
+	buffer.Reset();
 	D3D11_BUFFER_DESC desc{};
 	desc.ByteWidth = currentSize;
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.BindFlags = bind;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    return SUCCEEDED(device->CreateBuffer(&desc, nullptr, &buffer.get()));
+    return SUCCEEDED(device->CreateBuffer(&desc, nullptr, buffer.GetAddressOf()));
 }
 
 BaseTextureCacheData *DX11Renderer::GetTexture(TSP tsp, TCW tcw)
@@ -310,7 +310,7 @@ BaseTextureCacheData *DX11Renderer::GetTexture(TSP tsp, TCW tcw)
 	else if (tf->IsCustomTextureAvailable())
 	{
 		texCache.DeleteLater(tf->texture);
-		tf->texture.reset();
+		tf->texture.Reset();
 		// FIXME textureView
 		tf->loadCustomTexture();
 	}
@@ -376,10 +376,10 @@ void DX11Renderer::configVertexShader()
 	constant.bottomPlane[1] = -1;
 	constant.bottomPlane[3] = 1;
 	D3D11_MAPPED_SUBRESOURCE mappedSubres;
-	deviceContext->Map(vtxConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+	deviceContext->Map(vtxConstants.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 	memcpy(mappedSubres.pData, &constant, sizeof(constant));
-	deviceContext->Unmap(vtxConstants, 0);
-	deviceContext->VSSetConstantBuffers(0, 1, &vtxConstants.get());
+	deviceContext->Unmap(vtxConstants.Get(), 0);
+	deviceContext->VSSetConstantBuffers(0, 1, &vtxConstants.GetAddressOf());
 }
 
 void DX11Renderer::uploadGeometryBuffers()
@@ -390,16 +390,16 @@ void DX11Renderer::uploadGeometryBuffers()
 	bool rc = ensureBufferSize(vertexBuffer, D3D11_BIND_VERTEX_BUFFER, vertexBufferSize, size);
 	verify(rc);
 	D3D11_MAPPED_SUBRESOURCE mappedSubres;
-	deviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+	deviceContext->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 	memcpy(mappedSubres.pData, pvrrc.verts.data(), size);
-	deviceContext->Unmap(vertexBuffer, 0);
+	deviceContext->Unmap(vertexBuffer.Get(), 0);
 
 	size = pvrrc.idx.size() * sizeof(decltype(*pvrrc.idx.data()));
 	rc = ensureBufferSize(indexBuffer, D3D11_BIND_INDEX_BUFFER, indexBufferSize, size);
 	verify(rc);
-	deviceContext->Map(indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+	deviceContext->Map(indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 	memcpy(mappedSubres.pData, pvrrc.idx.data(), size);
-	deviceContext->Unmap(indexBuffer, 0);
+	deviceContext->Unmap(indexBuffer.Get(), 0);
 
 	if (config::ModifierVolumes && !pvrrc.modtrig.empty())
 	{
@@ -407,14 +407,14 @@ void DX11Renderer::uploadGeometryBuffers()
 		size = pvrrc.modtrig.size() * sizeof(decltype(pvrrc.modtrig[0]));
 		rc = ensureBufferSize(modvolBuffer, D3D11_BIND_VERTEX_BUFFER, modvolBufferSize, size);
 		verify(rc);
-		deviceContext->Map(modvolBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+		deviceContext->Map(modvolBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 		memcpy(mappedSubres.pData, data, size);
-		deviceContext->Unmap(modvolBuffer, 0);
+		deviceContext->Unmap(modvolBuffer.Get(), 0);
 	}
     unsigned int stride = sizeof(Vertex);
     unsigned int offset = 0;
-	deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer.get(), &stride, &offset);
-	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }
 
 void DX11Renderer::setupPixelShaderConstants()
@@ -462,10 +462,10 @@ void DX11Renderer::setupPixelShaderConstants()
 	}
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubres;
-	deviceContext->Map(pxlConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+	deviceContext->Map(pxlConstants.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 	memcpy(mappedSubres.pData, &pixelConstants, sizeof(pixelConstants));
-	deviceContext->Unmap(pxlConstants, 0);
-	ID3D11Buffer *buffers[] { pxlConstants, pxlPolyConstants };
+	deviceContext->Unmap(pxlConstants.Get(), 0);
+	ID3D11Buffer *buffers[] { pxlConstants.Get(), pxlPolyConstants.Get() };
 	deviceContext->PSSetConstantBuffers(0, std::size(buffers), buffers);
 }
 
@@ -476,19 +476,19 @@ bool DX11Renderer::Render()
 	if (!is_rtt)
 	{
 		resize(pvrrc.framebufferWidth, pvrrc.framebufferHeight);
-		deviceContext->OMSetRenderTargets(1, &fbRenderTarget.get(), depthTexView);
-		deviceContext->ClearDepthStencilView(depthTexView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
+		deviceContext->OMSetRenderTargets(1, fbRenderTarget.GetAddressOf(), depthTexView.Get());
+		deviceContext->ClearDepthStencilView(depthTexView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
 		if (pvrrc.clearFramebuffer)
 		{
 			float colors[4];
 			VO_BORDER_COL.getRGBColor(colors);
 			colors[3] = 1.f;
-			deviceContext->ClearRenderTargetView(fbRenderTarget, colors);
+			deviceContext->ClearRenderTargetView(fbRenderTarget.Get(), colors);
 		}
 	}
 	configVertexShader();
 
-	deviceContext->IASetInputLayout(mainInputLayout);
+	deviceContext->IASetInputLayout(mainInputLayout.Get());
 
 	n2Helper.resetCache();
 	uploadGeometryBuffers();
@@ -512,7 +512,7 @@ bool DX11Renderer::Render()
 	{
 		aspectRatio = getOutputFramebufferAspectRatio();
 #ifndef LIBRETRO
-		deviceContext->OMSetRenderTargets(1, &theDX11Context.getRenderTarget().get(), nullptr);
+		deviceContext->OMSetRenderTargets(1, theDX11Context.getRenderTarget().GetAddressOf(), nullptr);
 		displayFramebuffer();
 		DrawOSD(false);
 		renderVideoRouting();
@@ -544,7 +544,7 @@ void DX11Renderer::displayFramebuffer()
 	float colors[4];
 	VO_BORDER_COL.getRGBColor(colors);
 	colors[3] = 1.f;
-	deviceContext->ClearRenderTargetView(theDX11Context.getRenderTarget(), colors);
+	deviceContext->ClearRenderTargetView(theDX11Context.getRenderTarget().Get(), colors);
 
 	float shiftX, shiftY;
 	getVideoShift(shiftX, shiftY);
@@ -580,7 +580,7 @@ void DX11Renderer::displayFramebuffer()
 	// Shift
 	x += shiftX;
 	y += shiftY;
-	deviceContext->OMSetBlendState(blendStates.getState(false), nullptr, 0xffffffff);
+	deviceContext->OMSetBlendState(blendStates.getState(false).Get(), nullptr, 0xffffffff);
 	quad->draw(fbTextureView, samplers->getSampler(config::TextureFiltering != 1), nullptr, x, y, w, h, config::Rotate90);
 #endif
 }
@@ -602,7 +602,7 @@ void DX11Renderer::setCullMode(int mode)
 		rasterizer = rasterCullBack;
 		break;
 	}
-	deviceContext->RSSetState(rasterizer);
+	deviceContext->RSSetState(rasterizer.Get());
 }
 
 template <u32 Type, bool SortingEnabled>
@@ -636,7 +636,7 @@ void DX11Renderer::setRenderState(const PolyParam *gp)
 	}
 
 	ComPtr<ID3D11VertexShader> vertexShader = shaders->getVertexShader(gp->pcw.Gouraud, gp->isNaomi2());
-	deviceContext->VSSetShader(vertexShader, nullptr, 0);
+	deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
 	ComPtr<ID3D11PixelShader> pixelShader = shaders->getShader(
 			gp->pcw.Texture,
 			gp->tsp.UseAlpha,
@@ -652,7 +652,7 @@ void DX11Renderer::setRenderState(const PolyParam *gp)
 			Type == ListType_Punch_Through,
 			clipmode == TileClipping::Inside,
 			dithering);
-	deviceContext->PSSetShader(pixelShader, nullptr, 0);
+	deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
 	if (gpuPalette != 0)
 	{
@@ -681,14 +681,14 @@ void DX11Renderer::setRenderState(const PolyParam *gp)
 	if (constants.trilinearAlpha != 1.f || gpuPalette != 0 || clipmode == TileClipping::Inside)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubres;
-		deviceContext->Map(pxlPolyConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
+		deviceContext->Map(pxlPolyConstants.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubres);
 		memcpy(mappedSubres.pData, &constants, sizeof(constants));
-		deviceContext->Unmap(pxlPolyConstants, 0);
+		deviceContext->Unmap(pxlPolyConstants.Get(), 0);
 	}
 
 	if (texture != nullptr)
 	{
-        deviceContext->PSSetShaderResources(0, 1, &texture->textureView.get());
+        deviceContext->PSSetShaderResources(0, 1, texture->textureView.GetAddressOf());
 		bool linearFiltering;
 		if (gpuPalette != 0)
 			linearFiltering = false;
@@ -699,11 +699,11 @@ void DX11Renderer::setRenderState(const PolyParam *gp)
 		else
 			linearFiltering = true;
         auto sampler = samplers->getSampler(linearFiltering, gp->tsp.ClampU, gp->tsp.ClampV, gp->tsp.FlipU, gp->tsp.FlipV, Type == ListType_Punch_Through);
-        deviceContext->PSSetSamplers(0, 1, &sampler.get());
+        deviceContext->PSSetSamplers(0, 1, sampler.GetAddressOf());
 	}
 
 	// Apparently punch-through polys support blending, or at least some combinations
-	deviceContext->OMSetBlendState(blendStates.getState(true, gp->tsp.SrcInstr, gp->tsp.DstInstr), nullptr, 0xffffffff);
+	deviceContext->OMSetBlendState(blendStates.getState(true, gp->tsp.SrcInstr, gp->tsp.DstInstr).Get(), nullptr, 0xffffffff);
 
 	setCullMode(gp->isp.CullMode);
 
@@ -727,7 +727,7 @@ void DX11Renderer::setRenderState(const PolyParam *gp)
 			zwriteEnable = !gp->isp.ZWriteDis;
 	}
 	const u32 stencil = (gp->pcw.Shadow != 0) ? 0x80 : 0;
-	deviceContext->OMSetDepthStencilState(depthStencilStates.getState(true, zwriteEnable, zfunc, config::ModifierVolumes), stencil);
+	deviceContext->OMSetDepthStencilState(depthStencilStates.getState(true, zwriteEnable, zfunc, config::ModifierVolumes).Get(), stencil);
 
 	if (gp->isNaomi2())
 		n2Helper.setConstants(*gp, 0, pvrrc); // poly number only used in OIT
@@ -775,10 +775,10 @@ void DX11Renderer::drawSorted(int first, int count, bool multipass)
 	if (multipass && config::TranslucentPolygonDepthMask)
 	{
 		// Write to the depth buffer now. The next render pass might need it. (Cosmic Smash)
-		deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true), nullptr, 0xffffffff);
+		deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true).Get(), nullptr, 0xffffffff);
 
 		ComPtr<ID3D11VertexShader> vertexShader = shaders->getVertexShader(true, settings.platform.isNaomi2());
-		deviceContext->VSSetShader(vertexShader, nullptr, 0);
+		deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
 		ComPtr<ID3D11PixelShader> pixelShader = shaders->getShader(
 				false,
 				false,
@@ -794,10 +794,10 @@ void DX11Renderer::drawSorted(int first, int count, bool multipass)
 				false,
 				false,
 				false);
-		deviceContext->PSSetShader(pixelShader, nullptr, 0);
+		deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
 		// Enable depth test, enable depth write, >=, disable stencil
-		deviceContext->OMSetDepthStencilState(depthStencilStates.getState(true, true, 6, false), 0);
+		deviceContext->OMSetDepthStencilState(depthStencilStates.getState(true, true, 6, false).Get(), 0);
 		deviceContext->RSSetScissorRects(1, &scissorRect);
 
 		for (int p = first; p < end; p++)
@@ -817,15 +817,15 @@ void DX11Renderer::drawModVols(int first, int count)
 	if (count == 0 || pvrrc.modtrig.empty() || !config::ModifierVolumes)
 		return;
 
-	deviceContext->IASetInputLayout(modVolInputLayout);
+	deviceContext->IASetInputLayout(modVolInputLayout.Get());
     unsigned int stride = 3 * sizeof(float);
     unsigned int offset = 0;
-	deviceContext->IASetVertexBuffers(0, 1, &modvolBuffer.get(), &stride, &offset);
+	deviceContext->IASetVertexBuffers(0, 1, modvolBuffer.GetAddressOf(), &stride, &offset);
 	deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true), nullptr, 0xffffffff);
+	deviceContext->OMSetBlendState(blendStates.getState(false, 0, 0, true).Get(), nullptr, 0xffffffff);
 
-	deviceContext->PSSetShader(shaders->getModVolShader(), nullptr, 0);
+	deviceContext->PSSetShader(shaders->getModVolShader().Get(), nullptr, 0);
 
 	deviceContext->RSSetScissorRects(1, &scissorRect);
 	setCullMode(0);
@@ -851,13 +851,13 @@ void DX11Renderer::drawModVols(int first, int count)
 			curProjMat = param.projMatrix;
 			n2Helper.setConstants(pvrrc.matrices[param.mvMatrix].mat, pvrrc.matrices[param.projMatrix].mat);
 		}
-		deviceContext->VSSetShader(shaders->getMVVertexShader(param.isNaomi2()), nullptr, 0);
+		deviceContext->VSSetShader(shaders->getMVVertexShader(param.isNaomi2()).Get(), nullptr, 0);
 		if (!param.isp.VolumeLast && mv_mode > 0)
 			// OR'ing (open volume or quad)
-			deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Or), 2);
+			deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Or).Get(), 2);
 		else
 			// XOR'ing (closed volume)
-			deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Xor), 0);
+			deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Xor).Get(), 0);
 
 		if (param.count > 0)
 		{
@@ -868,7 +868,7 @@ void DX11Renderer::drawModVols(int first, int count)
 		if (mv_mode == 1 || mv_mode == 2)
 		{
 			// Sum the area
-			deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(mv_mode == 1 ? DepthStencilStates::Inclusion : DepthStencilStates::Exclusion), 1);
+			deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(mv_mode == 1 ? DepthStencilStates::Inclusion : DepthStencilStates::Exclusion).Get(), 1);
 			deviceContext->Draw((param.first + param.count - mod_base) * 3, mod_base * 3);
 			mod_base = -1;
 		}
@@ -876,21 +876,21 @@ void DX11Renderer::drawModVols(int first, int count)
 	//disable culling
 	setCullMode(0);
 	//enable color writes
-	deviceContext->OMSetBlendState(blendStates.getState(true, 4, 5), nullptr, 0xffffffff);
+	deviceContext->OMSetBlendState(blendStates.getState(true, 4, 5).Get(), nullptr, 0xffffffff);
 
 	//black out any stencil with '1'
 	//only pixels that are Modvol enabled, and in area 1
-	deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Final), 0x81);
+	deviceContext->OMSetDepthStencilState(depthStencilStates.getMVState(DepthStencilStates::Final).Get(), 0x81);
 
-	deviceContext->IASetInputLayout(mainInputLayout);
+	deviceContext->IASetInputLayout(mainInputLayout.Get());
     stride = sizeof(Vertex);
     offset = 0;
-	deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer.get(), &stride, &offset);
-	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+	deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	// Use the background poly as a quad
-	deviceContext->VSSetShader(shaders->getMVVertexShader(false), nullptr, 0);
+	deviceContext->VSSetShader(shaders->getMVVertexShader(false).Get(), nullptr, 0);
 	deviceContext->DrawIndexed(4, 0, 0);
 }
 
@@ -964,8 +964,8 @@ void DX11Renderer::RenderFramebuffer(const FramebufferInfo& info)
 		dcfbTexture->GetDesc(&desc);
 		if ((int)desc.Width != width || (int)desc.Height != height)
 		{
-			dcfbTexture.reset();
-			dcfbTextureView.reset();
+			dcfbTexture.Reset();
+			dcfbTextureView.Reset();
 		}
 	}
 	if (!dcfbTexture)
@@ -980,28 +980,28 @@ void DX11Renderer::RenderFramebuffer(const FramebufferInfo& info)
 		desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		desc.MipLevels = 1;
 
-		HRESULT hr = device->CreateTexture2D(&desc, nullptr, &dcfbTexture.get());
+		HRESULT hr = device->CreateTexture2D(&desc, nullptr, dcfbTexture.GetAddressOf());
 		if (FAILED(hr))
 			WARN_LOG(RENDERER, "DC Framebuffer texture creation failed");
 		D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 		viewDesc.Format = desc.Format;
 		viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipLevels = 1;
-		hr = device->CreateShaderResourceView(dcfbTexture, &viewDesc, &dcfbTextureView.get());
+		hr = device->CreateShaderResourceView(dcfbTexture.Get(), &viewDesc, dcfbTextureView.GetAddressOf());
 		if (FAILED(hr))
 			WARN_LOG(RENDERER, "DC Framebuffer texture view creation failed");
 	}
-	deviceContext->UpdateSubresource(dcfbTexture, 0, nullptr, pb.data(), width * sizeof(u32), width * sizeof(u32) * height);
+	deviceContext->UpdateSubresource(dcfbTexture.Get(), 0, nullptr, pb.data(), width * sizeof(u32), width * sizeof(u32) * height);
 
 #ifndef LIBRETRO
 	ID3D11ShaderResourceView *nullResView = nullptr;
     deviceContext->PSSetShaderResources(0, 1, &nullResView);
 	resize(width, height);
-	deviceContext->OMSetRenderTargets(1, &fbRenderTarget.get(), nullptr);
+	deviceContext->OMSetRenderTargets(1, fbRenderTarget.GetAddressOf(), nullptr);
 	float colors[4];
 	info.vo_border_col.getRGBColor(colors);
 	colors[3] = 1.f;
-	deviceContext->ClearRenderTargetView(fbRenderTarget, colors);
+	deviceContext->ClearRenderTargetView(fbRenderTarget.Get(), colors);
 	D3D11_VIEWPORT vp{};
 	vp.Width = (FLOAT)this->width;
 	vp.Height = (FLOAT)this->height;
@@ -1010,7 +1010,7 @@ void DX11Renderer::RenderFramebuffer(const FramebufferInfo& info)
 	deviceContext->RSSetViewports(1, &vp);
 	const D3D11_RECT r = { 0, 0, (LONG)this->width, (LONG)this->height };
 	deviceContext->RSSetScissorRects(1, &r);
-	deviceContext->OMSetBlendState(blendStates.getState(false), nullptr, 0xffffffff);
+	deviceContext->OMSetBlendState(blendStates.getState(false).Get(), nullptr, 0xffffffff);
 	deviceContext->GSSetShader(nullptr, nullptr, 0);
 	deviceContext->HSSetShader(nullptr, nullptr, 0);
 	deviceContext->DSSetShader(nullptr, nullptr, 0);
@@ -1020,7 +1020,7 @@ void DX11Renderer::RenderFramebuffer(const FramebufferInfo& info)
 
 	aspectRatio = getDCFramebufferAspectRatio();
 
-	deviceContext->OMSetRenderTargets(1, &theDX11Context.getRenderTarget().get(), nullptr);
+	deviceContext->OMSetRenderTargets(1, theDX11Context.getRenderTarget().GetAddressOf(), nullptr);
 	displayFramebuffer();
 	DrawOSD(false);
 	renderVideoRouting();
@@ -1129,8 +1129,8 @@ void DX11Renderer::prepareRttRenderTarget(u32 texAddress)
 
 	createTexAndRenderTarget(rttTexture, rttRenderTarget, fbw2, fbh2);
 	createDepthTexAndView(rttDepthTex, rttDepthTexView, fbw2, fbh2);
-	deviceContext->ClearDepthStencilView(rttDepthTexView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
-	deviceContext->OMSetRenderTargets(1, &rttRenderTarget.get(), rttDepthTexView);
+	deviceContext->ClearDepthStencilView(rttDepthTexView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.f, 0);
+	deviceContext->OMSetRenderTargets(1, rttRenderTarget.GetAddressOf(), rttDepthTexView.Get());
 
 	D3D11_VIEWPORT vp{};
 	vp.Width = (FLOAT)fbw;
@@ -1155,20 +1155,20 @@ void DX11Renderer::readRttRenderTarget(u32 texAddress)
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
 		ComPtr<ID3D11Texture2D> stagingTex;
-		HRESULT hr = device->CreateTexture2D(&desc, nullptr, &stagingTex.get());
+		HRESULT hr = device->CreateTexture2D(&desc, nullptr, stagingTex.GetAddressOf());
 		if (FAILED(hr))
 		{
 			WARN_LOG(RENDERER, "Staging RTT texture creation failed");
 			return;
 		}
-		deviceContext->CopyResource(stagingTex, rttTexture);
+		deviceContext->CopyResource(stagingTex.Get(), rttTexture.Get());
 
 		PixelBuffer<u32> tmp_buf;
 		tmp_buf.init(w, h);
 		u8 *p = (u8 *)tmp_buf.data();
 
 		D3D11_MAPPED_SUBRESOURCE mappedSubres;
-		hr = deviceContext->Map(stagingTex, 0, D3D11_MAP_READ, 0, &mappedSubres);
+		hr = deviceContext->Map(stagingTex.Get(), 0, D3D11_MAP_READ, 0, &mappedSubres);
 		if (FAILED(hr))
 		{
 			WARN_LOG(RENDERER, "Failed to map staging RTT texture");
@@ -1186,7 +1186,7 @@ void DX11Renderer::readRttRenderTarget(u32 texAddress)
 				src += mappedSubres.RowPitch;
 			}
 		}
-		deviceContext->Unmap(stagingTex, 0);
+		deviceContext->Unmap(stagingTex.Get(), 0);
 
 		u16 *dst = (u16 *)&vram[texAddress];
 		WriteTextureToVRam<2, 1, 0, 3>(w, h, (u8 *)tmp_buf.data(), dst, pvrrc.fb_W_CTRL, pvrrc.fb_W_LINESTRIDE * 8);
@@ -1199,14 +1199,14 @@ void DX11Renderer::readRttRenderTarget(u32 texAddress)
 			DX11Texture* texture = texCache.getRTTexture(texAddress, pvrrc.fb_W_CTRL.fb_packmode, w, h);
 
 			texture->texture = rttTexture;
-			rttTexture.reset();
-			rttRenderTarget.reset();
-			texture->textureView.reset();
+			rttTexture.Reset();
+			rttRenderTarget.Reset();
+			texture->textureView.Reset();
 			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 			viewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 			viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			viewDesc.Texture2D.MipLevels = 1;
-			device->CreateShaderResourceView(texture->texture, &viewDesc, &texture->textureView.get());
+			device->CreateShaderResourceView(texture->texture.Get(), &viewDesc, texture->textureView.GetAddressOf());
 
 			texture->dirty = 0;
 			texture->unprotectVRam();
@@ -1219,10 +1219,10 @@ void DX11Renderer::updatePaletteTexture()
 	if (palette_updated)
 	{
 		palette_updated = false;
-		deviceContext->UpdateSubresource(paletteTexture, 0, nullptr, palette32_ram, 32 * sizeof(u32), 32 * sizeof(u32) * 32);
+		deviceContext->UpdateSubresource(paletteTexture.Get(), 0, nullptr, palette32_ram, 32 * sizeof(u32), 32 * sizeof(u32) * 32);
 	}
-    deviceContext->PSSetShaderResources(1, 1, &paletteTextureView.get());
-    deviceContext->PSSetSamplers(1, 1, &samplers->getSampler(false).get());
+    deviceContext->PSSetShaderResources(1, 1, paletteTextureView.GetAddressOf());
+    deviceContext->PSSetSamplers(1, 1, samplers->getSampler(false).GetAddressOf());
 }
 
 void DX11Renderer::updateFogTexture()
@@ -1235,10 +1235,10 @@ void DX11Renderer::updateFogTexture()
 		u8 temp_tex_buffer[256];
 		MakeFogTexture(temp_tex_buffer);
 
-		deviceContext->UpdateSubresource(fogTexture, 0, nullptr, temp_tex_buffer, 128, 128 * 2);
+		deviceContext->UpdateSubresource(fogTexture.Get(), 0, nullptr, temp_tex_buffer, 128, 128 * 2);
 	}
-    deviceContext->PSSetShaderResources(2, 1, &fogTextureView.get());
-    deviceContext->PSSetSamplers(2, 1, &samplers->getSampler(true).get());
+    deviceContext->PSSetShaderResources(2, 1, fogTextureView.GetAddressOf());
+    deviceContext->PSSetSamplers(2, 1, samplers->getSampler(true).GetAddressOf());
 }
 
 void DX11Renderer::DrawOSD(bool clear_screen)
@@ -1275,9 +1275,9 @@ void DX11Renderer::writeFramebufferToVRAM()
 			fbScaledTexture->GetDesc(&desc);
 			if (desc.Width != scaledW || desc.Height != scaledH)
 			{
-				fbScaledTexture.reset();
-				fbScaledTextureView.reset();
-				fbScaledRenderTarget.reset();
+				fbScaledTexture.Reset();
+				fbScaledTextureView.Reset();
+				fbScaledRenderTarget.Reset();
 			}
 		}
 		if (!fbScaledTexture)
@@ -1288,16 +1288,16 @@ void DX11Renderer::writeFramebufferToVRAM()
 			viewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 			viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			viewDesc.Texture2D.MipLevels = 1;
-			device->CreateShaderResourceView(fbScaledTexture, &viewDesc, &fbScaledTextureView.get());
+			device->CreateShaderResourceView(fbScaledTexture.Get(), &viewDesc, fbScaledTextureView.GetAddressOf());
 		}
-		deviceContext->OMSetRenderTargets(1, &fbScaledRenderTarget.get(), nullptr);
+		deviceContext->OMSetRenderTargets(1, fbScaledRenderTarget.GetAddressOf(), nullptr);
 		D3D11_VIEWPORT vp{};
 		vp.Width = (FLOAT)scaledW;
 		vp.Height = (FLOAT)scaledH;
 		vp.MinDepth = 0.f;
 		vp.MaxDepth = 1.f;
 		deviceContext->RSSetViewports(1, &vp);
-		deviceContext->OMSetBlendState(blendStates.getState(false), nullptr, 0xffffffff);
+		deviceContext->OMSetBlendState(blendStates.getState(false).Get(), nullptr, 0xffffffff);
 		quad->draw(fbTextureView, samplers->getSampler(true));
 
 		width = scaledW;
@@ -1320,20 +1320,20 @@ void DX11Renderer::writeFramebufferToVRAM()
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
 	ComPtr<ID3D11Texture2D> stagingTex;
-	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &stagingTex.get());
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, stagingTex.GetAddressOf());
 	if (FAILED(hr))
 	{
 		WARN_LOG(RENDERER, "Staging RTT texture creation failed");
 		return;
 	}
-	deviceContext->CopyResource(stagingTex, fbTexture);
+	deviceContext->CopyResource(stagingTex.Get(), fbTexture.Get());
 
 	PixelBuffer<u32> tmp_buf;
 	tmp_buf.init(width, height);
 	u8 *p = (u8 *)tmp_buf.data();
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubres;
-	hr = deviceContext->Map(stagingTex, 0, D3D11_MAP_READ, 0, &mappedSubres);
+	hr = deviceContext->Map(stagingTex.Get(), 0, D3D11_MAP_READ, 0, &mappedSubres);
 	if (FAILED(hr))
 	{
 		WARN_LOG(RENDERER, "Failed to map staging RTT texture");
@@ -1351,7 +1351,7 @@ void DX11Renderer::writeFramebufferToVRAM()
 			src += mappedSubres.RowPitch;
 		}
 	}
-	deviceContext->Unmap(stagingTex, 0);
+	deviceContext->Unmap(stagingTex.Get(), 0);
 
 	xClip.min = std::min(xClip.min, width - 1);
 	xClip.max = std::min(xClip.max, width - 1);
@@ -1391,7 +1391,7 @@ bool DX11Renderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 
 	ID3D11ShaderResourceView *nullResView = nullptr;
 	deviceContext->PSSetShaderResources(0, 1, &nullResView);
-	deviceContext->OMSetRenderTargets(1, &dstRenderTarget.get(), nullptr);
+	deviceContext->OMSetRenderTargets(1, dstRenderTarget.GetAddressOf(), nullptr);
 	D3D11_VIEWPORT vp{};
 	vp.Width = (FLOAT)width;
 	vp.Height = (FLOAT)height;
@@ -1400,7 +1400,7 @@ bool DX11Renderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 	deviceContext->RSSetViewports(1, &vp);
 	const D3D11_RECT r = { 0, 0, (LONG)width, (LONG)height };
 	deviceContext->RSSetScissorRects(1, &r);
-	deviceContext->OMSetBlendState(blendStates.getState(false), nullptr, 0xffffffff);
+	deviceContext->OMSetBlendState(blendStates.getState(false).Get(), nullptr, 0xffffffff);
 	deviceContext->GSSetShader(nullptr, nullptr, 0);
 	deviceContext->HSSetShader(nullptr, nullptr, 0);
 	deviceContext->DSSetShader(nullptr, nullptr, 0);
@@ -1409,7 +1409,7 @@ bool DX11Renderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 	quad->draw(fbTextureView, samplers->getSampler(true), nullptr, -1.f, -1.f, 2.f, 2.f, config::Rotate90);
 
 #ifndef LIBRETRO
-	deviceContext->OMSetRenderTargets(1, &theDX11Context.getRenderTarget().get(), nullptr);
+	deviceContext->OMSetRenderTargets(1, theDX11Context.getRenderTarget().GetAddressOf(), nullptr);
 #else
 	ID3D11RenderTargetView *nullView = nullptr;
 	deviceContext->OMSetRenderTargets(1, &nullView, nullptr);
@@ -1422,16 +1422,16 @@ bool DX11Renderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
 	ComPtr<ID3D11Texture2D> stagingTex;
-	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &stagingTex.get());
+	HRESULT hr = device->CreateTexture2D(&desc, nullptr, stagingTex.GetAddressOf());
 	if (FAILED(hr))
 	{
 		WARN_LOG(RENDERER, "Staging screenshot texture creation failed");
 		return false;
 	}
-	deviceContext->CopyResource(stagingTex, dstTex);
+	deviceContext->CopyResource(stagingTex.Get(), dstTex.Get());
 
 	D3D11_MAPPED_SUBRESOURCE mappedSubres;
-	hr = deviceContext->Map(stagingTex, 0, D3D11_MAP_READ, 0, &mappedSubres);
+	hr = deviceContext->Map(stagingTex.Get(), 0, D3D11_MAP_READ, 0, &mappedSubres);
 	if (FAILED(hr))
 	{
 		WARN_LOG(RENDERER, "Failed to map staging screenshot texture");
@@ -1448,7 +1448,7 @@ bool DX11Renderer::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 			data.push_back(p[0]);
 		}
 	}
-	deviceContext->Unmap(stagingTex, 0);
+	deviceContext->Unmap(stagingTex.Get(), 0);
 
 	return true;
 }
@@ -1460,7 +1460,7 @@ void DX11Renderer::renderVideoRouting()
 	{
 		extern void os_VideoRoutingPublishFrameTexture(ID3D11Texture2D* pTexture);
 		
-		ID3D11RenderTargetView* pRenderTargetView = theDX11Context.getRenderTarget().get();
+		ID3D11RenderTargetView* pRenderTargetView = theDX11Context.getRenderTarget().Get();
 
 		// Backbuffer texture would be different after resizing, fetching new address everytime
 		ID3D11Resource* pResource = nullptr;
@@ -1479,20 +1479,20 @@ void DX11Renderer::renderVideoRouting()
 			// Window resized?
 			if (!vrStagingTexture || bbDesc.Width != vrsDesc.Width || bbDesc.Height != vrsDesc.Height)
 			{
-				vrStagingTexture.reset();
-				vrStagingTextureSRV.reset();
+				vrStagingTexture.Reset();
+				vrStagingTextureSRV.Reset();
 
 				D3D11_TEXTURE2D_DESC srvDesc = bbDesc;
 				srvDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 				srvDesc.Usage = D3D11_USAGE_DEFAULT;
-				device->CreateTexture2D(&srvDesc, nullptr, &vrStagingTexture.get());
+				device->CreateTexture2D(&srvDesc, nullptr, vrStagingTexture.GetAddressOf());
 
 				D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc{};
 				viewDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 				viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 				viewDesc.Texture2D.MipLevels = 1;
 				
-				device->CreateShaderResourceView(vrStagingTexture.get(), &viewDesc, &vrStagingTextureSRV.get());
+				device->CreateShaderResourceView(vrStagingTexture.Get(), &viewDesc, vrStagingTextureSRV.GetAddressOf());
 			}
 
 			// Scale down value changed?
@@ -1503,8 +1503,8 @@ void DX11Renderer::renderVideoRouting()
 			if (!vrScaledTexture || (int)vrscDesc.Height != config::VideoRoutingVRes)
 			{
 
-				vrScaledTexture.reset();
-				vrScaledRenderTarget.reset();
+				vrScaledTexture.Reset();
+				vrScaledRenderTarget.Reset();
 				createTexAndRenderTarget(vrScaledTexture, vrScaledRenderTarget, targetWidth, config::VideoRoutingVRes);
 			}
 			D3D11_VIEWPORT scaledViewPort{};
@@ -1513,13 +1513,13 @@ void DX11Renderer::renderVideoRouting()
 			scaledViewPort.MinDepth = 0.f;
 			scaledViewPort.MaxDepth = 1.f;
 
-			deviceContext->OMSetRenderTargets(1, &vrScaledRenderTarget.get(), nullptr);
+			deviceContext->OMSetRenderTargets(1, vrScaledRenderTarget.GetAddressOf(), nullptr);
 			deviceContext->RSSetViewports(1, &scaledViewPort);
-			deviceContext->CopyResource(vrStagingTexture.get(), backBufferTexture);
+			deviceContext->CopyResource(vrStagingTexture.Get(), backBufferTexture);
 			quad->draw(vrStagingTextureSRV, samplers->getSampler(true));
-			os_VideoRoutingPublishFrameTexture(vrScaledTexture);
+			os_VideoRoutingPublishFrameTexture(vrScaledTexture.Get());
 
-			deviceContext->OMSetRenderTargets(1, &theDX11Context.getRenderTarget().get(), nullptr);
+			deviceContext->OMSetRenderTargets(1, theDX11Context.getRenderTarget().GetAddressOf(), nullptr);
 
 		} else {
 			os_VideoRoutingPublishFrameTexture(backBufferTexture);
