@@ -173,11 +173,11 @@ bool VulkanContext::InitInstance(const char** extensions, uint32_t extensions_co
 		//layer_names.push_back("VK_LAYER_ARM_AGA");
 #ifdef VK_DEBUG
 #ifndef __ANDROID__
-		vext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-		vext.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		vext.push_back(vk::EXTDebugUtilsExtensionName);
+		vext.push_back(vk::EXTDebugReportExtensionName);
 		layer_names.push_back("VK_LAYER_KHRONOS_validation");
 #else
-		vext.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);	// NDK <= 19?
+		vext.push_back(vk::EXTDebugReportExtensionName);	// NDK <= 19?
 		layer_names.push_back("VK_LAYER_GOOGLE_threading");
 		layer_names.push_back("VK_LAYER_LUNARG_parameter_validation");
 		layer_names.push_back("VK_LAYER_LUNARG_core_validation");
@@ -385,42 +385,42 @@ bool VulkanContext::InitDevice()
 		// Enable VK_KHR_dedicated_allocation if available
 		bool getMemReq2Supported = false;
 		dedicatedAllocationSupported = false;
-		std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+		std::vector<const char *> deviceExtensions = { vk::KHRSwapchainExtensionName };
 		for (const auto& property : physicalDevice.enumerateDeviceExtensionProperties())
 		{
-			if (!strcmp(property.extensionName, VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME))
+			if (!strcmp(property.extensionName, vk::KHRGetMemoryRequirements2ExtensionName))
 			{
-				deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+				deviceExtensions.push_back(vk::KHRGetMemoryRequirements2ExtensionName);
 				getMemReq2Supported = true;
 			}
-			else if (!strcmp(property.extensionName, VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME))
+			else if (!strcmp(property.extensionName, vk::KHRDedicatedAllocationExtensionName))
 			{
-				deviceExtensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+				deviceExtensions.push_back(vk::KHRDedicatedAllocationExtensionName);
 				dedicatedAllocationSupported = true;
 			}
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-			else if (!strcmp(property.extensionName, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME))
-				deviceExtensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+			else if (!strcmp(property.extensionName, vk::KHRPortabilitySubsetExtensionName))
+				deviceExtensions.push_back(vk::KHRPortabilitySubsetExtensionName);
 #endif
 #ifdef VK_USE_PLATFORM_METAL_EXT
-			else if (!strcmp(property.extensionName, VK_EXT_METAL_OBJECTS_EXTENSION_NAME))
-				deviceExtensions.push_back(VK_EXT_METAL_OBJECTS_EXTENSION_NAME);
+			else if (!strcmp(property.extensionName, vk::EXTMetalObjectsExtensionName))
+				deviceExtensions.push_back(vk::EXTMetalObjectsExtensionName);
 #endif
 #ifdef VK_DEBUG
-			else if (!strcmp(property.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+			else if (!strcmp(property.extensionName, vk::EXTDebugMarkerExtensionName))
 			{
 				NOTICE_LOG(RENDERER, "Debug extension %s available", property.extensionName.data());
-				deviceExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+				deviceExtensions.push_back(vk::EXTDebugMarkerExtensionName);
 			}
-			else if(!strcmp(property.extensionName, VK_EXT_DEBUG_REPORT_EXTENSION_NAME))
+			else if(!strcmp(property.extensionName, vk::EXTDebugReportExtensionName))
 			{
 				NOTICE_LOG(RENDERER, "Debug extension %s available", property.extensionName.data());
-				deviceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+				deviceExtensions.push_back(vk::EXTDebugReportExtensionName);
 			}
-			else if (!strcmp(property.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+			else if (!strcmp(property.extensionName, vk::EXTDebugUtilsExtensionName))
 			{
 				NOTICE_LOG(RENDERER, "Debug extension %s available", property.extensionName.data());
-				deviceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+				deviceExtensions.push_back(vk::EXTDebugUtilsExtensionName);
 			}
 #endif
 		}
@@ -733,7 +733,7 @@ bool VulkanContext::init()
 	GraphicsContext::instance = this;
 
 	std::vector<const char *> extensions;
-	extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRSurfaceExtensionName);
 #if defined(USE_SDL)
 	if (!sdl_recreate_window(SDL_WINDOW_VULKAN))
 		return false;
@@ -744,13 +744,13 @@ bool VulkanContext::init()
 #elif defined(VK_USE_PLATFORM_WIN32_KHR)
     extern void CreateMainWindow();
     CreateMainWindow();
-	extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRWin32SurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_METAL_EXT)
-	extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::EXTMetalSurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-	extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRXlibSurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRAndroidSurfaceExtensionName);
 #endif
 	if (!InitInstance(&extensions[0], extensions.size())) {
 		term();
