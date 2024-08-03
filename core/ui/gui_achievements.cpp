@@ -308,7 +308,7 @@ void achievementList()
     }
 
 	// ImGuiWindowFlags_NavFlattened prevents the child window from getting the focus and thus the list can't be scrolled with a keyboard or gamepad.
-	if (ImGui::BeginChild(ImGui::GetID("ach_list"), ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling))
+	if (ImGui::BeginChild(ImGui::GetID("ach_list"), ImVec2(0, 0), ImGuiChildFlags_Border))
 	{
 		std::vector<Achievement> achList = getAchievementList();
 		int id = 0;
