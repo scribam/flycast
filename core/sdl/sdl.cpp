@@ -744,7 +744,7 @@ bool sdl_recreate_window(u32 flags)
 	return true;
 }
 
-static const char *getClipboardText(void *)
+static const char *getClipboardText(ImGuiContext *)
 {
 	clipboardText.clear();
 	if (SDL_HasClipboardText())
@@ -756,7 +756,7 @@ static const char *getClipboardText(void *)
 	return clipboardText.c_str();
 }
 
-static void setClipboardText(void *, const char *text)
+static void setClipboardText(ImGuiContext *, const char *text)
 {
 	SDL_SetClipboardText(text);
 }
@@ -796,8 +796,11 @@ void sdl_window_create()
 	sdlDeInit.initialized = true;
 	initRenderApi();
 	// ImGui copy & paste
-	ImGui::GetIO().GetClipboardTextFn = getClipboardText;
-	ImGui::GetIO().SetClipboardTextFn = setClipboardText;
+	ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+	platform_io.Platform_SetClipboardTextFn = setClipboardText;
+	platform_io.Platform_GetClipboardTextFn = getClipboardText;
+	platform_io.Platform_ClipboardUserData = nullptr;
+	platform_io.Platform_SetImeDataFn = nullptr;
 #ifdef TARGET_UWP
 	// Must be fast so an event filter is required
 	SDL_SetEventFilter(suspendEventFilter, nullptr);

@@ -117,7 +117,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 
 		ImGui::Text("%s", title.c_str());
 		ImGui::BeginChild(ImGui::GetID("dir_list"), ImVec2(0, - uiScaled(30) - ImGui::GetStyle().ItemSpacing.y),
-				ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling | ImGuiWindowFlags_NavFlattened);
+				ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened);
 		{
 			ImguiStyleVar _(ImGuiStyleVar_ItemSpacing, ScaledVec2(8, 20));
 
@@ -185,6 +185,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 // See https://github.com/ocornut/imgui/issues/3379
 void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
 {
+#if 0
 	ImGuiContext& g = *ImGui::GetCurrentContext();
 	ImGuiWindow* window = g.CurrentWindow;
 	while (window != nullptr
@@ -215,6 +216,7 @@ void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
     	window->DragScrolling = true;
     	window->ScrollSpeed = delta;
     }
+#endif
 }
 
 static void UnpackAccumulativeOffsetsIntoRanges(int base_codepoint, const short* accumulative_offsets, int accumulative_offsets_count, ImWchar* out_ranges)
@@ -547,7 +549,7 @@ bool OptionArrowButtons(const char *name, config::Option<int>& option, int min, 
 	}
 
 	ImGui::SameLine(0.0f, innerSpacing);
-	ImGui::PushButtonRepeat(true);
+	ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
 	bool valueChanged = false;
 	{
 		DisabledScope scope(option.isReadOnly());
@@ -556,7 +558,7 @@ bool OptionArrowButtons(const char *name, config::Option<int>& option, int min, 
 		ImGui::SameLine(0.0f, innerSpacing);
 		if (ImGui::ArrowButton((id + "right").c_str(), ImGuiDir_Right)) { option.set(std::min(max, option + 1)); valueChanged = true; }
 	}
-	ImGui::PopButtonRepeat();
+	ImGui::PopItemFlag();
 	ImGui::SameLine(0.0f, innerSpacing);
 	ImGui::Text("%s", name);
 	if (help != nullptr)
@@ -672,6 +674,7 @@ static void computeScrollSpeed(float &v)
 
 void windowDragScroll()
 {
+#if 0
 	ImGuiWindow *window = ImGui::GetCurrentWindow();
 	if (window->DragScrolling)
 	{
@@ -700,6 +703,7 @@ void windowDragScroll()
 			ImGui::SetScrollY(window, window->Scroll.y - window->ScrollSpeed.y);
 		}
 	}
+#endif
 }
 
 static void setUV(float ar, ImVec2& uv0, ImVec2& uv1)
@@ -909,7 +913,7 @@ void ImguiVmuTexture::displayVmus(const ImVec2& pos)
 }
 
 // Custom version of ImGui::BeginListBox that allows passing window flags
-bool BeginListBox(const char* label, const ImVec2& size_arg, ImGuiWindowFlags windowFlags)
+bool BeginListBox(const char* label, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags)
 {
 	using namespace ImGui;
     ImGuiContext& g = *GImGui;
@@ -946,7 +950,7 @@ bool BeginListBox(const char* label, const ImVec2& size_arg, ImGuiWindowFlags wi
         window->DC.CursorMaxPos = ImMax(window->DC.CursorMaxPos, label_pos + label_size);
     }
 
-    BeginChild(id, frame_bb.GetSize(), ImGuiChildFlags_FrameStyle, windowFlags);
+    BeginChild(id, frame_bb.GetSize(), ImGuiChildFlags_FrameStyle | child_flags, window_flags);
     return true;
 }
 

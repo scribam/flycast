@@ -42,7 +42,7 @@ static void addCheat()
 			ImGui::Indent(uiScaled(10));
 			ImGui::Text("ADD CHEAT");
 
-			ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Cancel").x - ImGui::GetStyle().FramePadding.x * 4.f
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("Cancel").x - ImGui::GetStyle().FramePadding.x * 3.f
 				- ImGui::CalcTextSize("OK").x - ImGui::GetStyle().ItemSpacing.x);
 			if (ImGui::Button("Cancel"))
 				ImGui::CloseCurrentPopup();
@@ -62,7 +62,7 @@ static void addCheat()
 			ImGui::Unindent(uiScaled(10));
 		}
 
-		ImGui::BeginChild(ImGui::GetID("input"), ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_NavFlattened);
+		ImGui::BeginChild(ImGui::GetID("input"), ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened);
 		{
 			ImGui::InputText("Name", cheatName, sizeof(cheatName), 0, nullptr, nullptr);
 			ImGui::InputTextMultiline("Code", cheatCode, sizeof(cheatCode), ImVec2(0, ImGui::GetTextLineHeight() * 8), 0, nullptr, nullptr);
@@ -93,7 +93,7 @@ void gui_cheats()
 		ImGui::Indent(uiScaled(10));
 		ImGui::Text(ICON_FA_MASK "  CHEATS");
 
-		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Add").x  - ImGui::CalcTextSize("Close").x - ImGui::GetStyle().FramePadding.x * 6.f
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("Add").x  - ImGui::CalcTextSize("Close").x - ImGui::GetStyle().FramePadding.x * 5.f
 			- ImGui::CalcTextSize("Load").x - ImGui::GetStyle().ItemSpacing.x * 2);
 		if (ImGui::Button("Add"))
 			ImGui::OpenPopup("addCheat");
@@ -119,7 +119,7 @@ void gui_cheats()
 			return true;
 		}, true, "cht");
 
-	ImGui::BeginChild(ImGui::GetID("cheats"), ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling | ImGuiWindowFlags_NavFlattened);
+	ImGui::BeginChild(ImGui::GetID("cheats"), ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened);
     {
 		if (cheatManager.cheatCount() == 0)
 			ImGui::Text("(No cheat loaded)");
