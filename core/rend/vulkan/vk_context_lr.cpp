@@ -45,17 +45,18 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 		const char** required_device_layers, unsigned num_required_device_layers,
 		const VkPhysicalDeviceFeatures* required_features)
 {
+	verify(instance != VK_NULL_HANDLE);
+	vk::Instance vkinstance(instance);
+
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(get_instance_proc_addr);
-	VULKAN_HPP_DEFAULT_DISPATCHER.init(instance);
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkinstance);
 #endif
 
 	vk::PhysicalDevice physicalDevice(gpu);
 	if (gpu == VK_NULL_HANDLE)
 	{
 		// Choose a discrete gpu if there's one, otherwise just pick the first one
-		verify(instance != VK_NULL_HANDLE);
-		vk::Instance vkinstance(instance);
 		const auto devices = vkinstance.enumeratePhysicalDevices();
 		for (const auto& phyDev : devices)
 		{
@@ -132,19 +133,19 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 	// Enable VK_KHR_dedicated_allocation if available
 	bool getMemReq2Supported = false;
 	VulkanContext::Instance()->dedicatedAllocationSupported = false;
-	std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	std::vector<const char *> deviceExtensions = { vk::KHRSurfaceExtensionName };
 	for (unsigned i = 0; i < num_required_device_extensions; i++)
 		deviceExtensions.push_back(required_device_extensions[i]);
 	for (const auto& property : physicalDevice.enumerateDeviceExtensionProperties())
 	{
-		if (!strcmp(property.extensionName, VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME))
+		if (!strcmp(property.extensionName, vk::KHRGetMemoryRequirements2ExtensionName))
 		{
-			deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+			deviceExtensions.push_back(vk::KHRGetMemoryRequirements2ExtensionName);
 			getMemReq2Supported = true;
 		}
-		else if (!strcmp(property.extensionName, VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME))
+		else if (!strcmp(property.extensionName, vk::KHRDedicatedAllocationExtensionName))
 		{
-			deviceExtensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+			deviceExtensions.push_back(vk::KHRDedicatedAllocationExtensionName);
 			VulkanContext::Instance()->dedicatedAllocationSupported = true;
 		}
 	}
@@ -164,10 +165,10 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 	vk::Device device = physicalDevice.createDevice(vk::DeviceCreateInfo(vk::DeviceCreateFlags(),
 			context->queue_family_index == context->presentation_queue_family_index ? 1 : 2, deviceQueueCreateInfos,
 					num_required_device_layers, required_device_layers, deviceExtensions.size(), &deviceExtensions[0], &features));
-	context->device = (VkDevice)device;
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1
-	VULKAN_HPP_DEFAULT_DISPATCHER.init(context->device);
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(device);
 #endif
+	context->device = (VkDevice)device;
 
 	// Queues
 	context->queue = (VkQueue)device.getQueue(context->queue_family_index, 0);

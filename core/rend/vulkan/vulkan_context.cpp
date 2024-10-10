@@ -42,6 +42,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #endif
 
 #include <memory>
+#include <set>
 
 void ReInitOSD();
 
@@ -173,11 +174,11 @@ bool VulkanContext::InitInstance(const char** extensions, uint32_t extensions_co
 		//layer_names.push_back("VK_LAYER_ARM_AGA");
 #ifdef VK_DEBUG
 #ifndef __ANDROID__
-		vext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-		vext.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		vext.push_back(vk::EXTDebugUtilsExtensionName);
+		vext.push_back(vk::EXTDebugReportExtensionName);
 		layer_names.push_back("VK_LAYER_KHRONOS_validation");
 #else
-		vext.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);	// NDK <= 19?
+		vext.push_back(vk::EXTDebugReportExtensionName);	// NDK <= 19?
 		layer_names.push_back("VK_LAYER_GOOGLE_threading");
 		layer_names.push_back("VK_LAYER_LUNARG_parameter_validation");
 		layer_names.push_back("VK_LAYER_LUNARG_core_validation");
@@ -432,21 +433,21 @@ bool VulkanContext::InitDevice()
 		};
 
 		// Required swapchain extension
-		tryAddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::KHRSwapchainExtensionName);
 
 		// Enable VK_KHR_dedicated_allocation if available
-		const bool getMemReq2Supported = tryAddDeviceExtension(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
-		dedicatedAllocationSupported = tryAddDeviceExtension(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+		const bool getMemReq2Supported = tryAddDeviceExtension(vk::KHRGetMemoryRequirements2ExtensionName);
+		dedicatedAllocationSupported = tryAddDeviceExtension( vk::KHRDedicatedAllocationExtensionName);
 		dedicatedAllocationSupported &= getMemReq2Supported;
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-		tryAddDeviceExtension(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::KHRPortabilitySubsetExtensionName);
 #endif
 #ifdef VK_USE_PLATFORM_METAL_EXT
-		tryAddDeviceExtension(VK_EXT_METAL_OBJECTS_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::EXTMetalObjectsExtensionName);
 #endif
 #ifdef VK_DEBUG
-		tryAddDeviceExtension(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::EXTDebugMarkerExtensionName);
 #endif
 
 		// create a UniqueDevice
@@ -759,7 +760,7 @@ bool VulkanContext::init()
 	GraphicsContext::instance = this;
 
 	std::vector<const char *> extensions;
-	extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRSurfaceExtensionName);
 #if defined(USE_SDL)
 	if (!sdl_recreate_window(SDL_WINDOW_VULKAN))
 		return false;
@@ -770,13 +771,13 @@ bool VulkanContext::init()
 #elif defined(VK_USE_PLATFORM_WIN32_KHR)
     extern void CreateMainWindow();
     CreateMainWindow();
-	extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRWin32SurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_METAL_EXT)
-	extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::EXTMetalSurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-	extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRXlibSurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRAndroidSurfaceExtensionName);
 #endif
 	if (!InitInstance(&extensions[0], extensions.size())) {
 		term();
