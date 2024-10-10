@@ -44,3 +44,6 @@
 [submodule "external/AltKit"]
 	path = external/AltKit
 	url = https://github.com/rileytestut/AltKit.git
+[submodule "external/ELFIO"]
+	path = external/ELFIO
+	url = https://github.com/serge1/ELFIO.git
