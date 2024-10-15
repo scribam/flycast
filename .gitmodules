@@ -47,3 +47,6 @@
 [submodule "external/VulkanMemoryAllocator"]
 	path = external/VulkanMemoryAllocator
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "external/dirent"]
+	path = external/dirent
+	url = https://github.com/tronkko/dirent.git
