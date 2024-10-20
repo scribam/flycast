@@ -280,7 +280,7 @@ void achievementList()
 	ImGui::Begin("##achievements", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
 
 	{
-		float w = ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Close").x - ImGui::GetStyle().ItemSpacing.x * 2 - ImGui::GetStyle().WindowPadding.x
+		float w = ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("Close").x - ImGui::GetStyle().ItemSpacing.x * 2 - ImGui::GetStyle().WindowPadding.x
 				- uiScaled(80.f + 20.f * 2);	// image width and button frame padding
 		Game game = getCurrentGame();
 		ImguiFileTexture tex(game.image);
@@ -308,7 +308,7 @@ void achievementList()
     }
 
 	// ImGuiWindowFlags_NavFlattened prevents the child window from getting the focus and thus the list can't be scrolled with a keyboard or gamepad.
-	if (ImGui::BeginChild(ImGui::GetID("ach_list"), ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling))
+	if (ImGui::BeginChild(ImGui::GetID("ach_list"), ImVec2(0, 0), ImGuiChildFlags_Borders))
 	{
 		std::vector<Achievement> achList = getAchievementList();
 		int id = 0;
