@@ -479,12 +479,12 @@ if(NOT LIBRETRO)
 	endif()
 endif()
 
-add_subdirectory(core/deps/libchdr EXCLUDE_FROM_ALL)
+add_subdirectory(external/libchdr EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PRIVATE chdr-static)
-target_include_directories(${PROJECT_NAME} PRIVATE core/deps/libchdr/include)
+target_include_directories(${PROJECT_NAME} PRIVATE external/libchdr/include)
 
 if(NOT WITH_SYSTEM_ZLIB)
-	set(ZLIB_RELATIVE_PATH "core/deps/libchdr/deps/zlib-1.3.1")
+	set(ZLIB_RELATIVE_PATH "external/libchdr/deps/zlib-1.3.1")
 	target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/${ZLIB_RELATIVE_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/${ZLIB_RELATIVE_PATH}")
 	# help libzip find the package
 	set(ZLIB_FOUND TRUE)
@@ -639,7 +639,7 @@ endif()
 
 if(NOT LIBZIP_FOUND OR NINTENDO_SWITCH)
 	cmake_policy(SET CMP0026 OLD)
-	set(zstd_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/core/deps/libchdr/deps/zstd-1.5.6/lib")
+	set(zstd_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/libchdr/deps/zstd-1.5.6/lib")
 	get_target_property(zstd_STATIC_LIBRARY libzstd_static LOCATION)
 
 	option(ENABLE_COMMONCRYPTO "Enable use of CommonCrypto" OFF)
