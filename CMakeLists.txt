@@ -1342,7 +1342,8 @@ if(USE_VULKAN)
 		target_compile_definitions(${PROJECT_NAME} PUBLIC VK_USE_PLATFORM_METAL_EXT)
 	endif()
 
-	add_subdirectory(core/deps/Vulkan-Headers)
+	option(VULKAN_HEADERS_ENABLE_MODULE "Enables building of the Vulkan C++ module. Default is true if supported by the CMake version and compilers" OFF)
+	add_subdirectory(external/Vulkan-Headers)
 	target_link_libraries(${PROJECT_NAME} PRIVATE Vulkan::Headers)
 
 	add_subdirectory(core/deps/VulkanMemoryAllocator)
