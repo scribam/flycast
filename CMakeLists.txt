@@ -726,15 +726,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE _7ZIP_ST)
 target_sources(${PROJECT_NAME} PRIVATE core/deps/lzma/7zArcIn.c core/deps/lzma/7zBuf.c core/deps/lzma/7zCrc.c core/deps/lzma/7zCrcOpt.c core/deps/lzma/7zDec.c core/deps/lzma/7zFile.c core/deps/lzma/7zStream.c core/deps/lzma/Alloc.c core/deps/lzma/Bcj2.c core/deps/lzma/Bra86.c core/deps/lzma/Bra.c core/deps/lzma/BraIA64.c core/deps/lzma/CpuArch.c core/deps/lzma/Delta.c core/deps/lzma/LzFind.c core/deps/lzma/Lzma2Dec.c core/deps/lzma/Lzma86Dec.c core/deps/lzma/Lzma86Enc.c core/deps/lzma/LzmaDec.c core/deps/lzma/LzmaEnc.c core/deps/lzma/LzmaLib.c core/deps/lzma/Sort.c)
 if(NOT LIBRETRO)
-	target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DISABLE_DEMO_WINDOWS IMGUI_DEFINE_MATH_OPERATORS)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/imgui core/deps/imgui/backends)
-	target_sources(${PROJECT_NAME} PRIVATE
-		core/deps/imgui/imgui.cpp
-		core/deps/imgui/imgui_demo.cpp
-		core/deps/imgui/imgui_draw.cpp
-		core/deps/imgui/imgui_stdlib.cpp
-		core/deps/imgui/imgui_tables.cpp
-		core/deps/imgui/imgui_widgets.cpp)
+	add_library(imgui STATIC external/imgui/misc/cpp/imgui_stdlib.cpp external/imgui/imgui.cpp external/imgui/imgui_draw.cpp external/imgui/imgui_tables.cpp external/imgui/imgui_widgets.cpp)
+	target_compile_definitions(imgui PRIVATE IMGUI_DISABLE_DEMO_WINDOWS PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
+	if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+		target_compile_definitions(imgui PUBLIC ImTextureID=ImU64)
+	endif()
+	if(NINTENDO_SWITCH)
+		target_compile_definitions(imgui PRIVATE IMGUI_DISABLE_DEFAULT_SHELL_FUNCTIONS)
+	endif()
+	target_include_directories(imgui PUBLIC external/imgui external/imgui/misc/cpp core/deps/imgui/backends)
+	target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
 
 	if(ENABLE_FC_PROFILER)
 		target_include_directories(${PROJECT_NAME} PRIVATE core/deps/implot)
@@ -1406,9 +1407,6 @@ if(USE_VULKAN)
 				core/rend/vulkan/vulkan_context.cpp
 				core/deps/imgui/backends/imgui_impl_vulkan.cpp
 				core/deps/imgui/backends/imgui_impl_vulkan.h)
-		if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-			target_compile_definitions(${PROJECT_NAME} PRIVATE ImTextureID=ImU64)
-		endif()
 	endif()
 endif()
 
