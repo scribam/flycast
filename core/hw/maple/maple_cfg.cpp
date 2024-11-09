@@ -352,7 +352,7 @@ static void createDreamcastDevices()
 			break;
 
 		default:
-			WARN_LOG(MAPLE, "Invalid device type %d for port %d", (MapleDeviceType)config::MapleMainDevices[bus], bus);
+			WARN_LOG(MAPLE, "Invalid device type %d for port %d", fmt::underlying((MapleDeviceType)config::MapleMainDevices[bus]), bus);
 			break;
 		}
 	}

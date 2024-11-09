@@ -56,7 +56,7 @@ public:
 	void Compile(DSPState *DSP)
 	{
 		this->DSP = DSP;
-		DEBUG_LOG(AICA_ARM, "DSPAssembler::DSPCompile recompiling for x86/64 at %p", this->getCode());
+		DEBUG_LOG(AICA_ARM, "DSPAssembler::DSPCompile recompiling for x86/64 at %p", fmt::ptr(this->getCode()));
 
 		push(rbx);
 		push(rbp);

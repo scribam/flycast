@@ -610,7 +610,7 @@ static void read_native_sockets()
     	pico_socket *ps = pico_socket_open(PICO_PROTO_IPV4, PICO_PROTO_TCP, &tcp_callback);
     	if (ps == NULL)
     	{
-    		INFO_LOG(MODEM, "pico_socket_open failed: error %d", pico_err);
+    		INFO_LOG(MODEM, "pico_socket_open failed: error %d", fmt::underlying(pico_err));
     		closesocket(sockfd);
     		continue;
     	}
@@ -618,7 +618,7 @@ static void read_native_sockets()
     	ps->local_port = src_addr.sin_port;
     	if (pico_socket_connect(ps, &dcaddr.addr, it->first) != 0)
     	{
-    		INFO_LOG(MODEM, "pico_socket_connect failed: error %d", pico_err);
+    		INFO_LOG(MODEM, "pico_socket_connect failed: error %d", fmt::underlying(pico_err));
     		closesocket(sockfd);
     		pico_socket_close(ps);
     		continue;

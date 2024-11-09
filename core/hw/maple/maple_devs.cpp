@@ -2055,7 +2055,7 @@ maple_device* maple_Create(MapleDeviceType type)
 		break;
 
 	default:
-		ERROR_LOG(MAPLE, "Invalid device type %d", type);
+		ERROR_LOG(MAPLE, "Invalid device type %d", fmt::underlying(type));
 		die("Invalid maple device type");
 		break;
 	}

@@ -603,7 +603,7 @@ bool X86Compiler::rewriteMemAccess(host_context_t &context)
 			return true;
 		}
 	}
-	ERROR_LOG(DYNAREC, "rewriteMemAccess code not found: hpc %08x retadr %p acc %08x", context.pc, retAddr, context.eax);
+	ERROR_LOG(DYNAREC, "rewriteMemAccess code not found: hpc %08x retadr %p acc %08x", context.pc, fmt::ptr(retAddr), context.eax);
 	die("Failed to match the code");
 
 	return false;

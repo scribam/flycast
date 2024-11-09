@@ -58,7 +58,7 @@
 #include "hw/naomi/naomi_cart.h"
 #include "hw/naomi/card_reader.h"
 #include "imgread/common.h"
-#include "LogManager.h"
+#include "log/Log.h"
 #include "cheats.h"
 #include "rend/osd.h"
 #include "cfg/option.h"

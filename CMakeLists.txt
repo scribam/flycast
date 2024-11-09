@@ -752,6 +752,18 @@ endif()
 cmrc_add_resource_library(flycast-resources ALIAS flycast::res NAMESPACE flycast)
 target_link_libraries(${PROJECT_NAME} PRIVATE flycast::res)
 
+if(NINTENDO_SWITCH)
+	# Trick to have fileno available
+	add_compile_options(-U__STRICT_ANSI__)
+endif()
+option(SPDLOG_NO_THREAD_ID "prevent spdlog from querying the thread id on each log call if thread id is not needed" ON)
+option(SPDLOG_DISABLE_DEFAULT_LOGGER "Disable default logger creation" ON)
+add_subdirectory(core/deps/spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
+target_sources(${PROJECT_NAME} PRIVATE core/log/Log.h core/log/Log.cpp core/log/libretro_sink.h)
+
 if(LIBRETRO)
 	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/libretro-common/include)
 	target_sources(${PROJECT_NAME} PRIVATE
@@ -783,8 +795,6 @@ if(LIBRETRO)
 		shell/libretro/libretro_core_options_intl.h
 		shell/libretro/libretro_core_options.h
 		shell/libretro/libretro.cpp
-		shell/libretro/LogManager.cpp
-		shell/libretro/LogManager.h
 		shell/libretro/option.cpp
 		shell/libretro/oslib.cpp
 		shell/libretro/vmu_xhair.cpp)
@@ -1093,20 +1103,6 @@ if(NOT LIBRETRO)
 			core/linux-dist/x11.cpp
 			core/linux-dist/x11.h
 			core/linux-dist/x11_keyboard.h)
-endif()
-
-target_sources(${PROJECT_NAME} PRIVATE
-		core/log/BitSet.h
-		core/log/Log.h
-		core/log/StringUtil.h)
-if(NOT LIBRETRO)
-	target_sources(${PROJECT_NAME} PRIVATE
-			core/log/ConsoleListener.h
-			core/log/ConsoleListenerDroid.cpp
-			core/log/ConsoleListenerNix.cpp
-			core/log/ConsoleListenerWin.cpp
-			core/log/LogManager.cpp
-			core/log/LogManager.h)
 endif()
 
 target_sources(${PROJECT_NAME} PRIVATE

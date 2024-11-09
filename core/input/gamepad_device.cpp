@@ -148,7 +148,7 @@ bool GamepadDevice::handleButtonInput(int port, DreamcastKey key, bool pressed)
 			return false;
 		}
 	}
-	DEBUG_LOG(INPUT, "%d: BUTTON %s %d. kcode=%x", port, pressed ? "down" : "up", key, port >= 0 ? kcode[port] : 0);
+	DEBUG_LOG(INPUT, "%d: BUTTON %s %d. kcode=%x", port, pressed ? "down" : "up", fmt::underlying(key), port >= 0 ? kcode[port] : 0);
 
 	return true;
 }

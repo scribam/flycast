@@ -1178,7 +1178,7 @@ static bool handleBarcodeScanner(const SDL_Event& event)
 		{
 			if (!barcode.empty())
 			{
-				INFO_LOG(INPUT, "Unrecognized barcode scancode %d mod 0x%x", scancode, mod);
+				INFO_LOG(INPUT, "Unrecognized barcode scancode %d mod 0x%x", fmt::underlying(scancode), mod);
 				barcode.clear();
 			}
 			return false;

@@ -465,7 +465,7 @@ static void on_message(u8 *msg, int len)
 		break;
 
 	default:
-		WARN_LOG(NETWORK, "Unknown app message type %d", event->type);
+		WARN_LOG(NETWORK, "Unknown app message type %d", fmt::underlying(event->type));
 		break;
 	}
 }
@@ -549,7 +549,7 @@ void startSession(int localPort, int localPlayerNum)
 			&verif, sizeof(verif));
 	if (result != GGPO_OK)
 	{
-		WARN_LOG(NETWORK, "GGPO start session failed: %d", result);
+		WARN_LOG(NETWORK, "GGPO start session failed: %d", fmt::underlying(result));
 		ggpoSession = nullptr;
 		throw FlycastException("GGPO network initialization failed");
 	}
@@ -565,7 +565,7 @@ void startSession(int localPort, int localPlayerNum)
 	result = ggpo_add_player(ggpoSession, &player, &localPlayer);
 	if (result != GGPO_OK)
 	{
-		WARN_LOG(NETWORK, "GGPO cannot add local player: %d", result);
+		WARN_LOG(NETWORK, "GGPO cannot add local player: %d", fmt::underlying(result));
 		stopSession();
 		throw FlycastException("GGPO cannot add local player");
 	}
@@ -594,7 +594,7 @@ void startSession(int localPort, int localPlayerNum)
 	result = ggpo_add_player(ggpoSession, &player, &remotePlayer);
 	if (result != GGPO_OK)
 	{
-		WARN_LOG(NETWORK, "GGPO cannot add remote player: %d", result);
+		WARN_LOG(NETWORK, "GGPO cannot add remote player: %d", fmt::underlying(result));
 		stopSession();
 		throw FlycastException("GGPO cannot add remote player");
 	}
@@ -751,7 +751,7 @@ bool nextFrame()
 			break;
 		if (error != GGPO_ERRORCODE_PREDICTION_THRESHOLD)
 		{
-			WARN_LOG(NETWORK, "ggpo_add_local_input failed %d", error);
+			WARN_LOG(NETWORK, "ggpo_add_local_input failed %d", fmt::underlying(error));
 			stopSession();
 			throw FlycastException("GGPO error");
 		}
@@ -817,7 +817,7 @@ std::future<bool> startNetwork()
 					throw FlycastException("Peer verification failed");
 				else if (result != GGPO_OK)
 				{
-					WARN_LOG(NETWORK, "ggpo_idle failed %d", result);
+					WARN_LOG(NETWORK, "ggpo_idle failed %d", fmt::underlying(result));
 					throw FlycastException("GGPO error");
 				}
 			}

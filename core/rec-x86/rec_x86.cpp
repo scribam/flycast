@@ -905,7 +905,7 @@ public:
 					restarting = false;
 			} while (restarting);
 		} catch (const SH4ThrownException& e) {
-			ERROR_LOG(DYNAREC, "SH4ThrownException in mainloop %x pc %x", e.expEvn, e.epc);
+			ERROR_LOG(DYNAREC, "SH4ThrownException in mainloop %x pc %x", fmt::underlying(e.expEvn), e.epc);
 			throw FlycastException("Fatal: Unhandled SH4 exception");
 		}
 	}

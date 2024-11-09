@@ -575,7 +575,7 @@ public:
 					sendPosition(1);
 				}
 				else
-					WARN_LOG(NAOMI, "Unknown command %.9s", &recvBuffer[0]);
+					WARN_LOG(NAOMI, "Unknown command %.9s", std::string(recvBuffer.begin(), recvBuffer.end()));
 				recvBuffer.clear();
 			}
 			else
@@ -2637,7 +2637,7 @@ void SystemSpCart::process()
 		{
 			u32 addr = readNetMem<u32>(0x208);
 			//u32 len = readNetMem<u32>(0x20c);
-			INFO_LOG(NAOMI, "process: modifyMyIPaddr(%s, %08x)", &netmem[addr & (sizeof(netmem) - 1)], readNetMem<u32>(0x210));
+			INFO_LOG(NAOMI, "process: modifyMyIPaddr(%s, %08x)", (const char *)&netmem[addr & (sizeof(netmem) - 1)], readNetMem<u32>(0x210));
 			writeNetMem(2, NET_OK);
 		}
 		break;

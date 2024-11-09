@@ -33,7 +33,6 @@
 #include "oslib/oslib.h"
 #include "audio/audiostream.h"
 #include "imgread/common.h"
-#include "log/LogManager.h"
 #include "emulator.h"
 #include "mainui.h"
 #include "lua/lua.h"
@@ -1565,33 +1564,24 @@ static void gui_debug_tab()
 {
 	header("Logging");
 	{
-		LogManager *logManager = LogManager::GetInstance();
-		for (LogTypes::LOG_TYPE type = LogTypes::AICA; type < LogTypes::NUMBER_OF_LOGS; type = (LogTypes::LOG_TYPE)(type + 1))
-		{
-			bool enabled = logManager->IsEnabled(type, logManager->GetLogLevel());
-			std::string name = std::string(logManager->GetShortName(type)) + " - " + logManager->GetFullName(type);
-			if (ImGui::Checkbox(name.c_str(), &enabled) && logManager->GetLogLevel() > LogTypes::LWARNING) {
-				logManager->SetEnable(type, enabled);
-				cfgSaveBool("log", logManager->GetShortName(type), enabled);
-			}
-		}
-		ImGui::Spacing();
-
-		static const char *levels[] = { "Notice", "Error", "Warning", "Info", "Debug" };
-		if (ImGui::BeginCombo("Log Verbosity", levels[logManager->GetLogLevel() - 1], ImGuiComboFlags_None))
-		{
-			for (std::size_t i = 0; i < std::size(levels); i++)
-			{
-				bool is_selected = logManager->GetLogLevel() - 1 == (int)i;
-				if (ImGui::Selectable(levels[i], &is_selected)) {
-					logManager->SetLogLevel((LogTypes::LOG_LEVELS)(i + 1));
-					cfgSaveInt("log", "Verbosity", i + 1);
+		spdlog::apply_all([](const auto &logger) {
+			if (ImGui::BeginCombo(logger->name().c_str(), spdlog::level::to_string_view(logger->level()).data())) {
+				for (int i = 0; i < spdlog::level::level_enum::n_levels; i++) {
+					auto level = static_cast<spdlog::level::level_enum>(i);
+					bool is_selected = logger->level() == level;
+					if (ImGui::Selectable(spdlog::level::to_string_view(level).data(), is_selected)) {
+						logger->set_level(level);
+#ifndef LIBRETRO
+						cfgSaveInt("log", logger->name(), level);
+#endif
+					}
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
 				}
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
+				ImGui::EndCombo();
 			}
-			ImGui::EndCombo();
-		}
+		});
 	}
 #if FC_PROFILER
 	ImGui::Spacing();

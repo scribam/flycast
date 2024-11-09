@@ -618,7 +618,7 @@ UdpProtocol::OnInput(UdpMsg *msg, int len)
             UdpProtocol::Event evt(UdpProtocol::Event::Input);
             evt.u.input.input = _last_received_input;
 
-            if (LogTypes::LDEBUG <= MAX_LOGLEVEL)
+            if (SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG)
             	_last_received_input.desc(desc, ARRAY_SIZE(desc));
 
             _state.running.last_input_packet_recv_time = GGPOPlatform::GetCurrentTimeMS();

@@ -58,7 +58,7 @@ void dc_serialize(Serializer& ser)
 
 void dc_deserialize(Deserializer& deser)
 {
-	DEBUG_LOG(SAVESTATE, "Loading state version %d", deser.version());
+	DEBUG_LOG(SAVESTATE, "Loading state version %d", fmt::underlying(deser.version()));
 
 	aica::deserialize(deser);
 

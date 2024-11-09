@@ -4,7 +4,6 @@
 #include "types.h"
 
 #if defined(__unix__)
-#include "log/LogManager.h"
 #include "emulator.h"
 #include "ui/mainui.h"
 #include "oslib/directory.h"

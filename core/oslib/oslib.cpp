@@ -352,7 +352,7 @@ void os_UpdateInputState()
 
 #include "http_client.h"
 #include "version.h"
-#include "log/InMemoryListener.h"
+#include "log/Log.h"
 #include "wsi/context.h"
 
 #define FLYCAST_CRASH_LIST "flycast-crashes.txt"
@@ -368,9 +368,11 @@ void registerCrash(const char *directory, const char *path)
 		fprintf(f, "%s\n", path);
 		fclose(f);
 	}
+
+#if 0
+	// TODO
 	// Save last log lines
-	InMemoryListener *listener = InMemoryListener::getInstance();
-	if (listener != nullptr)
+	if (LogManager::ringbuffer_sink != nullptr)
 	{
 		strncpy(list, path, sizeof(list) - 1);
 		list[sizeof(list) - 1] = '\0';
@@ -381,8 +383,7 @@ void registerCrash(const char *directory, const char *path)
 			FILE *f = nowide::fopen(list, "wt");
 			if (f != nullptr)
 			{
-				std::vector<std::string> log = listener->getLog();
-				for (const auto& line : log)
+				for (const auto& line : LogManager::ringbuffer_sink->last_formatted())
 					fprintf(f, "%s", line.c_str());
 				fprintf(f, "Version: %s\n", GIT_VERSION);
 				fprintf(f, "Renderer: %d\n", (int)config::RendererType.get());
@@ -394,6 +395,7 @@ void registerCrash(const char *directory, const char *path)
 			}
 		}
 	}
+#endif
 }
 
 void uploadCrashes(const std::string& directory)

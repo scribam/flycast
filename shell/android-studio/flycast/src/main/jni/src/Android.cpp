@@ -9,7 +9,6 @@
 #include "ui/gui.h"
 #include "rend/osd.h"
 #include "cfg/cfg.h"
-#include "log/LogManager.h"
 #include "wsi/context.h"
 #include "emulator.h"
 #include "ui/mainui.h"

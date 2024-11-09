@@ -635,7 +635,7 @@ void findGLVersion()
 	gl.mesa_nouveau = !stricmp(vendor, "nouveau")
 			|| (!stricmp(vendor, "Mesa") && !strncmp(renderer, "NV", 2));
 	NOTICE_LOG(RENDERER, "OpenGL%s version %d.%d", gl.is_gles ? " ES" : "", gl.gl_major, gl.gl_minor);
-	NOTICE_LOG(RENDERER, "Vendor '%s' Renderer '%s' Version '%s'", vendor, renderer, glGetString(GL_VERSION));
+	NOTICE_LOG(RENDERER, "Vendor '%s' Renderer '%s' Version '%s'", vendor, renderer, (const char *)glGetString(GL_VERSION));
 	while (glGetError() != GL_NO_ERROR)
 		;
 }

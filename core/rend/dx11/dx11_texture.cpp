@@ -96,7 +96,7 @@ void DX11Texture::UploadToGPU(int width, int height, const u8* temp_tex_buffer, 
 		}
 		else
 		{
-			ERROR_LOG(RENDERER, "Texture creation failed type %d dim %dx%d mipmap %d (included %d)", tex_type, width, height, mipmapped, mipmapsIncluded);
+			ERROR_LOG(RENDERER, "Texture creation failed type %d dim %dx%d mipmap %d (included %d)", fmt::underlying(tex_type), width, height, mipmapped, mipmapsIncluded);
 		}
 		verify(texture != nullptr);
 		verify(textureView != nullptr);

@@ -204,7 +204,7 @@ bool prepare_jit_block(void *, size_t size, void **code_area_rwx)
 		return false;
 
 	*code_area_rwx = ptr;
-	INFO_LOG(DYNAREC, "Found code area at %p, not too far away from %p", *code_area_rwx, &init);
+	INFO_LOG(DYNAREC, "Found code area at %p, not too far away from %p", fmt::ptr(*code_area_rwx), fmt::ptr(&init));
 
 	// We should have found some area in the addrspace, after all size is ~tens of megabytes.
 	// Pages are already RWX, all done
@@ -252,7 +252,7 @@ bool prepare_jit_block(void *, size_t size, void** code_area_rw, ptrdiff_t* rx_o
 
 	*code_area_rw = ptr_rw;
 	*rx_offset = (char*)ptr_rx - (char*)ptr_rw;
-	INFO_LOG(DYNAREC, "Info: Using NO_RWX mode, rx ptr: %p, rw ptr: %p, offset: %lu", ptr_rx, ptr_rw, (unsigned long)*rx_offset);
+	INFO_LOG(DYNAREC, "Info: Using NO_RWX mode, rx ptr: %p, rw ptr: %p, offset: %lu", fmt::ptr(ptr_rx), fmt::ptr(ptr_rw), (unsigned long)*rx_offset);
 
 	return (ptr_rw != NULL);
 }

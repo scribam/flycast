@@ -409,7 +409,7 @@ static const char *getKeyName(DreamcastKey key)
 	for (u32 i = 0; i < std::size(axis_list); i++)
 		if (key == axis_list[i].id)
 			return axis_list[i].option.c_str();
-	ERROR_LOG(INPUT, "Invalid key %x", key);
+	ERROR_LOG(INPUT, "Invalid key %x", fmt::underlying(key));
 
 	return nullptr;
 }

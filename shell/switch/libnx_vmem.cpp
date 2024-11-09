@@ -38,7 +38,7 @@ bool region_lock(void *start, size_t len)
 	{
 		rc = svcSetMemoryPermission((void *)addr, PAGE_SIZE, Perm_R);
 		if (R_FAILED(rc))
-			ERROR_LOG(VMEM, "Failed to SetPerm Perm_R on %p len 0x%x rc 0x%x", (void*)addr, PAGE_SIZE, rc);
+			ERROR_LOG(VMEM, "Failed to SetPerm Perm_R on %p len 0x%x rc 0x%x", fmt::ptr((void*)addr), PAGE_SIZE, rc);
 	}
 
 	return true;
@@ -55,7 +55,7 @@ bool region_unlock(void *start, size_t len)
 	{
 		rc = svcSetMemoryPermission((void *)addr, PAGE_SIZE, Perm_Rw);
 		if (R_FAILED(rc))
-			ERROR_LOG(VMEM, "Failed to SetPerm Perm_Rw on %p len 0x%x rc 0x%x", (void*)addr, PAGE_SIZE, rc);
+			ERROR_LOG(VMEM, "Failed to SetPerm Perm_Rw on %p len 0x%x rc 0x%x", fmt::ptr((void*)addr), PAGE_SIZE, rc);
 	}
 
 	return true;
@@ -88,7 +88,7 @@ bool init(void **vmem_base_addr, void **sh4rcb_addr, size_t ramSize)
 	virtmemUnlock();
 	if (reserved_base == nullptr || virtmemReservation == nullptr)
 	{
-		ERROR_LOG(VMEM, "virtmemReserve(%zx) failed: base %p res %p", reserved_size, reserved_base, virtmemReservation);
+		ERROR_LOG(VMEM, "virtmemReserve(%zx) failed: base %p res %p", reserved_size, fmt::ptr(reserved_base), fmt::ptr(virtmemReservation));
 		free(ramBase);
 		return false;
 	}
@@ -103,14 +103,14 @@ bool init(void **vmem_base_addr, void **sh4rcb_addr, size_t ramSize)
 	Result rc = svcMapProcessCodeMemory(process, (u64)sh4rcb_base_ptr, (u64)ramBase + fpcb_size, sz);
 	if (R_FAILED(rc))
 	{
-		ERROR_LOG(VMEM, "Failed to Map Sh4RCB (%p, %p, %zx) -> %x", sh4rcb_base_ptr, (u8 *)ramBase + fpcb_size, sz, rc);
+		ERROR_LOG(VMEM, "Failed to Map Sh4RCB (%p, %p, %zx) -> %x", fmt::ptr(sh4rcb_base_ptr), fmt::ptr((u8 *)ramBase + fpcb_size), sz, rc);
 		destroy();
 		return false;
 	}
 	rc = svcSetProcessMemoryPermission(process, (u64)sh4rcb_base_ptr, sz, Perm_Rw);
 	if (R_FAILED(rc))
 	{
-		ERROR_LOG(VMEM, "Failed to set Sh4RCB perms (%p, %zx) -> %x", sh4rcb_base_ptr, sz, rc);
+		ERROR_LOG(VMEM, "Failed to set Sh4RCB perms (%p, %zx) -> %x", fmt::ptr(sh4rcb_base_ptr), sz, rc);
 		destroy();
 		return false;
 	}
@@ -268,7 +268,7 @@ bool prepare_jit_block(void *code_area, size_t size, void **code_area_rw, ptrdif
 
 	*code_area_rw = ptr_rw;
 	*rx_offset = (char*)code_area - (char*)ptr_rw;
-	INFO_LOG(DYNAREC, "Info: Using NO_RWX mode, rx ptr: %p, rw ptr: %p, offset: %ld\n", code_area, ptr_rw, (long)*rx_offset);
+	INFO_LOG(DYNAREC, "Info: Using NO_RWX mode, rx ptr: %p, rw ptr: %p, offset: %ld\n", fmt::ptr(code_area), fmt::ptr(ptr_rw), (long)*rx_offset);
 
 	return true;
 }

@@ -659,7 +659,7 @@ void compile()
 
 	arm7backend_compile(block_ops, cycles);
 
-	arm_printf("arm7rec_compile done: %p,%p", rv, icPtr);
+	arm_printf("arm7rec_compile done: %p,%p", fmt::ptr(rv), fmt::ptr(icPtr));
 }
 
 void flush()

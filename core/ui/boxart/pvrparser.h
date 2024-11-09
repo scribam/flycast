@@ -90,7 +90,7 @@ static inline bool pvrParse(const u8 *data, u32 len, u32& width, u32& height, st
 			texConv = opengl::tex1555_PL32;
 		else
 		{
-			WARN_LOG(COMMON, "Unsupported 1555 image type: %d", imgType);
+			WARN_LOG(COMMON, "Unsupported 1555 image type: %d", fmt::underlying(imgType));
 			return false;
 		}
 		break;
@@ -105,7 +105,7 @@ static inline bool pvrParse(const u8 *data, u32 len, u32& width, u32& height, st
 			texConv = opengl::tex565_PL32;
 		else
 		{
-			WARN_LOG(COMMON, "Unsupported 565 image type: %d", imgType);
+			WARN_LOG(COMMON, "Unsupported 565 image type: %d", fmt::underlying(imgType));
 			return false;
 		}
 		break;
@@ -120,16 +120,16 @@ static inline bool pvrParse(const u8 *data, u32 len, u32& width, u32& height, st
 			texConv = opengl::tex4444_PL32;
 		else
 		{
-			WARN_LOG(COMMON, "Unsupported 4444 image type: %d", imgType);
+			WARN_LOG(COMMON, "Unsupported 4444 image type: %d", fmt::underlying(imgType));
 			return false;
 		}
 		break;
 
 	default:
-		WARN_LOG(COMMON, "Unsupported PVR pixel type: %d", pixelFormat);
+		WARN_LOG(COMMON, "Unsupported PVR pixel type: %d", fmt::underlying(pixelFormat));
 		return false;
 	}
-	DEBUG_LOG(COMMON, "PVR file: size %d pixelFmt %d imgType %d w %d h %d", size, pixelFormat, imgType, width, height);
+	DEBUG_LOG(COMMON, "PVR file: size %d pixelFmt %d imgType %d w %d h %d", size, fmt::underlying(pixelFormat), fmt::underlying(imgType), width, height);
 	u32 texU = 3;
 	while (1u << texU < width)
 		texU++;

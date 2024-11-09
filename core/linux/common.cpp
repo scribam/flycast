@@ -67,14 +67,14 @@ void fault_handler(int sn, siginfo_t * si, void *segfault_ctx)
 		return;
 	}
 
-	ERROR_LOG(COMMON, "SIGSEGV @ %p invalid access to %p", (void *)ctx.pc, si->si_addr);
+	ERROR_LOG(COMMON, "SIGSEGV @ %p invalid access to %p", fmt::ptr((void *)ctx.pc), fmt::ptr(si->si_addr));
 #endif
 
 #ifdef __SWITCH__
 	MemoryInfo meminfo;
 	u32 pageinfo;
 	svcQueryMemory(&meminfo, &pageinfo, (u64)&__start__);
-	ERROR_LOG(COMMON, ".text base: %p -> offset: %lx", (void*)meminfo.addr, ctx.pc - meminfo.addr);
+	ERROR_LOG(COMMON, ".text base: %p -> offset: %lx", fmt::ptr((void*)meminfo.addr), ctx.pc - meminfo.addr);
 #else
 	if (next_segv_handler.sa_sigaction != nullptr)
 		next_segv_handler.sa_sigaction(sn, si, segfault_ctx);

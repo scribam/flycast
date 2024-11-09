@@ -334,7 +334,7 @@ void* DYNACALL rdv_LinkBlock(u8* code,u32 dpc)
 	}
 	else
 	{
-		INFO_LOG(DYNAREC, "null RBI: from %08X to %08X -- unlinked stale block -- code %p next %p", rbi->vaddr, next_pc, code, rv);
+		INFO_LOG(DYNAREC, "null RBI: from %08X to %08X -- unlinked stale block -- code %p next %p", rbi->vaddr, next_pc, fmt::ptr(code), fmt::ptr(rv));
 	}
 	
 	return (void*)rv;
