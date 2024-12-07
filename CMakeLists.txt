@@ -679,7 +679,9 @@ if(NOT LIBZIP_FOUND OR NINTENDO_SWITCH)
 endif()
 
 if(WIN32)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/dirent)
+	add_library(dirent INTERFACE)
+	target_include_directories(dirent INTERFACE external/dirent/include)
+	target_link_libraries(${PROJECT_NAME} PRIVATE dirent)
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE core/deps/picotcp/include core/deps/picotcp/modules)
