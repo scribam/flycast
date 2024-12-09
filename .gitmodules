@@ -1,9 +1,6 @@
 [submodule "core/deps/breakpad"]
 	path = core/deps/breakpad
 	url = https://github.com/flyinghead/mingw-breakpad
-[submodule "core/deps/oboe"]
-	path = core/deps/oboe
-	url = https://github.com/google/oboe.git
 [submodule "core/deps/rcheevos"]
 	path = core/deps/rcheevos
 	url = https://github.com/RetroAchievements/rcheevos.git
@@ -72,3 +69,6 @@
 	path = external/nowide
 	url = https://github.com/boostorg/nowide.git
 	branch = standalone
+[submodule "external/oboe"]
+	path = external/oboe
+	url = https://github.com/google/oboe.git
