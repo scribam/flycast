@@ -784,12 +784,12 @@ if(NOT LIBRETRO)
 	target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
 
 	if(ENABLE_FC_PROFILER)
-		target_include_directories(${PROJECT_NAME} PRIVATE core/deps/implot)
-		target_sources(${PROJECT_NAME} PRIVATE
-			core/deps/implot/implot.h
-			core/deps/implot/implot.cpp
-			core/deps/implot/implot_internal.h
-			core/deps/implot/implot_items.cpp)
+		add_library(implot STATIC
+			external/implot/implot.cpp
+			external/implot/implot_internal.h
+			external/implot/implot_items.cpp)
+		target_include_directories(implot PRIVATE external/imgui PUBLIC external/implot)
+		target_link_libraries(${PROJECT_NAME} PRIVATE implot)
 	endif()
 endif()
 target_sources(${PROJECT_NAME} PRIVATE core/deps/xbrz/xbrz.cpp)
