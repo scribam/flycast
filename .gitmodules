@@ -44,3 +44,6 @@
 [submodule "core/deps/asio"]
 	path = core/deps/asio
 	url = https://github.com/chriskohlhoff/asio.git
+[submodule "external/AltKit"]
+	path = external/AltKit
+	url = https://github.com/rileytestut/AltKit.git
