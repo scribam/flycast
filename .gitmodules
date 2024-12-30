@@ -81,3 +81,6 @@
 [submodule "external/vixl"]
 	path = external/vixl
 	url = https://github.com/Linaro/vixl.git
+[submodule "external/xbyak"]
+	path = external/xbyak
+	url = https://github.com/herumi/xbyak.git
