@@ -1437,7 +1437,7 @@ if(USE_VULKAN)
 	target_link_libraries(${PROJECT_NAME} PRIVATE GPUOpen::VulkanMemoryAllocator)
 
 	if(ANDROID AND NOT LIBRETRO AND "arm64" IN_LIST ARCHITECTURE)
-		add_subdirectory(core/deps/libadrenotools)
+		add_subdirectory(external/libadrenotools)
 		target_link_libraries(${PROJECT_NAME} PRIVATE adrenotools)
 	endif()
 
