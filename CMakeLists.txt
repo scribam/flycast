@@ -799,7 +799,7 @@ target_sources(${PROJECT_NAME} PRIVATE core/deps/lzma/7zArcIn.c core/deps/lzma/7
 if(NOT LIBRETRO)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DISABLE_DEMO_WINDOWS IMGUI_DEFINE_MATH_OPERATORS)
 	if(NINTENDO_SWITCH)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DISABLE_DEFAULT_SHELL_FUNCTIONS)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DISABLE_DEFAULT_SHELL_FUNCTIONS IMGUI_IMPL_OPENGL_LOADER_CUSTOM IMGUI_INCLUDE_IMGUI_USER_H)
 	endif()
 	target_include_directories(${PROJECT_NAME} PRIVATE external/imgui external/imgui/misc/cpp external/imgui/backends)
 	target_sources(${PROJECT_NAME} PRIVATE
@@ -1350,8 +1350,8 @@ if(USE_OPENGL)
 
 	if(NOT LIBRETRO)
 		target_sources(${PROJECT_NAME} PRIVATE
-				core/deps/imgui/backends/imgui_impl_opengl3.cpp
-				core/deps/imgui/backends/imgui_impl_opengl3.h
+				external/imgui/backends/imgui_impl_opengl3.cpp
+				external/imgui/backends/imgui_impl_opengl3.h
 				core/rend/gles/opengl_driver.cpp
 				core/rend/gles/opengl_driver.h)
 	endif()
@@ -1692,7 +1692,8 @@ if(NOT LIBRETRO)
 			shell/android-studio/flycast/src/main/jni/src/android_input.cpp
 			shell/android-studio/flycast/src/main/jni/src/android_keyboard.h)
 
-		target_link_libraries(${PROJECT_NAME} PRIVATE android log)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_IMPL_OPENGL_ES2)
+		target_link_libraries(${PROJECT_NAME} PRIVATE android GLESv2 log)
 	elseif(APPLE)
 		string(TIMESTAMP YEAR "%Y")
 		string(REGEX MATCH "^[^-]+" TAG_VERSION ${GIT_VERSION})
