@@ -728,8 +728,9 @@ if(USE_LIBCDIO)
 	endif()
 endif()
 
-if(WIN32)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/dirent)
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+	add_subdirectory(external/dirent)
+	target_link_libraries(${PROJECT_NAME} PRIVATE dirent)
 endif()
 
 if(NOT LIBRETRO AND NOT NINTENDO_SWITCH)
