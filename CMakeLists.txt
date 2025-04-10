@@ -529,10 +529,15 @@ if(NOT WITH_SYSTEM_ZLIB)
     option(ZLIB_BUILD_EXAMPLES "Enable Zlib Examples" OFF)
     add_subdirectory("external/libchdr/deps/zlib-1.3.1" EXCLUDE_FROM_ALL)
 	set_target_properties(zlibstatic PROPERTIES POSITION_INDEPENDENT_CODE ON)
-	target_link_libraries(${PROJECT_NAME} PRIVATE zlibstatic)
+
 	# help libzip find the package
-	set(ZLIB_RELATIVE_PATH "external/libchdr/deps/zlib-1.3.1")
-	set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${ZLIB_RELATIVE_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/${ZLIB_RELATIVE_PATH}")
+	add_library(ZLIB::ZLIB INTERFACE IMPORTED)
+	set_target_properties(ZLIB::ZLIB PROPERTIES
+		INTERFACE_LINK_LIBRARIES zlibstatic
+		INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/external/libchdr/deps/zlib-1.3.1;${CMAKE_CURRENT_BINARY_DIR}/external/libchdr/deps/zlib-1.3.1")
+	set(ZLIB_FOUND TRUE)
+
+	target_link_libraries(${PROJECT_NAME} PRIVATE ZLIB::ZLIB)
 endif()
 
 if(PKG_CONFIG_FOUND AND USE_HOST_LIBCHDR)
