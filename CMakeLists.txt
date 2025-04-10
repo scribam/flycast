@@ -734,10 +734,8 @@ if(USE_LIBCDIO)
 	endif()
 endif()
 
-if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-	add_subdirectory(external/dirent)
-	target_link_libraries(${PROJECT_NAME} PRIVATE dirent)
-endif()
+add_subdirectory(external/dirent)
+target_link_libraries(${PROJECT_NAME} PRIVATE dirent)
 
 if(NOT LIBRETRO AND NOT NINTENDO_SWITCH)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_ICE)
