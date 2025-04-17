@@ -505,7 +505,6 @@ if(NOT LIBRETRO)
 
 	find_package(ZLIB)
 	if(TARGET ZLIB::ZLIB AND NOT ANDROID AND (NOT WIN32 OR WINDOWS_STORE))
-		set(WITH_SYSTEM_ZLIB ON CACHE BOOL "Use system provided zlib library")
 		target_link_libraries(${PROJECT_NAME} PRIVATE ZLIB::ZLIB)
 	endif()
 
@@ -525,14 +524,19 @@ endif()
 
 find_package(PkgConfig)
 
-if(NOT WITH_SYSTEM_ZLIB)
+if(NOT TARGET ZLIB::ZLIB)
     option(ZLIB_BUILD_EXAMPLES "Enable Zlib Examples" OFF)
-    add_subdirectory("external/libchdr/deps/zlib-1.3.1" EXCLUDE_FROM_ALL)
+    add_subdirectory(external/libchdr/deps/zlib-1.3.1 EXCLUDE_FROM_ALL)
 	set_target_properties(zlibstatic PROPERTIES POSITION_INDEPENDENT_CODE ON)
-	target_link_libraries(${PROJECT_NAME} PRIVATE zlibstatic)
-	# help libzip find the package
-	set(ZLIB_RELATIVE_PATH "external/libchdr/deps/zlib-1.3.1")
-	set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${ZLIB_RELATIVE_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/${ZLIB_RELATIVE_PATH}")
+
+	# Set ZLIB variables for find_package used by other projects
+	set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/libchdr/deps/zlib-1.3.1 CACHE STRING "Path to zlib include directory")
+	set(ZLIB_LIBRARY ZLIB::ZLIB CACHE STRING "Path to zlib library")
+
+	# Setup zlib alias project so FindZLIB doesn't recreate it
+	add_library(ZLIB::ZLIB ALIAS zlibstatic)
+
+	target_link_libraries(${PROJECT_NAME} PRIVATE ZLIB::ZLIB)
 endif()
 
 if(PKG_CONFIG_FOUND AND USE_HOST_LIBCHDR)
@@ -544,7 +548,9 @@ else()
 	option(ZSTD_LEGACY_SUPPORT "LEGACY SUPPORT" OFF)
 	add_subdirectory(external/libchdr/deps/zstd-1.5.6/build/cmake EXCLUDE_FROM_ALL)
 	target_link_libraries(${PROJECT_NAME} PRIVATE libzstd_static)
+	add_library(zstd::libzstd_static ALIAS libzstd_static)
 
+	option(WITH_SYSTEM_ZLIB "Use system provided zlib library" ON)
 	option(WITH_SYSTEM_ZSTD "Use system provided zstd library" ON)
 	add_subdirectory(external/libchdr EXCLUDE_FROM_ALL)
 	target_link_libraries(${PROJECT_NAME} PRIVATE chdr-static)
