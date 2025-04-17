@@ -32,7 +32,7 @@
 #include <gamingdeviceinformation.h>
 #endif
 
-#include "nowide/stackstring.hpp"
+#include <nowide/stackstring.hpp>
 
 DX11Context theDX11Context;
 
