@@ -728,9 +728,8 @@ if(USE_LIBCDIO)
 	endif()
 endif()
 
-if(WIN32)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/dirent)
-endif()
+add_subdirectory(external/dirent)
+target_link_libraries(${PROJECT_NAME} PRIVATE dirent)
 
 if(NOT LIBRETRO AND NOT NINTENDO_SWITCH)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_ICE)
