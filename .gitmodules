@@ -63,7 +63,7 @@
 	url = https://github.com/bylaws/libadrenotools.git
 [submodule "external/libchdr"]
 	path = external/libchdr
-	url = https://github.com/flyinghead/libchdr.git
+	url = https://github.com/rtissera/libchdr.git
 	ignore = dirty
 [submodule "external/libzip"]
 	path = external/libzip
