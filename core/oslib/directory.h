@@ -18,8 +18,8 @@
 */
 #pragma once
 #include "types.h"
-#include "nowide/config.hpp"
-#include "nowide/stackstring.hpp"
+#include <nowide/config.hpp>
+#include <nowide/stackstring.hpp>
 #include <dirent.h>
 #include <sys/stat.h>
 
