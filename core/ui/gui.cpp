@@ -1047,7 +1047,7 @@ static void gui_display_commands()
 		ImGui::SameLine();
 		if (!lowHeight)
 		{
-			ImGui::BeginChild("game_info", ScaledVec2(0, 100.f), ImGuiChildFlags_Border, ImGuiWindowFlags_None);
+			ImGui::BeginChild("game_info", ScaledVec2(0, 100.f), ImGuiChildFlags_Borders, ImGuiWindowFlags_None);
 			ImGui::PushFont(largeFont);
 			ImGui::Text("%s", art.name.c_str());
 			ImGui::PopFont();
@@ -1814,7 +1814,7 @@ static void controller_mapping_popup(const std::shared_ptr<GamepadDevice>& gamep
 
 		char key_id[32];
 
-		ImGui::BeginChild(ImGui::GetID("buttons"), ImVec2(0, 0), ImGuiChildFlags_FrameStyle, ImGuiWindowFlags_DragScrolling | ImGuiWindowFlags_NavFlattened);
+		ImGui::BeginChild(ImGui::GetID("buttons"), ImVec2(0, 0), ImGuiChildFlags_FrameStyle | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_DragScrolling);
 
 		for (; systemMapping->name != nullptr; systemMapping++)
 		{
@@ -2246,7 +2246,7 @@ static void gui_settings_general()
     size.y = (ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.f)
     				* (config::ContentPath.get().size() + 1);
 
-    if (BeginListBox("Content Location", size, ImGuiWindowFlags_NavFlattened))
+    if (BeginListBox("Content Location", size, ImGuiChildFlags_NavFlattened))
     {
     	int to_delete = -1;
         for (u32 i = 0; i < config::ContentPath.get().size(); i++)
@@ -2285,7 +2285,7 @@ static void gui_settings_general()
     size.y = ImGui::GetTextLineHeightWithSpacing() * 1.25f + ImGui::GetStyle().FramePadding.y * 2.0f;
 
 #if defined(__linux__) && !defined(__ANDROID__)
-    if (BeginListBox("Data Folder", size, ImGuiWindowFlags_NavFlattened))
+    if (BeginListBox("Data Folder", size, ImGuiChildFlags_NavFlattened))
     {
     	ImGui::AlignTextToFramePadding();
     	float w = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().FramePadding.x;
@@ -2299,7 +2299,7 @@ static void gui_settings_general()
 #if defined(__ANDROID__) || defined(TARGET_MAC)
     size.y += ImGui::GetTextLineHeightWithSpacing() * 1.25f;
 #endif
-    if (BeginListBox("Home Folder", size, ImGuiWindowFlags_NavFlattened))
+    if (BeginListBox("Home Folder", size, ImGuiChildFlags_NavFlattened))
     {
     	ImGui::AlignTextToFramePadding();
     	float w = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().FramePadding.x;
@@ -3838,26 +3838,26 @@ static void gui_display_content()
     if (gui_state != GuiState::SelectDisk)
     {
 #ifdef TARGET_UWP
-		ImGui::SameLine(ImGui::GetContentRegionMax().x - settingsBtnW
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - settingsBtnW
 				- ImGui::GetStyle().FramePadding.x * 2.0f  - ImGui::GetStyle().ItemSpacing.x - ImGui::CalcTextSize("Load...").x);
 		if (ImGui::Button("Load..."))
 			gui_load_game();
 		ImGui::SameLine();
 #elif defined(__SWITCH__)
-		ImGui::SameLine(ImGui::GetContentRegionMax().x - settingsBtnW
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - settingsBtnW
 				- ImGui::GetStyle().ItemSpacing.x - iconButtonWidth(ICON_FA_POWER_OFF, "Exit"));
 		if (iconButton(ICON_FA_POWER_OFF, "Exit"))
 			dc_exit();
 		ImGui::SameLine();
 #else
-		ImGui::SameLine(ImGui::GetContentRegionMax().x - settingsBtnW);
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - settingsBtnW);
 #endif
 		if (iconButton(ICON_FA_GEAR, "Settings"))
 			gui_setState(GuiState::Settings);
     }
     else
     {
-		ImGui::SameLine(ImGui::GetContentRegionMax().x
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x
 				- ImGui::GetStyle().FramePadding.x * 2.0f - ImGui::CalcTextSize("Cancel").x);
 		if (ImGui::Button("Cancel"))
 			gui_setState(GuiState::Commands);
@@ -3867,9 +3867,9 @@ static void gui_display_content()
     scanner.fetch_game_list();
 
 	// Only if Filter and Settings aren't focused... ImGui::SetNextWindowFocus();
-	ImGui::BeginChild(ImGui::GetID("library"), ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling | ImGuiWindowFlags_NavFlattened);
+	ImGui::BeginChild(ImGui::GetID("library"), ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_DragScrolling);
     {
-		const float totalWidth = ImGui::GetContentRegionMax().x - (!ImGui::GetCurrentWindow()->ScrollbarY ? ImGui::GetStyle().ScrollbarSize : 0);
+		const float totalWidth = ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - (!ImGui::GetCurrentWindow()->ScrollbarY ? ImGui::GetStyle().ScrollbarSize : 0);
 		const int itemsPerLine = std::max<int>(totalWidth / (uiScaled(150) + ImGui::GetStyle().ItemSpacing.x), 1);
 		const float responsiveBoxSize = totalWidth / itemsPerLine - ImGui::GetStyle().FramePadding.x * 2;
 		const ImVec2 responsiveBoxVec2 = ImVec2(responsiveBoxSize, responsiveBoxSize);
@@ -3914,7 +3914,7 @@ static void gui_display_content()
 							ImGui::SameLine();
 						counter++;
 						// Put the image inside a child window so we can detect when it's fully clipped and doesn't need to be loaded
-						if (ImGui::BeginChild("img", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY, ImGuiWindowFlags_NavFlattened))
+						if (ImGui::BeginChild("img", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_NavFlattened))
 						{
 							ImguiFileTexture tex(art.boxartPath);
 							pressed = gameImageButton(tex, game.name, responsiveBoxVec2, gameName);
@@ -3961,8 +3961,8 @@ static void gui_display_content()
 			const char *label = "Your game list is empty";
 			// center horizontally
 			const float w = largeFont->CalcTextSizeA(largeFont->FontSize, FLT_MAX, -1.f, label).x + ImGui::GetStyle().FramePadding.x * 2;
-			ImGui::SameLine((ImGui::GetContentRegionMax().x - w) / 2);
-			if (ImGui::BeginChild("empty", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY, ImGuiWindowFlags_NavFlattened))
+			ImGui::SameLine((ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - w) / 2);
+			if (ImGui::BeginChild("empty", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_NavFlattened))
 			{
 				ImGui::PushFont(largeFont);
 				ImGui::NewLine();
