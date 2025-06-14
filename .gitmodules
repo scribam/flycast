@@ -87,3 +87,6 @@
 [submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb.git
+[submodule "external/vixl"]
+	path = external/vixl
+	url = https://github.com/Linaro/vixl.git
