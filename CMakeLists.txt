@@ -1964,7 +1964,7 @@ if(BUILD_TESTING)
 	if(WIN32)
 		set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 	endif()
-	add_subdirectory(core/deps/googletest EXCLUDE_FROM_ALL)
+	add_subdirectory(external/googletest EXCLUDE_FROM_ALL)
 	target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest_main)
 
 	target_include_directories(${PROJECT_NAME} PUBLIC tests/inc)
