@@ -222,7 +222,7 @@ bool Notification::draw()
 		{
 			if (text[i].empty())
 				continue;
-			const ImFont *font = i == 0 ? largeFont : regularFont;
+			ImFont *font = i == 0 ? largeFont : regularFont;
 			textSize[i] = font->CalcTextSizeA(font->FontSize, FLT_MAX, maxW, text[i].c_str());
 			totalSize.x = std::max(totalSize.x, textSize[i].x);
 			totalSize.y += textSize[i].y;
@@ -262,7 +262,7 @@ bool Notification::draw()
 		{
 			if (text[i].empty())
 				continue;
-			const ImFont *font = i == 0 ? largeFont : regularFont;
+			ImFont *font = i == 0 ? largeFont : regularFont;
 			const ImU32 col = alphaOverride(i == 0 ? 0xffffff : 0x00ffff, alpha);
 			dl->AddText(font, font->FontSize, pos, col, &text[i].front(), &text[i].back() + 1, maxW);
 			pos.y += textSize[i].y + vspacing;
@@ -280,7 +280,7 @@ void achievementList()
 	ImGui::Begin("##achievements", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
 
 	{
-		float w = ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Close").x - ImGui::GetStyle().ItemSpacing.x * 2 - ImGui::GetStyle().WindowPadding.x
+		float w = ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("Close").x - ImGui::GetStyle().ItemSpacing.x * 2 - ImGui::GetStyle().WindowPadding.x
 				- uiScaled(80.f + 20.f * 2);	// image width and button frame padding
 		Game game = getCurrentGame();
 		ImguiFileTexture tex(game.image);
@@ -307,8 +307,8 @@ void achievementList()
 			gui_setState(GuiState::Commands);
     }
 
-	// ImGuiWindowFlags_NavFlattened prevents the child window from getting the focus and thus the list can't be scrolled with a keyboard or gamepad.
-	if (ImGui::BeginChild(ImGui::GetID("ach_list"), ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling))
+	// ImGuiChildFlags_NavFlattened prevents the child window from getting the focus and thus the list can't be scrolled with a keyboard or gamepad.
+	if (ImGui::BeginChild(ImGui::GetID("ach_list"), ImVec2(0, 0), ImGuiChildFlags_Borders, ImGuiWindowFlags_DragScrolling))
 	{
 		std::vector<Achievement> achList = getAchievementList();
 		int id = 0;
