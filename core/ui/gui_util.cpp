@@ -103,7 +103,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 			ImguiStyleVar _(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.f, 0.5f)); // Left
 			ImguiStyleVar _1(ImGuiStyleVar_DisabledAlpha, 1.0f);
 			ImGui::BeginDisabled();
-			ImGui::PushFont(largeFont);
+			ImGui::PushFont(largeFont, largeFont->LegacySize);
 			ImGui::ButtonEx(prompt, ImVec2(-1, 0));
 			ImGui::PopFont();
 			ImGui::EndDisabled();
@@ -118,7 +118,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 
 		ImGui::Text("%s", title.c_str());
 		ImGui::BeginChild(ImGui::GetID("dir_list"), ImVec2(0, - uiScaled(30) - ImGui::GetStyle().ItemSpacing.y),
-				ImGuiChildFlags_Border, ImGuiWindowFlags_DragScrolling | ImGuiWindowFlags_NavFlattened);
+				ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_DragScrolling);
 		{
 			ImguiStyleVar _(ImGuiStyleVar_ItemSpacing, ScaledVec2(8, 20));
 
@@ -201,7 +201,7 @@ void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
     ImGuiButtonFlags button_flags = (mouse_button == ImGuiMouseButton_Left) ? ImGuiButtonFlags_MouseButtonLeft
     		: (mouse_button == ImGuiMouseButton_Right) ? ImGuiButtonFlags_MouseButtonRight : ImGuiButtonFlags_MouseButtonMiddle;
     // If nothing hovered so far in the frame (not same as IsAnyItemHovered()!) or item is disabled
-    if (g.HoveredId == 0 || g.HoveredIdDisabled)
+    if (g.HoveredId == 0 || g.HoveredIdIsDisabled)
     {
     	bool hoveredAllowOverlap = g.HoveredIdAllowOverlap;
     	g.HoveredIdAllowOverlap = true;
@@ -213,8 +213,9 @@ void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
     const ImVec2& delta = ImGui::GetIO().MouseDelta;
     if (held && delta != ImVec2())
     {
-    	window->DragScrolling = true;
-    	window->ScrollSpeed = delta;
+    	window->DC.StateStorage->SetBool(ImGui::GetID("window##DragScrolling"), true);
+    	window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedX"), delta.x);
+    	window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedY"), delta.y);
     }
 }
 
@@ -548,7 +549,7 @@ bool OptionArrowButtons(const char *name, config::Option<int>& option, int min, 
 	}
 
 	ImGui::SameLine(0.0f, innerSpacing);
-	ImGui::PushButtonRepeat(true);
+	ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
 	bool valueChanged = false;
 	{
 		DisabledScope scope(option.isReadOnly());
@@ -557,7 +558,7 @@ bool OptionArrowButtons(const char *name, config::Option<int>& option, int min, 
 		ImGui::SameLine(0.0f, innerSpacing);
 		if (ImGui::ArrowButton((id + "right").c_str(), ImGuiDir_Right)) { option.set(std::min(max, option + 1)); valueChanged = true; }
 	}
-	ImGui::PopButtonRepeat();
+	ImGui::PopItemFlag();
 	ImGui::SameLine(0.0f, innerSpacing);
 	ImGui::Text("%s", name);
 	if (help != nullptr)
@@ -679,15 +680,20 @@ static void computeScrollSpeed(float &v)
 void windowDragScroll()
 {
 	ImGuiWindow *window = ImGui::GetCurrentWindow();
-	if (window->DragScrolling)
+	if (window->DC.StateStorage->GetBool(ImGui::GetID("window##DragScrolling")))
 	{
 		if (!ImGui::GetIO().MouseDown[ImGuiMouseButton_Left])
 		{
-			computeScrollSpeed(window->ScrollSpeed.x);
-			computeScrollSpeed(window->ScrollSpeed.y);
-			if (window->ScrollSpeed == ImVec2())
+			ImVec2 scrollSpeed = ImVec2(
+				window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedX")),
+				window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedY"))
+			);
+
+			computeScrollSpeed(scrollSpeed.x);
+			computeScrollSpeed(scrollSpeed.y);
+			if (scrollSpeed == ImVec2())
 			{
-				window->DragScrolling = false;
+				window->DC.StateStorage->SetBool(ImGui::GetID("window##DragScrolling"), false);
 				// FIXME we should really move the mouse off-screen after a touch up and this wouldn't be necessary
 				// the only problem is tool tips
 				gui_set_mouse_position(-1, -1);
@@ -698,12 +704,13 @@ void windowDragScroll()
 			ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
 			if (delta != ImVec2())
 				ImGui::ResetMouseDragDelta();
-			window->ScrollSpeed = delta;
+			window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedX"), delta.x);
+			window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedY"), delta.y);
 		}
-		if (window->DragScrolling)
+		if (window->DC.StateStorage->GetBool(ImGui::GetID("window##DragScrolling")))
 		{
-			ImGui::SetScrollX(window, window->Scroll.x - window->ScrollSpeed.x);
-			ImGui::SetScrollY(window, window->Scroll.y - window->ScrollSpeed.y);
+			ImGui::SetScrollX(window, window->Scroll.x - window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedX")));
+			ImGui::SetScrollY(window, window->Scroll.y - window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedY")));
 		}
 	}
 }
@@ -920,7 +927,7 @@ void ImguiVmuTexture::displayVmus(const ImVec2& pos)
 }
 
 // Custom version of ImGui::BeginListBox that allows passing window flags
-bool BeginListBox(const char* label, const ImVec2& size_arg, ImGuiWindowFlags windowFlags)
+bool BeginListBox(const char* label, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags)
 {
 	using namespace ImGui;
     ImGuiContext& g = *GImGui;
@@ -957,7 +964,7 @@ bool BeginListBox(const char* label, const ImVec2& size_arg, ImGuiWindowFlags wi
         window->DC.CursorMaxPos = ImMax(window->DC.CursorMaxPos, label_pos + label_size);
     }
 
-    BeginChild(id, frame_bb.GetSize(), ImGuiChildFlags_FrameStyle, windowFlags);
+    BeginChild(id, frame_bb.GetSize(), ImGuiChildFlags_FrameStyle | child_flags, window_flags);
     return true;
 }
 
@@ -992,9 +999,9 @@ bool Toast::draw()
 	const float maxW = std::min(uiScaled(640.f), displaySize.x);
 	ImFont *regularFont = ImGui::GetFont();
 	const ImVec2 titleSize = title.empty() ? ImVec2()
-			: largeFont->CalcTextSizeA(largeFont->FontSize, FLT_MAX, maxW, &title.front(), &title.back() + 1);
+			: largeFont->CalcTextSizeA(largeFont->LegacySize, FLT_MAX, maxW, &title.front(), &title.back() + 1);
 	const ImVec2 msgSize = message.empty() ? ImVec2()
-			: regularFont->CalcTextSizeA(regularFont->FontSize, FLT_MAX, maxW, &message.front(), &message.back() + 1);
+			: regularFont->CalcTextSizeA(regularFont->LegacySize, FLT_MAX, maxW, &message.front(), &message.back() + 1);
 	const ScaledVec2 padding(5.f, 4.f);
 	const ScaledVec2 spacing(0.f, 2.f);
 	ImVec2 totalSize(std::max(titleSize.x, msgSize.x), titleSize.y + msgSize.y);
@@ -1014,13 +1021,13 @@ bool Toast::draw()
 	if (!title.empty())
 	{
 		const ImU32 col = alphaOverride(ImGui::GetColorU32(ImGuiCol_Text), alpha);
-		dl->AddText(largeFont, largeFont->FontSize, pos, col, &title.front(), &title.back() + 1, maxW);
+		dl->AddText(largeFont, largeFont->LegacySize, pos, col, &title.front(), &title.back() + 1, maxW);
 		pos.y += spacing.y + titleSize.y;
 	}
 	if (!message.empty())
 	{
 		const ImU32 col = alphaOverride(0xFF00FFFF, alpha);	// yellow
-		dl->AddText(regularFont, regularFont->FontSize, pos, col, &message.front(), &message.back() + 1, maxW);
+		dl->AddText(regularFont, regularFont->LegacySize, pos, col, &message.front(), &message.back() + 1, maxW);
 	}
 
 	return true;
@@ -1031,11 +1038,9 @@ std::string middleEllipsis(const std::string& s, float width)
 	float tw = ImGui::CalcTextSize(s.c_str()).x;
 	if (tw <= width)
 		return s;
-	std::string ellipsis;
 	char buf[5];
 	ImTextCharToUtf8(buf, ImGui::GetFont()->EllipsisChar);
-	for (int i = 0; i < ImGui::GetFont()->EllipsisCharCount; i++)
-		ellipsis += buf;
+	std::string ellipsis = buf;
 
 	int l = s.length() / 2;
 	int d = l;
