@@ -53,3 +53,6 @@
 [submodule "core/deps/websocketpp"]
 	path = core/deps/websocketpp
 	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "external/AltKit"]
+	path = external/AltKit
+	url = https://github.com/rileytestut/AltKit.git
