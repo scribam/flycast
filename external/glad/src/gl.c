@@ -453,6 +453,7 @@ int GLAD_GL_MESA_pack_invert = 0;
 int GLAD_GL_MESA_program_binary_formats = 0;
 int GLAD_GL_MESA_resize_buffers = 0;
 int GLAD_GL_MESA_shader_integer_functions = 0;
+int GLAD_GL_MESA_texture_const_bandwidth = 0;
 int GLAD_GL_MESA_tile_raster_order = 0;
 int GLAD_GL_MESA_window_pos = 0;
 int GLAD_GL_MESA_ycbcr_texture = 0;
@@ -880,6 +881,7 @@ int GLAD_GL_QCOM_texture_foveated_subsampled_layout = 0;
 int GLAD_GL_QCOM_texture_lod_bias = 0;
 int GLAD_GL_QCOM_tiled_rendering = 0;
 int GLAD_GL_QCOM_writeonly_rendering = 0;
+int GLAD_GL_QCOM_ycbcr_degamma = 0;
 int GLAD_GL_VIV_shader_binary = 0;
 
 
@@ -2474,6 +2476,7 @@ PFNGLNAMEDFRAMEBUFFERTEXTUREEXTPROC glad_glNamedFramebufferTextureEXT = NULL;
 PFNGLNAMEDFRAMEBUFFERTEXTUREFACEEXTPROC glad_glNamedFramebufferTextureFaceEXT = NULL;
 PFNGLNAMEDFRAMEBUFFERTEXTURELAYERPROC glad_glNamedFramebufferTextureLayer = NULL;
 PFNGLNAMEDFRAMEBUFFERTEXTURELAYEREXTPROC glad_glNamedFramebufferTextureLayerEXT = NULL;
+PFNGLNAMEDFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC glad_glNamedFramebufferTextureMultiviewOVR = NULL;
 PFNGLNAMEDPROGRAMLOCALPARAMETER4DEXTPROC glad_glNamedProgramLocalParameter4dEXT = NULL;
 PFNGLNAMEDPROGRAMLOCALPARAMETER4DVEXTPROC glad_glNamedProgramLocalParameter4dvEXT = NULL;
 PFNGLNAMEDPROGRAMLOCALPARAMETER4FEXTPROC glad_glNamedProgramLocalParameter4fEXT = NULL;
@@ -8827,6 +8830,7 @@ static void glad_gl_load_GL_OES_single_precision( GLADuserptrloadfunc load, void
 static void glad_gl_load_GL_OVR_multiview( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_OVR_multiview) return;
     glad_glFramebufferTextureMultiviewOVR = (PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC) load(userptr, "glFramebufferTextureMultiviewOVR");
+    glad_glNamedFramebufferTextureMultiviewOVR = (PFNGLNAMEDFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC) load(userptr, "glNamedFramebufferTextureMultiviewOVR");
 }
 static void glad_gl_load_GL_PGI_misc_hints( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_PGI_misc_hints) return;
@@ -9360,6 +9364,10 @@ static void glad_gl_load_GL_NV_viewport_array( GLADuserptrloadfunc load, void* u
 static void glad_gl_load_GL_OES_EGL_image( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_OES_EGL_image) return;
     glad_glEGLImageTargetRenderbufferStorageOES = (PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC) load(userptr, "glEGLImageTargetRenderbufferStorageOES");
+    glad_glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) load(userptr, "glEGLImageTargetTexture2DOES");
+}
+static void glad_gl_load_GL_OES_EGL_image_external( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_GL_OES_EGL_image_external) return;
     glad_glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) load(userptr, "glEGLImageTargetTexture2DOES");
 }
 static void glad_gl_load_GL_OES_copy_image( GLADuserptrloadfunc load, void* userptr) {
@@ -10032,6 +10040,7 @@ static int glad_gl_find_extensions_gl(void) {
     GLAD_GL_MESA_program_binary_formats = glad_gl_has_extension(exts, exts_i, "GL_MESA_program_binary_formats");
     GLAD_GL_MESA_resize_buffers = glad_gl_has_extension(exts, exts_i, "GL_MESA_resize_buffers");
     GLAD_GL_MESA_shader_integer_functions = glad_gl_has_extension(exts, exts_i, "GL_MESA_shader_integer_functions");
+    GLAD_GL_MESA_texture_const_bandwidth = glad_gl_has_extension(exts, exts_i, "GL_MESA_texture_const_bandwidth");
     GLAD_GL_MESA_tile_raster_order = glad_gl_has_extension(exts, exts_i, "GL_MESA_tile_raster_order");
     GLAD_GL_MESA_window_pos = glad_gl_has_extension(exts, exts_i, "GL_MESA_window_pos");
     GLAD_GL_MESA_ycbcr_texture = glad_gl_has_extension(exts, exts_i, "GL_MESA_ycbcr_texture");
@@ -10710,6 +10719,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_MESA_framebuffer_swap_xy = glad_gl_has_extension(exts, exts_i, "GL_MESA_framebuffer_swap_xy");
     GLAD_GL_MESA_program_binary_formats = glad_gl_has_extension(exts, exts_i, "GL_MESA_program_binary_formats");
     GLAD_GL_MESA_shader_integer_functions = glad_gl_has_extension(exts, exts_i, "GL_MESA_shader_integer_functions");
+    GLAD_GL_MESA_texture_const_bandwidth = glad_gl_has_extension(exts, exts_i, "GL_MESA_texture_const_bandwidth");
     GLAD_GL_NVX_blend_equation_advanced_multi_draw_buffers = glad_gl_has_extension(exts, exts_i, "GL_NVX_blend_equation_advanced_multi_draw_buffers");
     GLAD_GL_NV_bindless_texture = glad_gl_has_extension(exts, exts_i, "GL_NV_bindless_texture");
     GLAD_GL_NV_blend_equation_advanced = glad_gl_has_extension(exts, exts_i, "GL_NV_blend_equation_advanced");
@@ -10746,6 +10756,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_NV_shader_texture_footprint = glad_gl_has_extension(exts, exts_i, "GL_NV_shader_texture_footprint");
     GLAD_GL_NV_shading_rate_image = glad_gl_has_extension(exts, exts_i, "GL_NV_shading_rate_image");
     GLAD_GL_NV_stereo_view_rendering = glad_gl_has_extension(exts, exts_i, "GL_NV_stereo_view_rendering");
+    GLAD_GL_NV_texture_barrier = glad_gl_has_extension(exts, exts_i, "GL_NV_texture_barrier");
     GLAD_GL_NV_timeline_semaphore = glad_gl_has_extension(exts, exts_i, "GL_NV_timeline_semaphore");
     GLAD_GL_NV_viewport_array2 = glad_gl_has_extension(exts, exts_i, "GL_NV_viewport_array2");
     GLAD_GL_NV_viewport_swizzle = glad_gl_has_extension(exts, exts_i, "GL_NV_viewport_swizzle");
@@ -10967,6 +10978,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_QCOM_texture_lod_bias = glad_gl_has_extension(exts, exts_i, "GL_QCOM_texture_lod_bias");
     GLAD_GL_QCOM_tiled_rendering = glad_gl_has_extension(exts, exts_i, "GL_QCOM_tiled_rendering");
     GLAD_GL_QCOM_writeonly_rendering = glad_gl_has_extension(exts, exts_i, "GL_QCOM_writeonly_rendering");
+    GLAD_GL_QCOM_ycbcr_degamma = glad_gl_has_extension(exts, exts_i, "GL_QCOM_ycbcr_degamma");
     GLAD_GL_VIV_shader_binary = glad_gl_has_extension(exts, exts_i, "GL_VIV_shader_binary");
 
     glad_gl_free_extensions(exts_i);
@@ -11068,6 +11080,7 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_NV_sample_locations(load, userptr);
     glad_gl_load_GL_NV_scissor_exclusive(load, userptr);
     glad_gl_load_GL_NV_shading_rate_image(load, userptr);
+    glad_gl_load_GL_NV_texture_barrier(load, userptr);
     glad_gl_load_GL_NV_timeline_semaphore(load, userptr);
     glad_gl_load_GL_NV_viewport_swizzle(load, userptr);
     glad_gl_load_GL_OVR_multiview(load, userptr);
@@ -11124,6 +11137,7 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_NV_read_buffer(load, userptr);
     glad_gl_load_GL_NV_viewport_array(load, userptr);
     glad_gl_load_GL_OES_EGL_image(load, userptr);
+    glad_gl_load_GL_OES_EGL_image_external(load, userptr);
     glad_gl_load_GL_OES_copy_image(load, userptr);
     glad_gl_load_GL_OES_draw_buffers_indexed(load, userptr);
     glad_gl_load_GL_OES_draw_elements_base_vertex(load, userptr);
