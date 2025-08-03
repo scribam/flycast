@@ -2,14 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-def getVersionName = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags', '--always'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
+def gitVersionName = providers.exec {
+    commandLine("git", "describe", "--tags", "--always")
+}.standardOutput.asText.get()
 
 def getSentryUrl = { ->
 	def url = System.env.SENTRY_UPLOAD_URL
@@ -19,15 +14,15 @@ def getSentryUrl = { ->
 android {
     namespace 'com.flycast.emulator'
     ndkVersion '23.2.8568313'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.flycast.emulator"
         minSdk 16
         //noinspection ExpiredTargetSdkVersion
-        targetSdk 34
+        targetSdk 36
         versionCode 8
-        versionName getVersionName()
+        versionName gitVersionName
         vectorDrawables.useSupportLibrary = true
 
         externalNativeBuild {
@@ -72,7 +67,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../../CMakeLists.txt')
-            version '3.28.3'
+            version '3.31.5'
         }
     }
     packagingOptions {
