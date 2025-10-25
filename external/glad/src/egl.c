@@ -174,7 +174,7 @@ static int glad_egl_find_extensions_egl(EGLDisplay display) {
     const char *extensions;
     if (!glad_egl_get_extensions(display, &extensions)) return 0;
 
-    GLAD_UNUSED(glad_egl_has_extension);
+    GLAD_UNUSED(&glad_egl_has_extension);
 
     return 1;
 }
@@ -383,7 +383,7 @@ int gladLoaderLoadEGL(EGLDisplay display) {
 }
 
 
-void gladLoaderUnloadEGL() {
+void gladLoaderUnloadEGL(void) {
     if (_egl_handle != NULL) {
         glad_close_dlopen_handle(_egl_handle);
         _egl_handle = NULL;
