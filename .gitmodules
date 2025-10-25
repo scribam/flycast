@@ -8,9 +8,6 @@
 [submodule "core/deps/oboe"]
 	path = core/deps/oboe
 	url = https://github.com/google/oboe.git
-[submodule "core/deps/discord-rpc"]
-	path = core/deps/discord-rpc
-	url = https://github.com/harmonytf/discord-rpc
 [submodule "core/deps/libadrenotools"]
 	path = core/deps/libadrenotools
 	url = https://github.com/bylaws/libadrenotools
@@ -68,3 +65,6 @@
 [submodule "external/dirent"]
 	path = external/dirent
 	url = https://github.com/tronkko/dirent.git
+[submodule "external/discord-rpc"]
+	path = external/discord-rpc
+	url = https://github.com/harmonytf/discord-rpc.git
