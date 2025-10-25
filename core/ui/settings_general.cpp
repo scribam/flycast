@@ -112,7 +112,7 @@ void gui_settings_general()
     size.y = (ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.f)
     				* (config::ContentPath.get().size() + 1);
 
-    if (BeginListBox("Content Location", size, ImGuiWindowFlags_NavFlattened))
+    if (BeginListBox("Content Location", size, ImGuiChildFlags_NavFlattened))
     {
     	int to_delete = -1;
         for (u32 i = 0; i < config::ContentPath.get().size(); i++)
@@ -151,7 +151,7 @@ void gui_settings_general()
     size.y = ImGui::GetTextLineHeightWithSpacing() * 1.25f + ImGui::GetStyle().FramePadding.y * 2.0f;
 
 #if defined(__linux__) && !defined(__ANDROID__)
-    if (BeginListBox("Data Folder", size, ImGuiWindowFlags_NavFlattened))
+    if (BeginListBox("Data Folder", size, ImGuiChildFlags_NavFlattened))
     {
     	ImGui::AlignTextToFramePadding();
     	float w = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().FramePadding.x;
@@ -165,7 +165,7 @@ void gui_settings_general()
 #if defined(__ANDROID__) || defined(TARGET_MAC)
     size.y += ImGui::GetTextLineHeightWithSpacing() * 1.25f;
 #endif
-    if (BeginListBox("Home Folder", size, ImGuiWindowFlags_NavFlattened))
+    if (BeginListBox("Home Folder", size, ImGuiChildFlags_NavFlattened))
     {
     	ImGui::AlignTextToFramePadding();
     	float w = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().FramePadding.x;
@@ -365,9 +365,9 @@ static void applyLightTheme()
 
 	style.Colors[ImGuiCol_Tab] = ImVec4(0.65f, 0.65f, 0.80f, 1.00f);            // Medium blue-gray tabs (fully opaque)
 	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.55f, 0.55f, 0.75f, 1.00f);     // Darker when hovered (fully opaque)
-	style.Colors[ImGuiCol_TabActive] = ImVec4(0.50f, 0.50f, 0.70f, 1.00f);      // Even darker when active (fully opaque)
-	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.75f, 0.75f, 0.85f, 1.00f);   // Lighter when unfocused (fully opaque)
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.65f, 0.65f, 0.80f, 1.00f); // Medium when unfocused but active (fully opaque)
+	style.Colors[ImGuiCol_TabSelected] = ImVec4(0.50f, 0.50f, 0.70f, 1.00f);      // Even darker when active (fully opaque)
+	style.Colors[ImGuiCol_TabDimmed] = ImVec4(0.75f, 0.75f, 0.85f, 1.00f);   // Lighter when unfocused (fully opaque)
+	style.Colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.65f, 0.65f, 0.80f, 1.00f); // Medium when unfocused but active (fully opaque)
 
 	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.45f, 0.45f, 0.85f, 0.35f); // Visible selection background (transparency ok)
 
@@ -419,9 +419,9 @@ static void applyDreamcastTheme()
 	// Tabs - using X Button Blue - more vibrant
 	style.Colors[ImGuiCol_Tab] = ImVec4(0.13f, 0.16f, 0.40f, 1.00f);           // X Button Blue
 	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.25f, 0.30f, 0.60f, 1.00f);    // Brighter when hovered (fully opaque)
-	style.Colors[ImGuiCol_TabActive] = ImVec4(0.30f, 0.35f, 0.65f, 1.00f);     // Much brighter & whiter when active
-	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.13f, 0.16f, 0.40f, 1.00f);  // Same blue but fully opaque
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.25f, 0.30f, 0.60f, 1.00f); // Brighter for unfocused active (fully opaque)
+	style.Colors[ImGuiCol_TabSelected] = ImVec4(0.30f, 0.35f, 0.65f, 1.00f);     // Much brighter & whiter when active
+	style.Colors[ImGuiCol_TabDimmed] = ImVec4(0.13f, 0.16f, 0.40f, 1.00f);  // Same blue but fully opaque
+	style.Colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.25f, 0.30f, 0.60f, 1.00f); // Brighter for unfocused active (fully opaque)
 
 	// Other elements - more vibrant
 	style.Colors[ImGuiCol_Border] = ImVec4(1.00f, 0.85f, 0.25f, 0.70f);         // Brighter DC "X" yellow borders (some transparency ok)
@@ -496,9 +496,9 @@ static void applyHighContrastTheme()
 	// Tabs
 	style.Colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);            // Dark gray tabs
 	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.00f, 0.65f, 0.90f, 1.00f);     // DC Highlight Blue when hovered
-	style.Colors[ImGuiCol_TabActive] = ImVec4(0.00f, 0.43f, 0.73f, 1.00f);      // DC Logo Blue when active
-	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);   // Dark gray when unfocused
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.00f, 0.43f, 0.73f, 1.00f); // DC Logo Blue when unfocused but active (fully opaque)
+	style.Colors[ImGuiCol_TabSelected] = ImVec4(0.00f, 0.43f, 0.73f, 1.00f);      // DC Logo Blue when active
+	style.Colors[ImGuiCol_TabDimmed] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);   // Dark gray when unfocused
+	style.Colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.00f, 0.43f, 0.73f, 1.00f); // DC Logo Blue when unfocused but active (fully opaque)
 
 	// Other UI elements
 	style.Colors[ImGuiCol_Separator] = ImVec4(1.00f, 1.00f, 1.00f, 0.40f);      // Semi-transparent white separators (transparency ok)
@@ -572,9 +572,9 @@ static void applyNintendoTheme()
 	// Tab elements - Red/green for Mario/Luigi contrast
 	style.Colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.10f, 0.30f, 1.00f);            // Dark purple tabs (fully opaque)
 	style.Colors[ImGuiCol_TabHovered] = luigiGreenLight;                        // Luigi green when hovered
-	style.Colors[ImGuiCol_TabActive] = nintendoRed;                             // Mario red when active
-	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.08f, 0.20f, 1.00f);   // Darker when unfocused (fully opaque)
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.40f, 0.10f, 0.10f, 1.00f); // Darker red when unfocused but active (fully opaque)
+	style.Colors[ImGuiCol_TabSelected] = nintendoRed;                             // Mario red when active
+	style.Colors[ImGuiCol_TabDimmed] = ImVec4(0.10f, 0.08f, 0.20f, 1.00f);   // Darker when unfocused (fully opaque)
+	style.Colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.40f, 0.10f, 0.10f, 1.00f); // Darker red when unfocused but active (fully opaque)
 
 	// Border and separator
 	style.Colors[ImGuiCol_Border] = ImVec4(0.40f, 0.40f, 0.50f, 0.50f);         // Keep subtle border transparency
@@ -645,9 +645,9 @@ static void applySoftTheme()
 	// Tabs - soft blue palette
 	style.Colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.30f, 0.40f, 1.00f);           // Soft blue tabs (fully opaque)
 	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.25f, 0.40f, 0.50f, 1.00f);    // Slightly brighter when hovered (fully opaque)
-	style.Colors[ImGuiCol_TabActive] = ImVec4(0.30f, 0.50f, 0.60f, 1.00f);     // Turquoise blue when active (fully opaque)
-	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.25f, 0.35f, 1.00f);  // More muted when unfocused (fully opaque)
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.20f, 0.35f, 0.45f, 1.00f); // In-between for unfocused active (fully opaque)
+	style.Colors[ImGuiCol_TabSelected] = ImVec4(0.30f, 0.50f, 0.60f, 1.00f);     // Turquoise blue when active (fully opaque)
+	style.Colors[ImGuiCol_TabDimmed] = ImVec4(0.10f, 0.25f, 0.35f, 1.00f);  // More muted when unfocused (fully opaque)
+	style.Colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.20f, 0.35f, 0.45f, 1.00f); // In-between for unfocused active (fully opaque)
 
 	// Other elements
 	style.Colors[ImGuiCol_Border] = ImVec4(0.20f, 0.35f, 0.45f, 0.60f);         // Soft blue borders (some transparency ok)
