@@ -320,6 +320,7 @@ void VulkanContext::InitImgui()
 		vkDriver->reset();
 	}
 	ImGui_ImplVulkan_InitInfo initInfo{};
+	initInfo.ApiVersion = VK_API_VERSION_1_0;
 	initInfo.Instance = (VkInstance)*instance;
 	initInfo.PhysicalDevice = (VkPhysicalDevice)physicalDevice;
 	initInfo.Device = (VkDevice)*device;
@@ -327,15 +328,17 @@ void VulkanContext::InitImgui()
 	initInfo.Queue = (VkQueue)graphicsQueue;
 	initInfo.PipelineCache = (VkPipelineCache)*pipelineCache;
 	initInfo.DescriptorPool = (VkDescriptorPool)*descriptorPool;
-	initInfo.RenderPass = (VkRenderPass)*renderPass;
 	initInfo.MinImageCount = 2;
 	initInfo.ImageCount = GetSwapChainSize();
+	initInfo.PipelineInfoMain.RenderPass = (VkRenderPass)*renderPass;
+	initInfo.PipelineInfoMain.Subpass = 0;
+	initInfo.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 #ifdef VK_DEBUG
 	initInfo.CheckVkResultFn = &CheckImGuiResult;
 #endif
 
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1
-	ImGui_ImplVulkan_LoadFunctions([](const char *function_name, void *) {
+	ImGui_ImplVulkan_LoadFunctions(VK_API_VERSION_1_0, [](const char *function_name, void *) {
 		return VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr((VkInstance) *contextInstance->instance, function_name);
 	});
 #endif
