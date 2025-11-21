@@ -20,9 +20,6 @@
 [submodule "core/deps/Syphon"]
 	path = core/deps/Syphon
 	url = https://github.com/vkedwardli/Syphon-Framework.git
-[submodule "core/deps/Spout"]
-	path = core/deps/Spout
-	url = https://github.com/vkedwardli/Spout2.git
 [submodule "core/deps/discord-rpc"]
 	path = core/deps/discord-rpc
 	url = https://github.com/harmonytf/discord-rpc
@@ -65,3 +62,6 @@
 [submodule "external/SDL"]
 	path = external/SDL
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "external/Spout2"]
+	path = external/Spout2
+	url = https://github.com/leadedge/Spout2.git
