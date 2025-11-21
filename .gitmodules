@@ -5,9 +5,6 @@
 [submodule "core/deps/oboe"]
 	path = core/deps/oboe
 	url = https://github.com/google/oboe.git
-[submodule "core/deps/libadrenotools"]
-	path = core/deps/libadrenotools
-	url = https://github.com/bylaws/libadrenotools
 [submodule "core/deps/rcheevos"]
 	path = core/deps/rcheevos
 	url = https://github.com/RetroAchievements/rcheevos.git
@@ -80,3 +77,6 @@
 [submodule "external/json"]
 	path = external/json
 	url = https://github.com/nlohmann/json.git
+[submodule "external/libadrenotools"]
+	path = external/libadrenotools
+	url = https://github.com/bylaws/libadrenotools.git
