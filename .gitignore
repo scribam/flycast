@@ -15,7 +15,7 @@ out/
 cmake-build-*/
 
 # Dependencies from .gitmodules
-core/deps/breakpad/
+external/breakpad/
 core/deps/glslang/
 .cache/
 compile_commands.json
