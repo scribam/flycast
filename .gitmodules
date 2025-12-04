@@ -1,9 +1,6 @@
 [submodule "core/deps/xbyak"]
 	path = core/deps/xbyak
 	url = https://github.com/herumi/xbyak.git
-[submodule "core/deps/websocketpp"]
-	path = core/deps/websocketpp
-	url = https://github.com/zaphoyd/websocketpp.git
 [submodule "core/deps/DreamPicoPort-API"]
 	path = core/deps/DreamPicoPort-API
 	url = https://github.com/OrangeFox86/DreamPicoPort-API.git
@@ -96,3 +93,6 @@
 [submodule "external/vixl"]
 	path = external/vixl
 	url = https://github.com/Linaro/vixl.git
+[submodule "external/websocketpp"]
+	path = external/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
