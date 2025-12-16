@@ -2,14 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-def getVersionName = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags', '--always'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
+def gitVersionName = providers.exec {
+    commandLine("git", "describe", "--tags", "--always")
+}.standardOutput.asText.get()
 
 def getSentryUrl = { ->
 	def url = System.env.SENTRY_UPLOAD_URL
@@ -19,15 +14,16 @@ def getSentryUrl = { ->
 android {
     namespace 'com.flycast.emulator'
     ndkVersion '29.0.14206865'
-    compileSdk 35
+    compileSdk {
+        version = release(36)
+    }
 
     defaultConfig {
         applicationId "com.flycast.emulator"
         minSdk 21
-        //noinspection ExpiredTargetSdkVersion
-        targetSdk 35
+        targetSdk 36
         versionCode 8
-        versionName getVersionName()
+        versionName gitVersionName
         vectorDrawables.useSupportLibrary = true
 
         externalNativeBuild {
@@ -95,9 +91,7 @@ dependencies {
     implementation libs.slf4j.android
     implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
     implementation libs.documentfile
-
-    androidTestImplementation 'androidx.test:runner:1.5.0'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test:core:1.5.0'
-    androidTestImplementation 'junit:junit:4.12'
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
 }
