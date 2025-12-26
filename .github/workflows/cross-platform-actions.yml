@@ -1,4 +1,4 @@
-name: BSD
+name: BSD, Haiku
 
 on:
   push:
@@ -14,19 +14,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating_system: [ freebsd, netbsd, openbsd ]
+        operating_system: [ freebsd, haiku, netbsd, openbsd ]
         architecture: [ arm64, x86-64 ]
         libretro: [ OFF, ON ]
         include:
           - operating_system: freebsd
             version: '15.0'
             pkginstall: sudo pkg update && sudo pkg install -y alsa-lib ccache cmake evdev-proto git libao libevdev libudev-devd libzip lua54 miniupnpc ninja pkgconf pulseaudio sdl2 libcdio
+          - operating_system: haiku
+            version: 'r1beta5'
+            pkginstall: pkgman refresh && pkgman install -y ccache cmake curl_devel getconf git libao_devel libcdio_devel libiconv_devel libsdl2_devel libusb_devel libzip_devel lua_devel miniupnpc_devel ninja
           - operating_system: netbsd
             version: '10.1'
             pkginstall: sudo pkgin update && sudo pkgin -y install alsa-lib ccache clang cmake git libao libzip lua54 miniupnpc ninja-build pkgconf pulseaudio SDL2 libcdio
           - operating_system: openbsd
             version: '7.8'
             pkginstall: sudo pkg_add -u && sudo pkg_add ccache cmake git libao libzip miniupnpc ninja pkgconf pulseaudio sdl2 libcdio
+        exclude:
+          - operating_system: haiku
+            architecture: arm64
 
     steps:
       - uses: actions/checkout@v6
