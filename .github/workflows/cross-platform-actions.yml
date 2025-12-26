@@ -1,4 +1,4 @@
-name: BSD, Haiku
+name: BSD, Haiku, OmniOS
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        operating_system: [ freebsd, haiku, netbsd, openbsd ]
+        operating_system: [ freebsd, haiku, netbsd, omnios, openbsd ]
         architecture: [ arm64, x86-64 ]
         libretro: [ OFF, ON ]
         include:
@@ -27,11 +27,16 @@ jobs:
           - operating_system: netbsd
             version: '10.1'
             pkginstall: sudo pkgin update && sudo pkgin -y install alsa-lib ccache clang cmake git libao libzip lua54 miniupnpc ninja-build pkgconf pulseaudio SDL2 libcdio
+          - operating_system: omnios
+            version: 'r151056'
+            pkginstall: sudo pkg refresh && sudo pkg install build-essential ccache cmake git libzip ninja pkg-config
           - operating_system: openbsd
             version: '7.8'
             pkginstall: sudo pkg_add -u && sudo pkg_add ccache cmake git libao libzip miniupnpc ninja pkgconf pulseaudio sdl2 libcdio
         exclude:
           - operating_system: haiku
+            architecture: arm64
+          - operating_system: omnios
             architecture: arm64
 
     steps:
@@ -46,7 +51,7 @@ jobs:
           key: ccache-${{ matrix.operating_system }}-${{ matrix.architecture }}-${{ github.sha }}
           restore-keys: ccache-${{ matrix.operating_system }}-${{ matrix.architecture }}-
 
-      - uses: cross-platform-actions/action@v0.31.0
+      - uses: cross-platform-actions/action@v0.32.0
         with:
           operating_system: ${{ matrix.operating_system }}
           architecture: ${{ matrix.architecture }}
