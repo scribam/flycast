@@ -1247,80 +1247,60 @@ if(ENABLE_GDB_SERVER)
 endif()
 
 if("arm" IN_LIST ARCHITECTURE AND NOT APPLE)
-	if(MSVC)
-		target_compile_options(${PROJECT_NAME} PRIVATE "/Zc:__cplusplus")
+	add_library(libvixl STATIC
+		external/vixl/src/code-buffer-vixl.cc
+		external/vixl/src/compiler-intrinsics-vixl.cc
+		external/vixl/src/cpu-features.cc
+		external/vixl/src/utils-vixl.cc
+		external/vixl/src/aarch32/assembler-aarch32.cc
+		external/vixl/src/aarch32/constants-aarch32.cc
+		external/vixl/src/aarch32/disasm-aarch32.cc
+		external/vixl/src/aarch32/instructions-aarch32.cc
+		external/vixl/src/aarch32/location-aarch32.cc
+		external/vixl/src/aarch32/macro-assembler-aarch32.cc
+		external/vixl/src/aarch32/operands-aarch32.cc)
+	target_compile_definitions(libvixl PRIVATE VIXL_CODE_BUFFER_MALLOC VIXL_INCLUDE_TARGET_A32)
+	if(CMAKE_BUILD_TYPE STREQUAL Debug)
+		target_compile_definitions(libvixl PRIVATE VIXL_DEBUG)
 	endif()
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/vixl)
-	target_sources(${PROJECT_NAME} PRIVATE
-		core/rec-ARM/rec_arm.cpp
-		core/deps/vixl/aarch32/location-aarch32.cc
-		core/deps/vixl/aarch32/location-aarch32.h
-		core/deps/vixl/aarch32/assembler-aarch32.cc
-		core/deps/vixl/aarch32/assembler-aarch32.h
-		core/deps/vixl/aarch32/instructions-aarch32.cc
-		core/deps/vixl/aarch32/instructions-aarch32.h
-		core/deps/vixl/aarch32/constants-aarch32.cc
-		core/deps/vixl/aarch32/constants-aarch32.h
-		core/deps/vixl/aarch32/macro-assembler-aarch32.cc
-		core/deps/vixl/aarch32/macro-assembler-aarch32.h
-		core/deps/vixl/aarch32/operands-aarch32.cc
-		core/deps/vixl/aarch32/operands-aarch32.h
-		core/deps/vixl/assembler-base-vixl.h
-		core/deps/vixl/code-buffer-vixl.cc
-		core/deps/vixl/code-buffer-vixl.h
-		core/deps/vixl/code-generation-scopes-vixl.h
-		core/deps/vixl/compiler-intrinsics-vixl.cc
-		core/deps/vixl/compiler-intrinsics-vixl.h
-		core/deps/vixl/cpu-features.cc
-		core/deps/vixl/cpu-features.h
-		core/deps/vixl/globals-vixl.h
-		core/deps/vixl/invalset-vixl.h
-		core/deps/vixl/macro-assembler-interface.h
-		core/deps/vixl/platform-vixl.h
-		core/deps/vixl/pool-manager.h
-		core/deps/vixl/pool-manager-impl.h
-		core/deps/vixl/utils-vixl.cc
-		core/deps/vixl/utils-vixl.h)
+	if(MSVC)
+		target_compile_options(libvixl PUBLIC "/Zc:__cplusplus")
+	endif()
+	target_include_directories(libvixl PUBLIC external/vixl/src)
+
+	target_sources(${PROJECT_NAME} PRIVATE core/rec-ARM/rec_arm.cpp)
+	target_link_libraries(${PROJECT_NAME} PRIVATE libvixl)
 endif()
 if("arm64" IN_LIST ARCHITECTURE)
-	if(MSVC)
-		target_compile_options(${PROJECT_NAME} PRIVATE "/Zc:__cplusplus")
+	add_library(libvixl STATIC
+		external/vixl/src/code-buffer-vixl.cc
+		external/vixl/src/compiler-intrinsics-vixl.cc
+		external/vixl/src/cpu-features.cc
+		external/vixl/src/utils-vixl.cc
+		external/vixl/src/aarch64/assembler-aarch64.cc
+		external/vixl/src/aarch64/cpu-features-auditor-aarch64.cc
+		external/vixl/src/aarch64/decoder-aarch64.cc
+		external/vixl/src/aarch64/disasm-aarch64.cc
+		external/vixl/src/aarch64/instructions-aarch64.cc
+		external/vixl/src/aarch64/logic-aarch64.cc
+		external/vixl/src/aarch64/macro-assembler-aarch64.cc
+		external/vixl/src/aarch64/operands-aarch64.cc
+		external/vixl/src/aarch64/pointer-auth-aarch64.cc
+		external/vixl/src/aarch64/registers-aarch64.cc)
+	target_compile_definitions(libvixl PRIVATE VIXL_CODE_BUFFER_MALLOC VIXL_INCLUDE_TARGET_A32)
+	if(CMAKE_BUILD_TYPE STREQUAL Debug)
+		target_compile_definitions(libvixl PRIVATE VIXL_DEBUG)
 	endif()
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/vixl)
-	target_sources(${PROJECT_NAME} PRIVATE
-		core/deps/vixl/aarch64/abi-aarch64.h
-		core/deps/vixl/aarch64/assembler-aarch64.cc
-		core/deps/vixl/aarch64/assembler-aarch64.h
-		core/deps/vixl/aarch64/assembler-sve-aarch64.cc
-		core/deps/vixl/aarch64/constants-aarch64.h
-		core/deps/vixl/aarch64/instructions-aarch64.cc
-		core/deps/vixl/aarch64/instructions-aarch64.h
-		core/deps/vixl/aarch64/macro-assembler-aarch64.cc
-		core/deps/vixl/aarch64/macro-assembler-aarch64.h
-		core/deps/vixl/aarch64/macro-assembler-sve-aarch64.cc
-		core/deps/vixl/aarch64/operands-aarch64.cc
-		core/deps/vixl/aarch64/operands-aarch64.h
-		core/deps/vixl/aarch64/registers-aarch64.cc
-		core/deps/vixl/aarch64/registers-aarch64.h
-		core/deps/vixl/aarch64/pointer-auth-aarch64.cc
-		core/deps/vixl/aarch64/simulator-constants-aarch64.h
-		core/deps/vixl/assembler-base-vixl.h
-		core/deps/vixl/code-buffer-vixl.cc
-		core/deps/vixl/code-buffer-vixl.h
-		core/deps/vixl/code-generation-scopes-vixl.h
-		core/deps/vixl/compiler-intrinsics-vixl.cc
-		core/deps/vixl/compiler-intrinsics-vixl.h
-		core/deps/vixl/cpu-features.cc
-		core/deps/vixl/cpu-features.h
-		core/deps/vixl/globals-vixl.h
-		core/deps/vixl/invalset-vixl.h
-		core/deps/vixl/macro-assembler-interface.h
-		core/deps/vixl/platform-vixl.h
-		core/deps/vixl/pool-manager.h
-		core/deps/vixl/pool-manager-impl.h
-		core/deps/vixl/utils-vixl.cc
-		core/deps/vixl/utils-vixl.h)
+	if(MSVC)
+		target_compile_options(libvixl PUBLIC "/Zc:__cplusplus")
+	endif()
+	target_include_directories(libvixl PUBLIC external/vixl/src)
+	if (NINTENDO_SWITCH)
+		target_include_directories(libvixl PRIVATE shell/switch)
+	endif()
+
 	target_sources(${PROJECT_NAME} PRIVATE core/rec-ARM64/rec_arm64.cpp core/rec-ARM64/arm64_regalloc.h)
+	target_link_libraries(${PROJECT_NAME} PRIVATE libvixl)
 endif()
 if("x86" IN_LIST ARCHITECTURE OR "x86_64" IN_LIST ARCHITECTURE)
 	add_subdirectory(core/deps/xbyak EXCLUDE_FROM_ALL)
