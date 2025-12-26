@@ -23,7 +23,7 @@ endif()
 
 if(APPLE)
 	if(CMAKE_SYSTEM_NAME STREQUAL iOS)
-		set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum iOS deployment version")
+		set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum iOS deployment version")
 		set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "")
 	elseif(CMAKE_SYSTEM_NAME STREQUAL tvOS)
 		set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum tvOS deployment version")
