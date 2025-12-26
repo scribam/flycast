@@ -427,8 +427,9 @@ set(XXHASH_BUILD_XXHSUM OFF CACHE BOOL "Build the xxhsum binary")
 add_subdirectory(core/deps/xxHash/cmake_unofficial)
 target_link_libraries(${PROJECT_NAME} PRIVATE xxHash::xxhash)
 
-option(BUILD_SHARED_LIBS "Build shared library" OFF)
-add_subdirectory(core/deps/glm)
+option(GLM_ENABLE_CXX_17 "Enable C++ 17" ON)
+add_subdirectory(external/glm)
+target_compile_definitions(glm PUBLIC GLM_ENABLE_EXPERIMENTAL)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
 if(USE_VULKAN)
