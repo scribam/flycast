@@ -696,7 +696,7 @@ endif()
 
 if(ANDROID AND NOT LIBRETRO)
 	set(BUILD_SHARED_LIBS OFF)
-	add_subdirectory(core/deps/oboe)
+	add_subdirectory(external/oboe)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_OBOE)
 	target_link_libraries(${PROJECT_NAME} PRIVATE oboe)
 endif()
