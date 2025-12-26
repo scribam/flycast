@@ -2,9 +2,6 @@
 	path = core/deps/libchdr
 	url = https://github.com/flyinghead/libchdr.git
 	ignore = dirty
-[submodule "core/deps/glslang"]
-	path = core/deps/glslang
-	url = https://github.com/KhronosGroup/glslang.git
 [submodule "core/deps/oboe"]
 	path = core/deps/oboe
 	url = https://github.com/google/oboe.git
@@ -71,3 +68,6 @@
 [submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "external/glslang"]
+	path = external/glslang
+	url = https://github.com/KhronosGroup/glslang.git
