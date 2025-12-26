@@ -7,9 +7,6 @@
 [submodule "core/deps/xbyak"]
 	path = core/deps/xbyak
 	url = https://github.com/herumi/xbyak.git
-[submodule "core/deps/libjuice"]
-	path = core/deps/libjuice
-	url = https://github.com/paullouisageneau/libjuice.git
 [submodule "core/deps/websocketpp"]
 	path = core/deps/websocketpp
 	url = https://github.com/zaphoyd/websocketpp.git
@@ -80,3 +77,6 @@
 	path = external/libchdr
 	url = https://github.com/rtissera/libchdr.git
 	ignore = dirty
+[submodule "external/libjuice"]
+	path = external/libjuice
+	url = https://github.com/paullouisageneau/libjuice.git

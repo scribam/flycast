@@ -791,7 +791,7 @@ if(NOT LIBRETRO AND NOT NINTENDO_SWITCH)
 	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 	option(NO_SERVER "Disable server support" ON)
 	option(NO_TESTS "Disable tests build" ON)
-	add_subdirectory(core/deps/libjuice EXCLUDE_FROM_ALL)
+	add_subdirectory(external/libjuice EXCLUDE_FROM_ALL)
 	target_link_libraries(${PROJECT_NAME} PRIVATE LibJuice::LibJuiceStatic)
 
 	# websocket++
