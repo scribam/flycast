@@ -1574,7 +1574,12 @@ if(NOT LIBRETRO)
 endif()
 
 if(BUILD_TESTING)
-	add_subdirectory(core/deps/googletest EXCLUDE_FROM_ALL)
+	option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
+	option(INSTALL_GTEST "Enable installation of googletest. (Projects embedding googletest may want to turn this OFF.)" OFF)
+	if(WIN32)
+		set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+	endif()
+	add_subdirectory(external/googletest EXCLUDE_FROM_ALL)
 	add_subdirectory(tests)
 endif()
 
