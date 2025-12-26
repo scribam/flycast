@@ -1367,7 +1367,7 @@ if(NOT LIBRETRO)
 		string(REGEX MATCH "^[^-]+" TAG_VERSION ${GIT_VERSION})
 		if(IOS)
 			set_property(TARGET ${PROJECT_NAME} PROPERTY XCODE_ATTRIBUTE_SWIFT_VERSION "5.0")
-			add_subdirectory(shell/apple/emulator-ios/AltKit)
+			add_subdirectory(external/AltKit)
 			target_link_libraries(${PROJECT_NAME} PRIVATE AltKit)
 
 			target_sources(${PROJECT_NAME} PRIVATE

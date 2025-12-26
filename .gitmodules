@@ -59,3 +59,6 @@
 [submodule "core/deps/tinygettext"]
 	path = core/deps/tinygettext
 	url = https://github.com/flyinghead/tinygettext
+[submodule "external/AltKit"]
+	path = external/AltKit
+	url = https://github.com/rileytestut/AltKit.git
