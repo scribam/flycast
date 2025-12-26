@@ -431,7 +431,7 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
 set(XXHASH_BUILD_XXHSUM OFF CACHE BOOL "Build the xxhsum binary")
-add_subdirectory(core/deps/xxHash/cmake_unofficial)
+add_subdirectory(external/xxHash/cmake_unofficial)
 target_link_libraries(${PROJECT_NAME} PRIVATE xxHash::xxhash)
 
 option(GLM_ENABLE_CXX_17 "Enable C++ 17" ON)
