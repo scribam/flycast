@@ -1104,8 +1104,8 @@ if(USE_VULKAN)
 	target_compile_options(VulkanMemoryAllocator INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:-Wno-nullability-completeness>)
 	target_link_libraries(${PROJECT_NAME} PRIVATE GPUOpen::VulkanMemoryAllocator)
 
-	if(ANDROID AND NOT LIBRETRO AND "arm64" IN_LIST ARCHITECTURE)
-		add_subdirectory(core/deps/libadrenotools)
+	if(CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a" AND NOT LIBRETRO)
+		add_subdirectory(external/libadrenotools)
 		target_link_libraries(${PROJECT_NAME} PRIVATE adrenotools)
 	endif()
 
