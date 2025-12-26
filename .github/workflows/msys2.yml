@@ -1,0 +1,46 @@
+name: MSYS2
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        sys: [ mingw32, mingw64, msys, ucrt64, clang64, clangarm64 ]
+        libretro: [ OFF, ON ]
+        include:
+          - os: windows-latest
+          - os: windows-11-arm
+            sys: clangarm64
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{matrix.sys}}
+          update: true
+          install: >-
+            git
+            make
+          pacboy: >-
+            cmake:p
+            libcdio:p
+            lua:p
+            ninja:p
+            SDL2:p
+            toolchain:p
+
+      - name: CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=artifact -G Ninja -DUSE_BREAKPAD=OFF -DUSE_DISCORD=ON -DUSE_LIBCDIO=ON -DLIBRETRO=${{ matrix.libretro }}
+          cmake --build build --config RelWithDebInfo --target install
