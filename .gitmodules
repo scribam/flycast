@@ -93,3 +93,6 @@
 [submodule "external/tinygettext"]
 	path = external/tinygettext
 	url = https://github.com/flyinghead/tinygettext.git
+[submodule "external/vixl"]
+	path = external/vixl
+	url = https://gitlab.arm.com/runtimes/vixl.git
