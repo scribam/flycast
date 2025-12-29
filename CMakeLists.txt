@@ -864,14 +864,17 @@ if(NOT LIBRETRO)
 		IMGUI_DISABLE_DEMO_WINDOWS
 		IMGUI_DISABLE_DEBUG_TOOLS
 		IMGUI_DEFINE_MATH_OPERATORS)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/imgui core/deps/imgui/backends)
+	if(NINTENDO_SWITCH)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DISABLE_DEFAULT_SHELL_FUNCTIONS IMGUI_IMPL_OPENGL_LOADER_CUSTOM IMGUI_INCLUDE_IMGUI_USER_H)
+	endif()
+	target_include_directories(${PROJECT_NAME} PRIVATE external/imgui external/imgui/misc/cpp external/imgui/backends)
 	target_sources(${PROJECT_NAME} PRIVATE
-		core/deps/imgui/imgui.cpp
-		core/deps/imgui/imgui_demo.cpp
-		core/deps/imgui/imgui_draw.cpp
-		core/deps/imgui/imgui_stdlib.cpp
-		core/deps/imgui/imgui_tables.cpp
-		core/deps/imgui/imgui_widgets.cpp)
+		external/imgui/misc/cpp/imgui_stdlib.cpp
+		external/imgui/imgui.cpp
+		external/imgui/imgui_demo.cpp
+		external/imgui/imgui_draw.cpp
+		external/imgui/imgui_tables.cpp
+		external/imgui/imgui_widgets.cpp)
 
 	if(ENABLE_FC_PROFILER)
 		target_include_directories(${PROJECT_NAME} PRIVATE core/deps/implot)
@@ -1035,8 +1038,8 @@ if(USE_OPENGL)
 
 	if(NOT LIBRETRO)
 		target_sources(${PROJECT_NAME} PRIVATE
-				core/deps/imgui/backends/imgui_impl_opengl3.cpp
-				core/deps/imgui/backends/imgui_impl_opengl3.h
+				external/imgui/backends/imgui_impl_opengl3.cpp
+				external/imgui/backends/imgui_impl_opengl3.h
 				core/rend/gles/opengl_driver.cpp
 				core/rend/gles/opengl_driver.h)
 	endif()
@@ -1149,11 +1152,8 @@ if(USE_VULKAN)
 		target_sources(${PROJECT_NAME} PRIVATE
 				core/rend/vulkan/vulkan_driver.h
 				core/rend/vulkan/vulkan_context.cpp
-				core/deps/imgui/backends/imgui_impl_vulkan.cpp
-				core/deps/imgui/backends/imgui_impl_vulkan.h)
-		if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-			target_compile_definitions(${PROJECT_NAME} PRIVATE ImTextureID=ImU64)
-		endif()
+				external/imgui/backends/imgui_impl_vulkan.cpp
+				external/imgui/backends/imgui_impl_vulkan.h)
 	endif()
 endif()
 
@@ -1170,8 +1170,8 @@ if(WIN32 AND USE_DX9 AND NOT LIBRETRO AND NOT WINDOWS_STORE AND ("x86" IN_LIST A
 		core/rend/dx9/dx9_driver.h
 		core/rend/dx9/dxcontext.cpp
 		core/rend/dx9/dxcontext.h
-		core/deps/imgui/backends/imgui_impl_dx9.h
-		core/deps/imgui/backends/imgui_impl_dx9.cpp)
+		external/imgui/backends/imgui_impl_dx9.h
+		external/imgui/backends/imgui_impl_dx9.cpp)
 	target_sources(${PROJECT_NAME} PRIVATE ${REND_DX9_FILES})
 
 	if(NOT MINGW)
@@ -1183,8 +1183,8 @@ endif()
 if(WIN32 AND USE_DX11)
 	if(NOT LIBRETRO)
 		target_sources(${PROJECT_NAME} PRIVATE
-			core/deps/imgui/backends/imgui_impl_dx11.cpp
-			core/deps/imgui/backends/imgui_impl_dx11.h)
+			external/imgui/backends/imgui_impl_dx11.cpp
+			external/imgui/backends/imgui_impl_dx11.h)
 	endif()
 	target_sources(${PROJECT_NAME} PRIVATE
 		core/rend/dx11/dx11_driver.h
@@ -1367,8 +1367,8 @@ if(NOT LIBRETRO)
 	if(ANDROID)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES3)
 		add_subdirectory(shell/android-studio/flycast/src/main/jni/src)
-		target_link_libraries(${PROJECT_NAME} PRIVATE android log)
-
+        target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_IMPL_OPENGL_ES2)
+        target_link_libraries(${PROJECT_NAME} PRIVATE android GLESv2 log)
 	elseif(APPLE)
 		string(TIMESTAMP YEAR "%Y")
 		string(REGEX MATCH "^[^-]+" TAG_VERSION ${GIT_VERSION})
