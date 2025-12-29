@@ -482,12 +482,12 @@ if(NOT LIBRETRO)
 				set(DREAMPICOPORT_LIBUSB_INCLUDE_DIRS "${LIBUSB_INCLUDE_DIRS}" CACHE STRING "Path to libusb include directory, when applicable")
 			else()
 				# libusb
-				add_subdirectory(core/deps/DreamPicoPort-API/ext/libusb-cmake)
+				add_subdirectory(external/DreamPicoPort-API/ext/libusb-cmake)
 			endif()
 
 			# DreamPicoPort-API
 			option(DREAMPICOPORT_ADD_LIBUSB "Add internal libusb library" OFF) # Already included above, when applicable
-			add_subdirectory(core/deps/DreamPicoPort-API)
+			add_subdirectory(external/DreamPicoPort-API)
 			target_link_libraries(${PROJECT_NAME} PRIVATE dream_pico_port_api)
 		endif()
 
