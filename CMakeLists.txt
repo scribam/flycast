@@ -906,7 +906,11 @@ if(NOT LIBRETRO)
 		target_link_libraries(${PROJECT_NAME} PRIVATE implot)
 	endif()
 endif()
-target_sources(${PROJECT_NAME} PRIVATE core/deps/xbrz/xbrz.cpp)
+
+add_library(xbrz STATIC external/xbrz/xbrz.cpp)
+target_include_directories(xbrz PUBLIC external/xbrz)
+target_link_libraries(${PROJECT_NAME} PRIVATE xbrz)
+
 target_sources(${PROJECT_NAME} PRIVATE core/deps/md5/md5.cpp)
 
 if(USE_DISCORD AND NOT LIBRETRO)
