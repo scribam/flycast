@@ -144,18 +144,16 @@ bool VulkanContext::InitInstance(const char** extensions, uint32_t extensions_co
 	try
 	{
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1
-		PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
 #if defined(__ANDROID__) && HOST_CPU == CPU_ARM64
-		vkGetInstanceProcAddr = loadVulkanDriver();
-#else
-		static vk::DynamicLoader dl;
-		vkGetInstanceProcAddr = dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-#endif
+		PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = loadVulkanDriver();
 		if (vkGetInstanceProcAddr == nullptr) {
 			ERROR_LOG(RENDERER, "Vulkan entry point vkGetInstanceProcAddr not found");
 			return false;
 		}
 		VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
+#else
+		VULKAN_HPP_DEFAULT_DISPATCHER.init();
+#endif
 #endif
 		bool vulkan11 = false;
 		if (VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceVersion != nullptr)
@@ -174,11 +172,11 @@ bool VulkanContext::InitInstance(const char** extensions, uint32_t extensions_co
 		//layer_names.push_back("VK_LAYER_ARM_AGA");
 #ifdef VK_DEBUG
 #ifndef __ANDROID__
-		vext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-		vext.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+		vext.push_back(vk::EXTDebugUtilsExtensionName);
+		vext.push_back(vk::EXTDebugReportExtensionName);
 		layer_names.push_back("VK_LAYER_KHRONOS_validation");
 #else
-		vext.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);	// NDK <= 19?
+		vext.push_back(vk::EXTDebugReportExtensionName);	// NDK <= 19?
 		layer_names.push_back("VK_LAYER_GOOGLE_threading");
 		layer_names.push_back("VK_LAYER_LUNARG_parameter_validation");
 		layer_names.push_back("VK_LAYER_LUNARG_core_validation");
@@ -430,16 +428,16 @@ bool VulkanContext::InitDevice()
 		};
 
 		// Required swapchain extension
-		tryAddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::KHRSwapchainExtensionName);
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
-		tryAddDeviceExtension(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::KHRPortabilitySubsetExtensionName);
 #endif
 #ifdef VK_USE_PLATFORM_METAL_EXT
-		tryAddDeviceExtension(VK_EXT_METAL_OBJECTS_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::EXTMetalObjectsExtensionName);
 #endif
 #ifdef VK_DEBUG
-		tryAddDeviceExtension(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+		tryAddDeviceExtension(vk::EXTDebugMarkerExtensionName);
 #endif
 
 		// Enable VK_KHR_dedicated_allocation if available
@@ -450,10 +448,10 @@ bool VulkanContext::InitDevice()
 		}
 		else
 		{
-			const bool getMemReq2Supported = tryAddDeviceExtension(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+			const bool getMemReq2Supported = tryAddDeviceExtension(vk::KHRGetMemoryRequirements2ExtensionName);
 			if (getMemReq2Supported)
 			{
-				dedicatedAllocationSupported = tryAddDeviceExtension(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+				dedicatedAllocationSupported = tryAddDeviceExtension(vk::KHRDedicatedAllocationExtensionName);
 			}
 		}
 
@@ -461,12 +459,12 @@ bool VulkanContext::InitDevice()
 		// Core as of Vulkan 1.1
 		const bool getPhysicalDeviceProperties2Supported =
 			(physicalDeviceProperties.apiVersion >= VK_API_VERSION_1_1)
-			? true : tryAddDeviceExtension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+			? true : tryAddDeviceExtension(vk::KHRGetPhysicalDeviceProperties2ExtensionName);
 
 		if (getPhysicalDeviceProperties2Supported)
 		{
 			// Enable VK_EXT_provoking_vertex if available
-			provokingVertexSupported = tryAddDeviceExtension(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+			provokingVertexSupported = tryAddDeviceExtension(vk::EXTProvokingVertexExtensionName);
 		}
 		
 		// Get device features
@@ -821,7 +819,7 @@ bool VulkanContext::init()
 	GraphicsContext::instance = this;
 
 	std::vector<const char *> extensions;
-	extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRSurfaceExtensionName);
 #if defined(USE_SDL)
 	if (!sdl_recreate_window(SDL_WINDOW_VULKAN))
 		return false;
@@ -832,13 +830,13 @@ bool VulkanContext::init()
 #elif defined(VK_USE_PLATFORM_WIN32_KHR)
     extern void CreateMainWindow();
     CreateMainWindow();
-	extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRWin32SurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_METAL_EXT)
-	extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::EXTMetalSurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-	extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRXlibSurfaceExtensionName);
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
+	extensions.push_back(vk::KHRAndroidSurfaceExtensionName);
 #endif
 	if (!InitInstance(&extensions[0], extensions.size())) {
 		term();
@@ -1207,14 +1205,14 @@ void VulkanContext::DoSwapAutomation()
 			// Transition destination image to transfer destination layout
 			vk::ImageMemoryBarrier barrier(vk::AccessFlags(), vk::AccessFlagBits::eTransferWrite,
 					vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-					VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+					vk::QueueFamilyIgnored, vk::QueueFamilyIgnored,
 					*dstImage, vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1));
 			cmdBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer,
 					vk::DependencyFlags(), nullptr, nullptr, barrier);
 			// Transition swapchain image from present to transfer source layout
 			barrier = vk::ImageMemoryBarrier(vk::AccessFlagBits::eMemoryRead, vk::AccessFlagBits::eTransferRead,
 								vk::ImageLayout::ePresentSrcKHR, vk::ImageLayout::eTransferSrcOptimal,
-								VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+								vk::QueueFamilyIgnored, vk::QueueFamilyIgnored,
 								srcImage, vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1));
 			cmdBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer,
 								vk::DependencyFlags(), nullptr, nullptr, barrier);
@@ -1238,14 +1236,14 @@ void VulkanContext::DoSwapAutomation()
 			// Transition destination image to general layout, which is the required layout for mapping the image memory later on
 			barrier = vk::ImageMemoryBarrier(vk::AccessFlagBits::eTransferWrite, vk::AccessFlagBits::eMemoryRead,
 											vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eGeneral,
-											VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+											vk::QueueFamilyIgnored, vk::QueueFamilyIgnored,
 											*dstImage, vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1));
 			cmdBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer,
 					vk::DependencyFlags(), nullptr, nullptr, barrier);
 			// Transition back the swap chain image after the blit is done
 			barrier = vk::ImageMemoryBarrier(vk::AccessFlagBits::eTransferRead, vk::AccessFlagBits::eMemoryRead,
 											vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::ePresentSrcKHR,
-											VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED,
+											vk::QueueFamilyIgnored, vk::QueueFamilyIgnored,
 											srcImage, vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1));
 			cmdBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer, vk::PipelineStageFlagBits::eTransfer,
 					vk::DependencyFlags(), nullptr, nullptr, barrier);
@@ -1259,7 +1257,7 @@ void VulkanContext::DoSwapAutomation()
 			vk::SubresourceLayout subresourceLayout;
 			device->getImageSubresourceLayout(*dstImage, &subresource, &subresourceLayout);
 
-			u8* img = (u8*)device->mapMemory(*deviceMemory, 0, VK_WHOLE_SIZE);
+			u8* img = (u8*)device->mapMemory(*deviceMemory, 0, vk::WholeSize);
 			img += subresourceLayout.offset;
 
 			u8 *end = img + settings.display.width * settings.display.height * 4;
@@ -1448,11 +1446,11 @@ bool VulkanContext::GetLastFrame(std::vector<u8>& data, int& width, int& height)
 	vk::BufferMemoryBarrier bufferMemoryBarrier(
 			vk::AccessFlagBits::eTransferWrite,
 			vk::AccessFlagBits::eHostRead,
-			VK_QUEUE_FAMILY_IGNORED,
-			VK_QUEUE_FAMILY_IGNORED,
+			vk::QueueFamilyIgnored,
+			vk::QueueFamilyIgnored,
 			*attachment.GetBufferData()->buffer,
 			0,
-			VK_WHOLE_SIZE);
+			vk::WholeSize);
 	commandBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTransfer,
 					vk::PipelineStageFlagBits::eHost, {}, nullptr, bufferMemoryBarrier, nullptr);
 	commandBuffer->end();
