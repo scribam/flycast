@@ -797,7 +797,7 @@ if(NOT LIBRETRO AND NOT NINTENDO_SWITCH)
 	target_link_libraries(${PROJECT_NAME} PRIVATE LibJuice::LibJuiceStatic)
 
 	# websocket++
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/websocketpp)
+	target_include_directories(${PROJECT_NAME} PRIVATE external/websocketpp)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE ASIO_STANDALONE)
 	if (MSVC)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE
