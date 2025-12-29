@@ -442,7 +442,10 @@ if(USE_VULKAN)
 		option(ENABLE_HLSL "Enables HLSL input support" OFF)
 		option(ENABLE_OPT "Enables spirv-opt capability if present" OFF)
 		option(ENABLE_PCH "Enables Precompiled header" OFF)
-		add_subdirectory(core/deps/glslang EXCLUDE_FROM_ALL)
+		add_subdirectory(external/glslang EXCLUDE_FROM_ALL)
+
+		# Workaround for https://github.com/KhronosGroup/glslang/issues/3509
+		target_include_directories(SPIRV PUBLIC external)
 	endif()
 	target_link_libraries(${PROJECT_NAME} PRIVATE glslang::glslang-default-resource-limits glslang::SPIRV)
 endif()
