@@ -708,7 +708,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 add_subdirectory(external/ELFIO)
 target_link_libraries(${PROJECT_NAME} PRIVATE elfio::elfio)
 
-add_subdirectory(core/deps/nowide EXCLUDE_FROM_ALL)
+add_subdirectory(external/nowide EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PRIVATE nowide::nowide)
 
 if(NOT MINIUPNP_FOUND)

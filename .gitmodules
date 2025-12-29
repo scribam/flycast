@@ -86,3 +86,7 @@
 [submodule "external/miniupnp"]
 	path = external/miniupnp
 	url = https://github.com/miniupnp/miniupnp.git
+[submodule "external/nowide"]
+	path = external/nowide
+	url = https://github.com/boostorg/nowide.git
+	branch = standalone
