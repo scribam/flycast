@@ -17,9 +17,6 @@
 [submodule "core/deps/oboe"]
 	path = core/deps/oboe
 	url = https://github.com/google/oboe.git
-[submodule "core/deps/Syphon"]
-	path = core/deps/Syphon
-	url = https://github.com/vkedwardli/Syphon-Framework.git
 [submodule "core/deps/discord-rpc"]
 	path = core/deps/discord-rpc
 	url = https://github.com/harmonytf/discord-rpc
@@ -65,3 +62,6 @@
 [submodule "external/Spout2"]
 	path = external/Spout2
 	url = https://github.com/leadedge/Spout2.git
+[submodule "external/Syphon-Framework"]
+	path = external/Syphon-Framework
+	url = https://github.com/vkedwardli/Syphon-Framework.git
