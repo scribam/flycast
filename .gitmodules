@@ -96,3 +96,6 @@
 [submodule "external/xbyak"]
 	path = external/xbyak
 	url = https://github.com/herumi/xbyak.git
+[submodule "external/xxHash"]
+	path = external/xxHash
+	url = https://github.com/Cyan4973/xxHash.git
