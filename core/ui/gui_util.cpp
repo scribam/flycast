@@ -109,7 +109,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 			ImguiStyleVar _(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.f, 0.5f)); // Left
 			ImguiStyleVar _1(ImGuiStyleVar_DisabledAlpha, 1.0f);
 			ImGui::BeginDisabled();
-			ImGui::PushFont(largeFont);
+			ImGui::PushFont(largeFont, largeFont->LegacySize);
 			ImGui::ButtonEx(prompt, ImVec2(-1, 0));
 			ImGui::PopFont();
 			ImGui::EndDisabled();
@@ -124,7 +124,7 @@ void select_file_popup(const char *prompt, StringCallback callback,
 
 		ImGui::Text("%s", title.c_str());
 		ImGui::BeginChild(ImGui::GetID("dir_list"), ImVec2(0, - uiScaled(30) - ImGui::GetStyle().ItemSpacing.y),
-				ImGuiChildFlags_Borders, ImGuiWindowFlags_DragScrolling | ImGuiChildFlags_NavFlattened);
+				ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_DragScrolling);
 		{
 			ImguiStyleVar _(ImGuiStyleVar_ItemSpacing, ScaledVec2(8, 20));
 
@@ -219,8 +219,9 @@ void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button)
     const ImVec2& delta = ImGui::GetIO().MouseDelta;
     if (held && delta != ImVec2())
     {
-    	window->DragScrolling = true;
-    	window->ScrollSpeed = delta;
+    	window->DC.StateStorage->SetBool(ImGui::GetID("window##DragScrolling"), true);
+    	window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedX"), delta.x);
+    	window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedY"), delta.y);
     }
 }
 
@@ -547,7 +548,7 @@ bool OptionArrowButtons(const char *name, config::Option<int>& option, int min, 
 	}
 
 	ImGui::SameLine(0.0f, innerSpacing);
-	ImGui::PushButtonRepeat(true);
+	ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
 	bool valueChanged = false;
 	{
 		DisabledScope scope(option.isReadOnly());
@@ -556,7 +557,7 @@ bool OptionArrowButtons(const char *name, config::Option<int>& option, int min, 
 		ImGui::SameLine(0.0f, innerSpacing);
 		if (ImGui::ArrowButton((id + "right").c_str(), ImGuiDir_Right)) { option.set(std::min(max, option + 1)); valueChanged = true; }
 	}
-	ImGui::PopButtonRepeat();
+	ImGui::PopItemFlag();
 	ImGui::SameLine(0.0f, innerSpacing);
 	ImGui::Text("%s", name);
 	if (help != nullptr)
@@ -678,15 +679,20 @@ static void computeScrollSpeed(float &v)
 void windowDragScroll()
 {
 	ImGuiWindow *window = ImGui::GetCurrentWindow();
-	if (window->DragScrolling)
+	if (window->DC.StateStorage->GetBool(ImGui::GetID("window##DragScrolling")))
 	{
 		if (!ImGui::GetIO().MouseDown[ImGuiMouseButton_Left])
 		{
-			computeScrollSpeed(window->ScrollSpeed.x);
-			computeScrollSpeed(window->ScrollSpeed.y);
-			if (window->ScrollSpeed == ImVec2())
+			ImVec2 scrollSpeed = ImVec2(
+				window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedX")),
+				window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedY"))
+			);
+
+			computeScrollSpeed(scrollSpeed.x);
+			computeScrollSpeed(scrollSpeed.y);
+			if (scrollSpeed == ImVec2())
 			{
-				window->DragScrolling = false;
+				window->DC.StateStorage->SetBool(ImGui::GetID("window##DragScrolling"), false);
 				// FIXME we should really move the mouse off-screen after a touch up and this wouldn't be necessary
 				// the only problem is tool tips
 				gui_set_mouse_position(-1, -1, true);
@@ -697,12 +703,13 @@ void windowDragScroll()
 			ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
 			if (delta != ImVec2())
 				ImGui::ResetMouseDragDelta();
-			window->ScrollSpeed = delta;
+			window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedX"), delta.x);
+			window->DC.StateStorage->SetFloat(ImGui::GetID("window##ScrollSpeedY"), delta.y);
 		}
-		if (window->DragScrolling)
+		if (window->DC.StateStorage->GetBool(ImGui::GetID("window##DragScrolling")))
 		{
-			ImGui::SetScrollX(window, window->Scroll.x - window->ScrollSpeed.x);
-			ImGui::SetScrollY(window, window->Scroll.y - window->ScrollSpeed.y);
+			ImGui::SetScrollX(window, window->Scroll.x - window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedX")));
+			ImGui::SetScrollY(window, window->Scroll.y - window->DC.StateStorage->GetFloat(ImGui::GetID("window##ScrollSpeedY")));
 		}
 	}
 }
