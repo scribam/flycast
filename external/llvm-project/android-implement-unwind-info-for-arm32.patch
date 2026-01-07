@@ -1,0 +1,212 @@
+Subject: [PATCH] android: implement unwind info for arm32
+---
+Index: external/llvm-project/libunwind/src/UnwindCursor.hpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/external/llvm-project/libunwind/src/UnwindCursor.hpp b/external/llvm-project/libunwind/src/UnwindCursor.hpp
+--- a/external/llvm-project/libunwind/src/UnwindCursor.hpp	(revision 93e9df6ce6ebb8fe8edf442bbb7b5afd5929a708)
++++ b/external/llvm-project/libunwind/src/UnwindCursor.hpp	(date 1748516999440)
+@@ -90,7 +90,7 @@
+ 
+ namespace libunwind {
+ 
+-#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND)
++#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND) || defined(_LIBUNWIND_ARM_EHABI)
+ /// Cache of recently found FDEs.
+ template <typename A>
+ class _LIBUNWIND_HIDDEN DwarfFDECache {
+@@ -1015,7 +1015,7 @@
+   int stepThroughSigReturn();
+ #endif
+ 
+-#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND)
++#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND) || defined(_LIBUNWIND_ARM_EHABI)
+   bool getInfoFromFdeCie(const typename CFI_Parser<A>::FDE_Info &fdeInfo,
+                          const typename CFI_Parser<A>::CIE_Info &cieInfo,
+                          pint_t pc, uintptr_t dso_base);
+@@ -1190,7 +1190,7 @@
+ 
+ #endif // defined(_LIBUNWIND_SUPPORT_COMPACT_UNWIND)
+ 
+-#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND)
++#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND) || defined(_LIBUNWIND_ARM_EHABI)
+   compact_unwind_encoding_t dwarfEncoding() const {
+     R dummy;
+     return dwarfEncoding(dummy);
+@@ -1627,7 +1627,7 @@
+ }
+ #endif
+ 
+-#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND)
++#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND) || defined(_LIBUNWIND_ARM_EHABI)
+ template <typename A, typename R>
+ bool UnwindCursor<A, R>::getInfoFromFdeCie(
+     const typename CFI_Parser<A>::FDE_Info &fdeInfo,
+@@ -2645,8 +2645,23 @@
+ 
+ #if defined(_LIBUNWIND_ARM_EHABI)
+     // If there is ARM EHABI unwind info, look there next.
+-    if (sects.arm_section != 0 && this->getInfoFromEHABISection(pc, sects))
++    if (sects.arm_section != 0 && this->getInfoFromEHABISection(pc, sects)) {
++      _info.unwind_info_size = 0;
+       return;
++    }
++    // Lastly, ask AddressSpace object about platform specific ways to locate
++    // other FDEs.
++    pint_t fde;
++    if (_addressSpace.findOtherFDE(pc, fde)) {
++      typename CFI_Parser<A>::FDE_Info fdeInfo;
++      typename CFI_Parser<A>::CIE_Info cieInfo;
++      if (!CFI_Parser<A>::decodeFDE(_addressSpace, fde, &fdeInfo, &cieInfo)) {
++        // Double check this FDE is for a function that includes the pc.
++        if ((fdeInfo.pcStart <= pc) && (pc < fdeInfo.pcEnd))
++          if (getInfoFromFdeCie(fdeInfo, cieInfo, pc, 0))
++            return;
++      }
++    }
+ #endif
+   }
+ 
+@@ -2996,7 +3011,10 @@
+ #elif defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND)
+     result = this->stepWithDwarfFDE(stage2);
+ #elif defined(_LIBUNWIND_ARM_EHABI)
+-    result = this->stepWithEHABI();
++    if (_info.unwind_info_size == 0)
++      result = this->stepWithEHABI();
++    else
++      result = this->stepWithDwarfFDE(stage2);
+ #else
+   #error Need _LIBUNWIND_SUPPORT_COMPACT_UNWIND or \
+               _LIBUNWIND_SUPPORT_SEH_UNWIND or \
+Index: external/llvm-project/libunwind/src/Unwind-EHABI.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/external/llvm-project/libunwind/src/Unwind-EHABI.cpp b/external/llvm-project/libunwind/src/Unwind-EHABI.cpp
+--- a/external/llvm-project/libunwind/src/Unwind-EHABI.cpp	(revision 93e9df6ce6ebb8fe8edf442bbb7b5afd5929a708)
++++ b/external/llvm-project/libunwind/src/Unwind-EHABI.cpp	(date 1748516999402)
+@@ -12,6 +12,7 @@
+ #include "Unwind-EHABI.h"
+ 
+ #if defined(_LIBUNWIND_ARM_EHABI)
++#include "UnwindCursor.hpp"
+ 
+ #include <inttypes.h>
+ #include <stdbool.h>
+@@ -558,6 +559,14 @@
+         return _URC_FATAL_PHASE1_ERROR;
+       }
+     }
++    else if (frameInfo.unwind_info_size != 0)
++    {
++        int stepResult = __unw_step(cursor);
++        if (stepResult == 0)
++          return _URC_END_OF_STACK;
++        else if (stepResult < 0)
++          return _URC_FATAL_PHASE1_ERROR;
++    }
+   }
+   return _URC_NO_REASON;
+ }
+@@ -687,6 +696,16 @@
+         return _URC_FATAL_PHASE2_ERROR;
+       }
+     }
++    else if (frameInfo.unwind_info_size != 0)
++    {
++      // Ask libunwind to get next frame.
++      libunwind::AbstractUnwindCursor *co = (libunwind::AbstractUnwindCursor *)cursor;
++      int stepResult = co->step(true);
++      if (stepResult == 0)
++        return _URC_END_OF_STACK;
++      else if (stepResult < 0)
++        return _URC_FATAL_PHASE2_ERROR;
++    }
+     frame_count++;
+   }
+ 
+Index: external/llvm-project/libunwind/src/AddressSpace.hpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/external/llvm-project/libunwind/src/AddressSpace.hpp b/external/llvm-project/libunwind/src/AddressSpace.hpp
+--- a/external/llvm-project/libunwind/src/AddressSpace.hpp	(revision 93e9df6ce6ebb8fe8edf442bbb7b5afd5929a708)
++++ b/external/llvm-project/libunwind/src/AddressSpace.hpp	(date 1748516999390)
+@@ -121,20 +121,22 @@
+ 
+ #endif
+ 
++bool flycastFindDynarecFDE(uintptr_t targetAddr, uintptr_t &fde);
++
+ namespace libunwind {
+ 
+ /// Used by findUnwindSections() to return info about needed sections.
+ struct UnwindInfoSections {
+ #if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND) ||                                \
+     defined(_LIBUNWIND_SUPPORT_COMPACT_UNWIND) ||                              \
+-    defined(_LIBUNWIND_USE_DL_ITERATE_PHDR)
++    defined(_LIBUNWIND_USE_DL_ITERATE_PHDR) || defined(_LIBUNWIND_ARM_EHABI)
+   // No dso_base for SEH.
+   uintptr_t       dso_base;
+ #endif
+ #if defined(_LIBUNWIND_USE_DL_ITERATE_PHDR)
+   size_t          text_segment_length;
+ #endif
+-#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND)
++#if defined(_LIBUNWIND_SUPPORT_DWARF_UNWIND) || defined(_LIBUNWIND_ARM_EHABI)
+   uintptr_t       dwarf_section;
+   size_t          dwarf_section_length;
+ #endif
+@@ -660,9 +662,7 @@
+ 
+ inline bool LocalAddressSpace::findOtherFDE(pint_t targetAddr, pint_t &fde) {
+   // TO DO: if OS has way to dynamically register FDEs, check that.
+-  (void)targetAddr;
+-  (void)fde;
+-  return false;
++  return flycastFindDynarecFDE(targetAddr, fde);
+ }
+ 
+ inline bool LocalAddressSpace::findFunctionName(pint_t addr, char *buf,
+Index: external/llvm-project/libunwind/src/CMakeLists.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/external/llvm-project/libunwind/src/CMakeLists.txt b/external/llvm-project/libunwind/src/CMakeLists.txt
+--- a/external/llvm-project/libunwind/src/CMakeLists.txt	(revision 93e9df6ce6ebb8fe8edf442bbb7b5afd5929a708)
++++ b/external/llvm-project/libunwind/src/CMakeLists.txt	(date 1748516997315)
+@@ -174,17 +174,17 @@
+   set_target_properties(unwind_shared_objects PROPERTIES POSITION_INDEPENDENT_CODE ON) # must set manually because it's an object library
+ endif()
+ 
+-add_library(unwind_shared SHARED)
+-target_link_libraries(unwind_shared PUBLIC unwind_shared_objects runtimes-libc-shared)
+-set_target_properties(unwind_shared
+-  PROPERTIES
+-    EXCLUDE_FROM_ALL "$<IF:$<BOOL:${LIBUNWIND_ENABLE_SHARED}>,FALSE,TRUE>"
+-    LINK_FLAGS "${LIBUNWIND_LINK_FLAGS}"
+-    LINKER_LANGUAGE C
+-    OUTPUT_NAME "${LIBUNWIND_SHARED_OUTPUT_NAME}"
+-    VERSION     "${LIBUNWIND_LIBRARY_VERSION}"
+-    SOVERSION   "1"
+-)
++#add_library(unwind_shared SHARED)
++#target_link_libraries(unwind_shared PUBLIC unwind_shared_objects runtimes-libc-shared)
++#set_target_properties(unwind_shared
++#  PROPERTIES
++#    EXCLUDE_FROM_ALL "$<IF:$<BOOL:${LIBUNWIND_ENABLE_SHARED}>,FALSE,TRUE>"
++#    LINK_FLAGS "${LIBUNWIND_LINK_FLAGS}"
++#    LINKER_LANGUAGE C
++#    OUTPUT_NAME "${LIBUNWIND_SHARED_OUTPUT_NAME}"
++#    VERSION     "${LIBUNWIND_LIBRARY_VERSION}"
++#    SOVERSION   "1"
++#)
+ 
+ if (LIBUNWIND_ENABLE_SHARED)
+   list(APPEND LIBUNWIND_BUILD_TARGETS "unwind_shared")
