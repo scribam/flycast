@@ -37,10 +37,9 @@ jobs:
           brew update || :
           brew install libao ldid pulseaudio
           brew uninstall --ignore-dependencies zstd
-          VULKAN_VER=1.3.290.0 && aria2c https://sdk.lunarg.com/sdk/download/$VULKAN_VER/mac/vulkansdk-macos-$VULKAN_VER.dmg
-          hdiutil attach ./vulkansdk-macos-*.dmg -mountpoint /Volumes/VulkanSDK
-          sudo /Volumes/VulkanSDK/InstallVulkan.app/Contents/MacOS/InstallVulkan --root $HOME/VulkanSDK --accept-licenses --default-answer --confirm-command install
-          hdiutil detach /Volumes/VulkanSDK
+          VULKAN_VER=1.4.335.0 && aria2c https://sdk.lunarg.com/sdk/download/$VULKAN_VER/mac/vulkansdk-macos-$VULKAN_VER.zip
+          unzip vulkansdk-macos-$VULKAN_VER.zip
+          sudo ./vulkansdk-macOS-$VULKAN_VER.app/Contents/MacOS/vulkansdk-macOS-$VULKAN_VER --root $HOME/VulkanSDK --accept-licenses --default-answer --confirm-command install
           echo "VULKAN_SDK=$HOME/VulkanSDK/macOS" >> $GITHUB_ENV
         if: runner.os == 'macOS'
 

@@ -1088,7 +1088,7 @@ if(USE_VULKAN)
 		target_compile_definitions(${PROJECT_NAME} PUBLIC VK_USE_PLATFORM_METAL_EXT)
 	endif()
 
-	add_subdirectory(core/deps/Vulkan-Headers)
+	add_subdirectory(external/Vulkan-Headers)
 	target_link_libraries(${PROJECT_NAME} PRIVATE Vulkan::Headers)
 
 	add_subdirectory(core/deps/VulkanMemoryAllocator)
