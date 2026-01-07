@@ -90,3 +90,6 @@
 [submodule "external/rcheevos"]
 	path = external/rcheevos
 	url = https://github.com/RetroAchievements/rcheevos.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb.git

@@ -306,7 +306,11 @@ endif()
 add_subdirectory(external/json)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
-target_include_directories(${PROJECT_NAME} PRIVATE core core/deps core/deps/stb external/asio/asio/include)
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE external/stb)
+target_link_libraries(${PROJECT_NAME} PRIVATE stb)
+
+target_include_directories(${PROJECT_NAME} PRIVATE core core/deps external/asio/asio/include)
 if(LIBRETRO)
 	target_include_directories(${PROJECT_NAME} PRIVATE shell/libretro)
 endif()
