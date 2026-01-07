@@ -1307,8 +1307,9 @@ if("arm64" IN_LIST ARCHITECTURE)
 	target_link_libraries(${PROJECT_NAME} PRIVATE libvixl)
 endif()
 if("x86" IN_LIST ARCHITECTURE OR "x86_64" IN_LIST ARCHITECTURE)
-	add_subdirectory(core/deps/xbyak EXCLUDE_FROM_ALL)
+	add_subdirectory(external/xbyak EXCLUDE_FROM_ALL)
 	target_link_libraries(${PROJECT_NAME} PRIVATE xbyak::xbyak)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE XBYAK_STRICT_CHECK_MEM_REG_SIZE=0)
 	if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 		target_sources(${PROJECT_NAME} PRIVATE
 			core/rec-x64/xbyak_base.h
