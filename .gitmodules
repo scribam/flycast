@@ -11,9 +11,6 @@
 [submodule "core/deps/rcheevos"]
 	path = core/deps/rcheevos
 	url = https://github.com/RetroAchievements/rcheevos.git
-[submodule "core/deps/googletest"]
-	path = core/deps/googletest
-	url = https://github.com/google/googletest.git
 [submodule "core/deps/xbyak"]
 	path = core/deps/xbyak
 	url = https://github.com/herumi/xbyak.git
@@ -71,3 +68,6 @@
 [submodule "external/glslang"]
 	path = external/glslang
 	url = https://github.com/KhronosGroup/glslang.git
+[submodule "external/googletest"]
+	path = external/googletest
+	url = https://github.com/google/googletest.git
