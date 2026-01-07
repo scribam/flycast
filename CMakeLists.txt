@@ -1091,7 +1091,7 @@ if(USE_VULKAN)
 	add_subdirectory(external/Vulkan-Headers)
 	target_link_libraries(${PROJECT_NAME} PRIVATE Vulkan::Headers)
 
-	add_subdirectory(core/deps/VulkanMemoryAllocator)
+	add_subdirectory(external/VulkanMemoryAllocator)
 	target_compile_options(VulkanMemoryAllocator INTERFACE $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:AppleClang,Clang>>:-Wno-nullability-completeness>)
 	target_link_libraries(${PROJECT_NAME} PRIVATE GPUOpen::VulkanMemoryAllocator)
 
