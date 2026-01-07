@@ -80,3 +80,6 @@
 [submodule "external/libjuice"]
 	path = external/libjuice
 	url = https://github.com/paullouisageneau/libjuice.git
+[submodule "external/libzip"]
+	path = external/libzip
+	url = https://github.com/nih-at/libzip.git
