@@ -496,7 +496,7 @@ if(NOT LIBRETRO)
 		endif()
 		if(NOT SDL2_FOUND)
 			set(SDL_TEST_ENABLED_BY_DEFAULT OFF)
-			add_subdirectory(core/deps/SDL EXCLUDE_FROM_ALL)
+			add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
 			set(SDL2_FOUND 1)
 		endif()
 
@@ -1542,13 +1542,13 @@ if(NOT LIBRETRO)
 					shell/uwp/splash.png
 					shell/uwp/flycast44.targetsize-48_altform-unplated.png
 					shell/uwp/flycast44.targetsize-48_altform-lightunplated.png
-					core/deps/SDL/src/main/winrt/SDL2-WinRTResource_BlankCursor.cur
-					core/deps/SDL/src/main/winrt/SDL2-WinRTResources.rc)
+					external/SDL/src/main/winrt/SDL2-WinRTResource_BlankCursor.cur
+					external/SDL/src/main/winrt/SDL2-WinRTResources.rc)
 			target_sources(${PROJECT_NAME} PRIVATE
 				${ResourceFiles}
 				shell/uwp/http_client.cpp)
 			if(NOT BUILD_TESTING)
-				target_sources(${PROJECT_NAME} PRIVATE core/deps/SDL/src/main/winrt/SDL_winrt_main_NonXAML.cpp)
+				target_sources(${PROJECT_NAME} PRIVATE external/SDL/src/main/winrt/SDL_winrt_main_NonXAML.cpp)
 			endif()
 			set_target_properties(${PROJECT_NAME} PROPERTIES RESOURCE "${ResourceFiles}")
 		else()
