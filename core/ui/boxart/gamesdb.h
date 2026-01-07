@@ -18,7 +18,8 @@
  */
 #pragma once
 #include "scraper.h"
-#include "json.hpp"
+
+#include <nlohmann/json.hpp>
 
 #include <map>
 #include <string>
