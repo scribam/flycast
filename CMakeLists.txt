@@ -318,7 +318,7 @@ endif()
 if(USE_BREAKPAD AND NOT LIBRETRO)
 	find_program(SH_EXECUTABLE sh)
 	if((ANDROID AND NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows") OR (MINGW AND SH_EXECUTABLE) OR (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
-		add_subdirectory(core/deps/breakpad)
+		add_subdirectory(external/breakpad)
 		if(WIN32)
 			target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--build-id")
 		endif()
@@ -326,47 +326,47 @@ if(USE_BREAKPAD AND NOT LIBRETRO)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE USE_BREAKPAD)
 	elseif(APPLE AND NOT IOS)
 		target_sources(${PROJECT_NAME} PRIVATE
-			core/deps/breakpad/src/client/minidump_file_writer-inl.h
-			core/deps/breakpad/src/client/minidump_file_writer.cc
-			core/deps/breakpad/src/client/minidump_file_writer.h
-			core/deps/breakpad/src/client/mac/handler/breakpad_nlist_64.cc
-			core/deps/breakpad/src/client/mac/handler/breakpad_nlist_64.h
-			core/deps/breakpad/src/client/mac/handler/dynamic_images.cc
-			core/deps/breakpad/src/client/mac/handler/dynamic_images.h
-			core/deps/breakpad/src/client/mac/handler/exception_handler.cc
-			core/deps/breakpad/src/client/mac/handler/exception_handler.h
-			core/deps/breakpad/src/client/mac/handler/minidump_generator.cc
-			core/deps/breakpad/src/client/mac/handler/minidump_generator.h
-			core/deps/breakpad/src/client/mac/handler/protected_memory_allocator.cc
-			core/deps/breakpad/src/client/mac/handler/protected_memory_allocator.h
-			core/deps/breakpad/src/client/mac/crash_generation/ConfigFile.h
-			core/deps/breakpad/src/client/mac/crash_generation/ConfigFile.mm
-			core/deps/breakpad/src/client/mac/crash_generation/client_info.h
-			core/deps/breakpad/src/client/mac/crash_generation/crash_generation_client.h
-			core/deps/breakpad/src/client/mac/crash_generation/crash_generation_client.cc
-			core/deps/breakpad/src/common/convert_UTF.cc
-			core/deps/breakpad/src/common/convert_UTF.h
-			core/deps/breakpad/src/common/md5.cc
-			core/deps/breakpad/src/common/string_conversion.cc
-			core/deps/breakpad/src/common/string_conversion.h
-			core/deps/breakpad/src/common/mac/file_id.cc
-			core/deps/breakpad/src/common/mac/file_id.h
-			core/deps/breakpad/src/common/mac/MachIPC.mm
-			core/deps/breakpad/src/common/mac/MachIPC.h
-			core/deps/breakpad/src/common/mac/bootstrap_compat.cc
-			core/deps/breakpad/src/common/mac/bootstrap_compat.h
-			core/deps/breakpad/src/common/mac/macho_id.cc
-			core/deps/breakpad/src/common/mac/macho_id.h
-			core/deps/breakpad/src/common/mac/macho_utilities.cc
-			core/deps/breakpad/src/common/mac/macho_utilities.h
-			core/deps/breakpad/src/common/mac/macho_walker.cc
-			core/deps/breakpad/src/common/mac/macho_walker.h
-			core/deps/breakpad/src/common/mac/string_utilities.cc
-			core/deps/breakpad/src/common/mac/string_utilities.h
+			external/breakpad/src/client/minidump_file_writer-inl.h
+			external/breakpad/src/client/minidump_file_writer.cc
+			external/breakpad/src/client/minidump_file_writer.h
+			external/breakpad/src/client/mac/handler/breakpad_nlist_64.cc
+			external/breakpad/src/client/mac/handler/breakpad_nlist_64.h
+			external/breakpad/src/client/mac/handler/dynamic_images.cc
+			external/breakpad/src/client/mac/handler/dynamic_images.h
+			external/breakpad/src/client/mac/handler/exception_handler.cc
+			external/breakpad/src/client/mac/handler/exception_handler.h
+			external/breakpad/src/client/mac/handler/minidump_generator.cc
+			external/breakpad/src/client/mac/handler/minidump_generator.h
+			external/breakpad/src/client/mac/handler/protected_memory_allocator.cc
+			external/breakpad/src/client/mac/handler/protected_memory_allocator.h
+			external/breakpad/src/client/mac/crash_generation/ConfigFile.h
+			external/breakpad/src/client/mac/crash_generation/ConfigFile.mm
+			external/breakpad/src/client/mac/crash_generation/client_info.h
+			external/breakpad/src/client/mac/crash_generation/crash_generation_client.h
+			external/breakpad/src/client/mac/crash_generation/crash_generation_client.cc
+			external/breakpad/src/common/convert_UTF.cc
+			external/breakpad/src/common/convert_UTF.h
+			external/breakpad/src/common/md5.cc
+			external/breakpad/src/common/string_conversion.cc
+			external/breakpad/src/common/string_conversion.h
+			external/breakpad/src/common/mac/file_id.cc
+			external/breakpad/src/common/mac/file_id.h
+			external/breakpad/src/common/mac/MachIPC.mm
+			external/breakpad/src/common/mac/MachIPC.h
+			external/breakpad/src/common/mac/bootstrap_compat.cc
+			external/breakpad/src/common/mac/bootstrap_compat.h
+			external/breakpad/src/common/mac/macho_id.cc
+			external/breakpad/src/common/mac/macho_id.h
+			external/breakpad/src/common/mac/macho_utilities.cc
+			external/breakpad/src/common/mac/macho_utilities.h
+			external/breakpad/src/common/mac/macho_walker.cc
+			external/breakpad/src/common/mac/macho_walker.h
+			external/breakpad/src/common/mac/string_utilities.cc
+			external/breakpad/src/common/mac/string_utilities.h
 		)
-		target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/core/deps/breakpad/src)
+		target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/breakpad/src)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE USE_BREAKPAD)
-		add_custom_target(dump_syms COMMAND xcodebuild -project ${CMAKE_CURRENT_SOURCE_DIR}/core/deps/breakpad/src/tools/mac/dump_syms/dump_syms.xcodeproj -target dump_syms -configuration Release CONFIGURATION_BUILD_DIR=${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad)
+		add_custom_target(dump_syms COMMAND xcodebuild -project ${CMAKE_CURRENT_SOURCE_DIR}/external/breakpad/src/tools/mac/dump_syms/dump_syms.xcodeproj -target dump_syms -configuration Release CONFIGURATION_BUILD_DIR=${CMAKE_CURRENT_SOURCE_DIR}/build/breakpad)
 		ADD_DEPENDENCIES(${PROJECT_NAME} dump_syms)
 
 		if(${CMAKE_GENERATOR} MATCHES "^Xcode.*")
