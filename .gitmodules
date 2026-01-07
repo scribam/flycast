@@ -53,12 +53,12 @@
 [submodule "core/deps/websocketpp"]
 	path = core/deps/websocketpp
 	url = https://github.com/zaphoyd/websocketpp.git
-[submodule "core/deps/DreamPicoPort-API"]
-	path = core/deps/DreamPicoPort-API
-	url = https://github.com/OrangeFox86/DreamPicoPort-API.git
 [submodule "core/deps/tinygettext"]
 	path = core/deps/tinygettext
 	url = https://github.com/flyinghead/tinygettext
 [submodule "external/AltKit"]
 	path = external/AltKit
 	url = https://github.com/rileytestut/AltKit.git
+[submodule "external/DreamPicoPort-API"]
+	path = external/DreamPicoPort-API
+	url = https://github.com/OrangeFox86/DreamPicoPort-API.git
