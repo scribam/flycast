@@ -83,3 +83,6 @@
 [submodule "external/libzip"]
 	path = external/libzip
 	url = https://github.com/nih-at/libzip.git
+[submodule "external/miniupnp"]
+	path = external/miniupnp
+	url = https://github.com/miniupnp/miniupnp.git
