@@ -690,6 +690,9 @@ target_sources(${PROJECT_NAME} PRIVATE
 		core/deps/chdpsr/cdipsr.cpp
 		core/deps/chdpsr/cdipsr.h)
 
+add_subdirectory(external/ELFIO)
+target_link_libraries(${PROJECT_NAME} PRIVATE elfio::elfio)
+
 add_subdirectory(core/deps/nowide EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PRIVATE nowide::nowide)
 
@@ -849,8 +852,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE _7ZIP_ST)
 target_sources(${PROJECT_NAME} PRIVATE core/deps/lzma/7zArcIn.c core/deps/lzma/7zBuf.c core/deps/lzma/7zCrc.c core/deps/lzma/7zCrcOpt.c core/deps/lzma/7zDec.c core/deps/lzma/7zFile.c core/deps/lzma/7zStream.c core/deps/lzma/Alloc.c core/deps/lzma/Bcj2.c core/deps/lzma/Bra86.c core/deps/lzma/Bra.c core/deps/lzma/BraIA64.c core/deps/lzma/CpuArch.c core/deps/lzma/Delta.c core/deps/lzma/LzFind.c core/deps/lzma/Lzma2Dec.c core/deps/lzma/Lzma86Dec.c core/deps/lzma/Lzma86Enc.c core/deps/lzma/LzmaDec.c core/deps/lzma/LzmaEnc.c core/deps/lzma/LzmaLib.c core/deps/lzma/Sort.c)
-add_subdirectory(core/deps/libelf)
-target_link_libraries(${PROJECT_NAME} PRIVATE elf)
 if(NOT LIBRETRO)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE
 		IMGUI_DISABLE_DEMO_WINDOWS
@@ -1577,7 +1578,6 @@ if(NINTENDO_SWITCH)
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:xxHash::xxhash>
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:chdr-static>
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:zip>
-			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:elf>
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:flycast::res>
 			COMMAND ${CMAKE_AR} -rs flycast_libretro_libnx.a *.o
 			COMMAND rm *.o
