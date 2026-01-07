@@ -317,6 +317,7 @@ int GLAD_GL_EXT_draw_instanced = 0;
 int GLAD_GL_EXT_draw_range_elements = 0;
 int GLAD_GL_EXT_external_buffer = 0;
 int GLAD_GL_EXT_fog_coord = 0;
+int GLAD_GL_EXT_fragment_shading_rate = 0;
 int GLAD_GL_EXT_framebuffer_blit = 0;
 int GLAD_GL_EXT_framebuffer_blit_layers = 0;
 int GLAD_GL_EXT_framebuffer_multisample = 0;
@@ -335,6 +336,7 @@ int GLAD_GL_EXT_light_texture = 0;
 int GLAD_GL_EXT_memory_object = 0;
 int GLAD_GL_EXT_memory_object_fd = 0;
 int GLAD_GL_EXT_memory_object_win32 = 0;
+int GLAD_GL_EXT_mesh_shader = 0;
 int GLAD_GL_EXT_misc_attribute = 0;
 int GLAD_GL_EXT_multi_draw_arrays = 0;
 int GLAD_GL_EXT_multisample = 0;
@@ -453,6 +455,7 @@ int GLAD_GL_MESA_pack_invert = 0;
 int GLAD_GL_MESA_program_binary_formats = 0;
 int GLAD_GL_MESA_resize_buffers = 0;
 int GLAD_GL_MESA_shader_integer_functions = 0;
+int GLAD_GL_MESA_texture_const_bandwidth = 0;
 int GLAD_GL_MESA_tile_raster_order = 0;
 int GLAD_GL_MESA_window_pos = 0;
 int GLAD_GL_MESA_ycbcr_texture = 0;
@@ -717,7 +720,6 @@ int GLAD_GL_EXT_draw_buffers_indexed = 0;
 int GLAD_GL_EXT_draw_elements_base_vertex = 0;
 int GLAD_GL_EXT_draw_transform_feedback = 0;
 int GLAD_GL_EXT_float_blend = 0;
-int GLAD_GL_EXT_fragment_shading_rate = 0;
 int GLAD_GL_EXT_geometry_point_size = 0;
 int GLAD_GL_EXT_geometry_shader = 0;
 int GLAD_GL_EXT_gpu_shader5 = 0;
@@ -745,6 +747,7 @@ int GLAD_GL_EXT_shader_non_constant_global_initializers = 0;
 int GLAD_GL_EXT_shader_pixel_local_storage = 0;
 int GLAD_GL_EXT_shader_pixel_local_storage2 = 0;
 int GLAD_GL_EXT_shader_texture_lod = 0;
+int GLAD_GL_EXT_shader_texture_samples = 0;
 int GLAD_GL_EXT_shadow_samplers = 0;
 int GLAD_GL_EXT_sparse_texture = 0;
 int GLAD_GL_EXT_tessellation_point_size = 0;
@@ -767,6 +770,8 @@ int GLAD_GL_EXT_texture_type_2_10_10_10_REV = 0;
 int GLAD_GL_EXT_texture_view = 0;
 int GLAD_GL_EXT_unpack_subimage = 0;
 int GLAD_GL_FJ_shader_binary_GCCSO = 0;
+int GLAD_GL_HUAWEI_program_binary = 0;
+int GLAD_GL_HUAWEI_shader_binary = 0;
 int GLAD_GL_IMG_bindless_texture = 0;
 int GLAD_GL_IMG_framebuffer_downsample = 0;
 int GLAD_GL_IMG_multisampled_render_to_texture = 0;
@@ -880,6 +885,7 @@ int GLAD_GL_QCOM_texture_foveated_subsampled_layout = 0;
 int GLAD_GL_QCOM_texture_lod_bias = 0;
 int GLAD_GL_QCOM_tiled_rendering = 0;
 int GLAD_GL_QCOM_writeonly_rendering = 0;
+int GLAD_GL_QCOM_ycbcr_degamma = 0;
 int GLAD_GL_VIV_shader_binary = 0;
 
 
@@ -1390,6 +1396,8 @@ PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glad_glDrawElementsInstancedBaseVertex 
 PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC glad_glDrawElementsInstancedBaseVertexBaseInstance = NULL;
 PFNGLDRAWELEMENTSINSTANCEDEXTPROC glad_glDrawElementsInstancedEXT = NULL;
 PFNGLDRAWMESHARRAYSSUNPROC glad_glDrawMeshArraysSUN = NULL;
+PFNGLDRAWMESHTASKSEXTPROC glad_glDrawMeshTasksEXT = NULL;
+PFNGLDRAWMESHTASKSINDIRECTEXTPROC glad_glDrawMeshTasksIndirectEXT = NULL;
 PFNGLDRAWMESHTASKSINDIRECTNVPROC glad_glDrawMeshTasksIndirectNV = NULL;
 PFNGLDRAWMESHTASKSNVPROC glad_glDrawMeshTasksNV = NULL;
 PFNGLDRAWPIXELSPROC glad_glDrawPixels = NULL;
@@ -1533,6 +1541,7 @@ PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glad_glFramebufferRenderbufferEXT = NULL;
 PFNGLFRAMEBUFFERSAMPLELOCATIONSFVARBPROC glad_glFramebufferSampleLocationsfvARB = NULL;
 PFNGLFRAMEBUFFERSAMPLELOCATIONSFVNVPROC glad_glFramebufferSampleLocationsfvNV = NULL;
 PFNGLFRAMEBUFFERSAMPLEPOSITIONSFVAMDPROC glad_glFramebufferSamplePositionsfvAMD = NULL;
+PFNGLFRAMEBUFFERSHADINGRATEEXTPROC glad_glFramebufferShadingRateEXT = NULL;
 PFNGLFRAMEBUFFERTEXTUREPROC glad_glFramebufferTexture = NULL;
 PFNGLFRAMEBUFFERTEXTURE1DPROC glad_glFramebufferTexture1D = NULL;
 PFNGLFRAMEBUFFERTEXTURE1DEXTPROC glad_glFramebufferTexture1DEXT = NULL;
@@ -1677,6 +1686,7 @@ PFNGLGETFRAGMENTLIGHTFVSGIXPROC glad_glGetFragmentLightfvSGIX = NULL;
 PFNGLGETFRAGMENTLIGHTIVSGIXPROC glad_glGetFragmentLightivSGIX = NULL;
 PFNGLGETFRAGMENTMATERIALFVSGIXPROC glad_glGetFragmentMaterialfvSGIX = NULL;
 PFNGLGETFRAGMENTMATERIALIVSGIXPROC glad_glGetFragmentMaterialivSGIX = NULL;
+PFNGLGETFRAGMENTSHADINGRATESEXTPROC glad_glGetFragmentShadingRatesEXT = NULL;
 PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC glad_glGetFramebufferAttachmentParameteriv = NULL;
 PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC glad_glGetFramebufferAttachmentParameterivEXT = NULL;
 PFNGLGETFRAMEBUFFERPARAMETERFVAMDPROC glad_glGetFramebufferParameterfvAMD = NULL;
@@ -2303,7 +2313,9 @@ PFNGLMULTIDRAWELEMENTSINDIRECTBINDLESSCOUNTNVPROC glad_glMultiDrawElementsIndire
 PFNGLMULTIDRAWELEMENTSINDIRECTBINDLESSNVPROC glad_glMultiDrawElementsIndirectBindlessNV = NULL;
 PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTPROC glad_glMultiDrawElementsIndirectCount = NULL;
 PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTARBPROC glad_glMultiDrawElementsIndirectCountARB = NULL;
+PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTEXTPROC glad_glMultiDrawMeshTasksIndirectCountEXT = NULL;
 PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTNVPROC glad_glMultiDrawMeshTasksIndirectCountNV = NULL;
+PFNGLMULTIDRAWMESHTASKSINDIRECTEXTPROC glad_glMultiDrawMeshTasksIndirectEXT = NULL;
 PFNGLMULTIDRAWMESHTASKSINDIRECTNVPROC glad_glMultiDrawMeshTasksIndirectNV = NULL;
 PFNGLMULTIDRAWRANGEELEMENTARRAYAPPLEPROC glad_glMultiDrawRangeElementArrayAPPLE = NULL;
 PFNGLMULTIMODEDRAWARRAYSIBMPROC glad_glMultiModeDrawArraysIBM = NULL;
@@ -2474,6 +2486,7 @@ PFNGLNAMEDFRAMEBUFFERTEXTUREEXTPROC glad_glNamedFramebufferTextureEXT = NULL;
 PFNGLNAMEDFRAMEBUFFERTEXTUREFACEEXTPROC glad_glNamedFramebufferTextureFaceEXT = NULL;
 PFNGLNAMEDFRAMEBUFFERTEXTURELAYERPROC glad_glNamedFramebufferTextureLayer = NULL;
 PFNGLNAMEDFRAMEBUFFERTEXTURELAYEREXTPROC glad_glNamedFramebufferTextureLayerEXT = NULL;
+PFNGLNAMEDFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC glad_glNamedFramebufferTextureMultiviewOVR = NULL;
 PFNGLNAMEDPROGRAMLOCALPARAMETER4DEXTPROC glad_glNamedProgramLocalParameter4dEXT = NULL;
 PFNGLNAMEDPROGRAMLOCALPARAMETER4DVEXTPROC glad_glNamedProgramLocalParameter4dvEXT = NULL;
 PFNGLNAMEDPROGRAMLOCALPARAMETER4FEXTPROC glad_glNamedProgramLocalParameter4fEXT = NULL;
@@ -2999,6 +3012,8 @@ PFNGLSHADEROP3EXTPROC glad_glShaderOp3EXT = NULL;
 PFNGLSHADERSOURCEPROC glad_glShaderSource = NULL;
 PFNGLSHADERSOURCEARBPROC glad_glShaderSourceARB = NULL;
 PFNGLSHADERSTORAGEBLOCKBINDINGPROC glad_glShaderStorageBlockBinding = NULL;
+PFNGLSHADINGRATECOMBINEROPSEXTPROC glad_glShadingRateCombinerOpsEXT = NULL;
+PFNGLSHADINGRATEEXTPROC glad_glShadingRateEXT = NULL;
 PFNGLSHADINGRATEIMAGEBARRIERNVPROC glad_glShadingRateImageBarrierNV = NULL;
 PFNGLSHADINGRATEIMAGEPALETTENVPROC glad_glShadingRateImagePaletteNV = NULL;
 PFNGLSHADINGRATESAMPLEORDERCUSTOMNVPROC glad_glShadingRateSampleOrderCustomNV = NULL;
@@ -3954,7 +3969,6 @@ PFNGLFRAMEBUFFERFETCHBARRIERQCOMPROC glad_glFramebufferFetchBarrierQCOM = NULL;
 PFNGLFRAMEBUFFERFOVEATIONCONFIGQCOMPROC glad_glFramebufferFoveationConfigQCOM = NULL;
 PFNGLFRAMEBUFFERFOVEATIONPARAMETERSQCOMPROC glad_glFramebufferFoveationParametersQCOM = NULL;
 PFNGLFRAMEBUFFERPIXELLOCALSTORAGESIZEEXTPROC glad_glFramebufferPixelLocalStorageSizeEXT = NULL;
-PFNGLFRAMEBUFFERSHADINGRATEEXTPROC glad_glFramebufferShadingRateEXT = NULL;
 PFNGLFRAMEBUFFERTEXTURE2DDOWNSAMPLEIMGPROC glad_glFramebufferTexture2DDownsampleIMG = NULL;
 PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC glad_glFramebufferTexture2DMultisampleEXT = NULL;
 PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEIMGPROC glad_glFramebufferTexture2DMultisampleIMG = NULL;
@@ -3972,7 +3986,6 @@ PFNGLGETDRIVERCONTROLSQCOMPROC glad_glGetDriverControlsQCOM = NULL;
 PFNGLGETFLOATI_VNVPROC glad_glGetFloati_vNV = NULL;
 PFNGLGETFLOATI_VOESPROC glad_glGetFloati_vOES = NULL;
 PFNGLGETFRAGDATAINDEXEXTPROC glad_glGetFragDataIndexEXT = NULL;
-PFNGLGETFRAGMENTSHADINGRATESEXTPROC glad_glGetFragmentShadingRatesEXT = NULL;
 PFNGLGETFRAMEBUFFERPIXELLOCALSTORAGESIZEEXTPROC glad_glGetFramebufferPixelLocalStorageSizeEXT = NULL;
 PFNGLGETGRAPHICSRESETSTATUSEXTPROC glad_glGetGraphicsResetStatusEXT = NULL;
 PFNGLGETGRAPHICSRESETSTATUSKHRPROC glad_glGetGraphicsResetStatusKHR = NULL;
@@ -4051,8 +4064,6 @@ PFNGLSCISSORINDEXEDNVPROC glad_glScissorIndexedNV = NULL;
 PFNGLSCISSORINDEXEDOESPROC glad_glScissorIndexedOES = NULL;
 PFNGLSCISSORINDEXEDVNVPROC glad_glScissorIndexedvNV = NULL;
 PFNGLSCISSORINDEXEDVOESPROC glad_glScissorIndexedvOES = NULL;
-PFNGLSHADINGRATECOMBINEROPSEXTPROC glad_glShadingRateCombinerOpsEXT = NULL;
-PFNGLSHADINGRATEEXTPROC glad_glShadingRateEXT = NULL;
 PFNGLSHADINGRATEQCOMPROC glad_glShadingRateQCOM = NULL;
 PFNGLSTARTTILINGQCOMPROC glad_glStartTilingQCOM = NULL;
 PFNGLTEXBUFFEROESPROC glad_glTexBufferOES = NULL;
@@ -7337,6 +7348,13 @@ static void glad_gl_load_GL_EXT_fog_coord( GLADuserptrloadfunc load, void* userp
     glad_glFogCoordfEXT = (PFNGLFOGCOORDFEXTPROC) load(userptr, "glFogCoordfEXT");
     glad_glFogCoordfvEXT = (PFNGLFOGCOORDFVEXTPROC) load(userptr, "glFogCoordfvEXT");
 }
+static void glad_gl_load_GL_EXT_fragment_shading_rate( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_GL_EXT_fragment_shading_rate) return;
+    glad_glFramebufferShadingRateEXT = (PFNGLFRAMEBUFFERSHADINGRATEEXTPROC) load(userptr, "glFramebufferShadingRateEXT");
+    glad_glGetFragmentShadingRatesEXT = (PFNGLGETFRAGMENTSHADINGRATESEXTPROC) load(userptr, "glGetFragmentShadingRatesEXT");
+    glad_glShadingRateCombinerOpsEXT = (PFNGLSHADINGRATECOMBINEROPSEXTPROC) load(userptr, "glShadingRateCombinerOpsEXT");
+    glad_glShadingRateEXT = (PFNGLSHADINGRATEEXTPROC) load(userptr, "glShadingRateEXT");
+}
 static void glad_gl_load_GL_EXT_framebuffer_blit( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_EXT_framebuffer_blit) return;
     glad_glBlitFramebufferEXT = (PFNGLBLITFRAMEBUFFEREXTPROC) load(userptr, "glBlitFramebufferEXT");
@@ -7473,6 +7491,13 @@ static void glad_gl_load_GL_EXT_memory_object_win32( GLADuserptrloadfunc load, v
     if(!GLAD_GL_EXT_memory_object_win32) return;
     glad_glImportMemoryWin32HandleEXT = (PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC) load(userptr, "glImportMemoryWin32HandleEXT");
     glad_glImportMemoryWin32NameEXT = (PFNGLIMPORTMEMORYWIN32NAMEEXTPROC) load(userptr, "glImportMemoryWin32NameEXT");
+}
+static void glad_gl_load_GL_EXT_mesh_shader( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_GL_EXT_mesh_shader) return;
+    glad_glDrawMeshTasksEXT = (PFNGLDRAWMESHTASKSEXTPROC) load(userptr, "glDrawMeshTasksEXT");
+    glad_glDrawMeshTasksIndirectEXT = (PFNGLDRAWMESHTASKSINDIRECTEXTPROC) load(userptr, "glDrawMeshTasksIndirectEXT");
+    glad_glMultiDrawMeshTasksIndirectCountEXT = (PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTEXTPROC) load(userptr, "glMultiDrawMeshTasksIndirectCountEXT");
+    glad_glMultiDrawMeshTasksIndirectEXT = (PFNGLMULTIDRAWMESHTASKSINDIRECTEXTPROC) load(userptr, "glMultiDrawMeshTasksIndirectEXT");
 }
 static void glad_gl_load_GL_EXT_multi_draw_arrays( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_EXT_multi_draw_arrays) return;
@@ -8827,6 +8852,7 @@ static void glad_gl_load_GL_OES_single_precision( GLADuserptrloadfunc load, void
 static void glad_gl_load_GL_OVR_multiview( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_OVR_multiview) return;
     glad_glFramebufferTextureMultiviewOVR = (PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC) load(userptr, "glFramebufferTextureMultiviewOVR");
+    glad_glNamedFramebufferTextureMultiviewOVR = (PFNGLNAMEDFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC) load(userptr, "glNamedFramebufferTextureMultiviewOVR");
 }
 static void glad_gl_load_GL_PGI_misc_hints( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_PGI_misc_hints) return;
@@ -9165,13 +9191,6 @@ static void glad_gl_load_GL_EXT_draw_transform_feedback( GLADuserptrloadfunc loa
     glad_glDrawTransformFeedbackEXT = (PFNGLDRAWTRANSFORMFEEDBACKEXTPROC) load(userptr, "glDrawTransformFeedbackEXT");
     glad_glDrawTransformFeedbackInstancedEXT = (PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDEXTPROC) load(userptr, "glDrawTransformFeedbackInstancedEXT");
 }
-static void glad_gl_load_GL_EXT_fragment_shading_rate( GLADuserptrloadfunc load, void* userptr) {
-    if(!GLAD_GL_EXT_fragment_shading_rate) return;
-    glad_glFramebufferShadingRateEXT = (PFNGLFRAMEBUFFERSHADINGRATEEXTPROC) load(userptr, "glFramebufferShadingRateEXT");
-    glad_glGetFragmentShadingRatesEXT = (PFNGLGETFRAGMENTSHADINGRATESEXTPROC) load(userptr, "glGetFragmentShadingRatesEXT");
-    glad_glShadingRateCombinerOpsEXT = (PFNGLSHADINGRATECOMBINEROPSEXTPROC) load(userptr, "glShadingRateCombinerOpsEXT");
-    glad_glShadingRateEXT = (PFNGLSHADINGRATEEXTPROC) load(userptr, "glShadingRateEXT");
-}
 static void glad_gl_load_GL_EXT_geometry_shader( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_EXT_geometry_shader) return;
     glad_glFramebufferTextureEXT = (PFNGLFRAMEBUFFERTEXTUREEXTPROC) load(userptr, "glFramebufferTextureEXT");
@@ -9360,6 +9379,10 @@ static void glad_gl_load_GL_NV_viewport_array( GLADuserptrloadfunc load, void* u
 static void glad_gl_load_GL_OES_EGL_image( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_OES_EGL_image) return;
     glad_glEGLImageTargetRenderbufferStorageOES = (PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC) load(userptr, "glEGLImageTargetRenderbufferStorageOES");
+    glad_glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) load(userptr, "glEGLImageTargetTexture2DOES");
+}
+static void glad_gl_load_GL_OES_EGL_image_external( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_GL_OES_EGL_image_external) return;
     glad_glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) load(userptr, "glEGLImageTargetTexture2DOES");
 }
 static void glad_gl_load_GL_OES_copy_image( GLADuserptrloadfunc load, void* userptr) {
@@ -9896,6 +9919,7 @@ static int glad_gl_find_extensions_gl(void) {
     GLAD_GL_EXT_draw_range_elements = glad_gl_has_extension(exts, exts_i, "GL_EXT_draw_range_elements");
     GLAD_GL_EXT_external_buffer = glad_gl_has_extension(exts, exts_i, "GL_EXT_external_buffer");
     GLAD_GL_EXT_fog_coord = glad_gl_has_extension(exts, exts_i, "GL_EXT_fog_coord");
+    GLAD_GL_EXT_fragment_shading_rate = glad_gl_has_extension(exts, exts_i, "GL_EXT_fragment_shading_rate");
     GLAD_GL_EXT_framebuffer_blit = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_blit");
     GLAD_GL_EXT_framebuffer_blit_layers = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_blit_layers");
     GLAD_GL_EXT_framebuffer_multisample = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_multisample");
@@ -9914,6 +9938,7 @@ static int glad_gl_find_extensions_gl(void) {
     GLAD_GL_EXT_memory_object = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object");
     GLAD_GL_EXT_memory_object_fd = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object_fd");
     GLAD_GL_EXT_memory_object_win32 = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object_win32");
+    GLAD_GL_EXT_mesh_shader = glad_gl_has_extension(exts, exts_i, "GL_EXT_mesh_shader");
     GLAD_GL_EXT_misc_attribute = glad_gl_has_extension(exts, exts_i, "GL_EXT_misc_attribute");
     GLAD_GL_EXT_multi_draw_arrays = glad_gl_has_extension(exts, exts_i, "GL_EXT_multi_draw_arrays");
     GLAD_GL_EXT_multisample = glad_gl_has_extension(exts, exts_i, "GL_EXT_multisample");
@@ -10032,6 +10057,7 @@ static int glad_gl_find_extensions_gl(void) {
     GLAD_GL_MESA_program_binary_formats = glad_gl_has_extension(exts, exts_i, "GL_MESA_program_binary_formats");
     GLAD_GL_MESA_resize_buffers = glad_gl_has_extension(exts, exts_i, "GL_MESA_resize_buffers");
     GLAD_GL_MESA_shader_integer_functions = glad_gl_has_extension(exts, exts_i, "GL_MESA_shader_integer_functions");
+    GLAD_GL_MESA_texture_const_bandwidth = glad_gl_has_extension(exts, exts_i, "GL_MESA_texture_const_bandwidth");
     GLAD_GL_MESA_tile_raster_order = glad_gl_has_extension(exts, exts_i, "GL_MESA_tile_raster_order");
     GLAD_GL_MESA_window_pos = glad_gl_has_extension(exts, exts_i, "GL_MESA_window_pos");
     GLAD_GL_MESA_ycbcr_texture = glad_gl_has_extension(exts, exts_i, "GL_MESA_ycbcr_texture");
@@ -10468,6 +10494,7 @@ int gladLoadGLUserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_EXT_draw_range_elements(load, userptr);
     glad_gl_load_GL_EXT_external_buffer(load, userptr);
     glad_gl_load_GL_EXT_fog_coord(load, userptr);
+    glad_gl_load_GL_EXT_fragment_shading_rate(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_blit(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_blit_layers(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_multisample(load, userptr);
@@ -10482,6 +10509,7 @@ int gladLoadGLUserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_EXT_memory_object(load, userptr);
     glad_gl_load_GL_EXT_memory_object_fd(load, userptr);
     glad_gl_load_GL_EXT_memory_object_win32(load, userptr);
+    glad_gl_load_GL_EXT_mesh_shader(load, userptr);
     glad_gl_load_GL_EXT_multi_draw_arrays(load, userptr);
     glad_gl_load_GL_EXT_multisample(load, userptr);
     glad_gl_load_GL_EXT_paletted_texture(load, userptr);
@@ -10658,10 +10686,12 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_EXT_debug_marker = glad_gl_has_extension(exts, exts_i, "GL_EXT_debug_marker");
     GLAD_GL_EXT_draw_instanced = glad_gl_has_extension(exts, exts_i, "GL_EXT_draw_instanced");
     GLAD_GL_EXT_external_buffer = glad_gl_has_extension(exts, exts_i, "GL_EXT_external_buffer");
+    GLAD_GL_EXT_fragment_shading_rate = glad_gl_has_extension(exts, exts_i, "GL_EXT_fragment_shading_rate");
     GLAD_GL_EXT_framebuffer_blit_layers = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_blit_layers");
     GLAD_GL_EXT_memory_object = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object");
     GLAD_GL_EXT_memory_object_fd = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object_fd");
     GLAD_GL_EXT_memory_object_win32 = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object_win32");
+    GLAD_GL_EXT_mesh_shader = glad_gl_has_extension(exts, exts_i, "GL_EXT_mesh_shader");
     GLAD_GL_EXT_multi_draw_arrays = glad_gl_has_extension(exts, exts_i, "GL_EXT_multi_draw_arrays");
     GLAD_GL_EXT_multiview_tessellation_geometry_shader = glad_gl_has_extension(exts, exts_i, "GL_EXT_multiview_tessellation_geometry_shader");
     GLAD_GL_EXT_multiview_texture_multisample = glad_gl_has_extension(exts, exts_i, "GL_EXT_multiview_texture_multisample");
@@ -10710,6 +10740,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_MESA_framebuffer_swap_xy = glad_gl_has_extension(exts, exts_i, "GL_MESA_framebuffer_swap_xy");
     GLAD_GL_MESA_program_binary_formats = glad_gl_has_extension(exts, exts_i, "GL_MESA_program_binary_formats");
     GLAD_GL_MESA_shader_integer_functions = glad_gl_has_extension(exts, exts_i, "GL_MESA_shader_integer_functions");
+    GLAD_GL_MESA_texture_const_bandwidth = glad_gl_has_extension(exts, exts_i, "GL_MESA_texture_const_bandwidth");
     GLAD_GL_NVX_blend_equation_advanced_multi_draw_buffers = glad_gl_has_extension(exts, exts_i, "GL_NVX_blend_equation_advanced_multi_draw_buffers");
     GLAD_GL_NV_bindless_texture = glad_gl_has_extension(exts, exts_i, "GL_NV_bindless_texture");
     GLAD_GL_NV_blend_equation_advanced = glad_gl_has_extension(exts, exts_i, "GL_NV_blend_equation_advanced");
@@ -10746,6 +10777,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_NV_shader_texture_footprint = glad_gl_has_extension(exts, exts_i, "GL_NV_shader_texture_footprint");
     GLAD_GL_NV_shading_rate_image = glad_gl_has_extension(exts, exts_i, "GL_NV_shading_rate_image");
     GLAD_GL_NV_stereo_view_rendering = glad_gl_has_extension(exts, exts_i, "GL_NV_stereo_view_rendering");
+    GLAD_GL_NV_texture_barrier = glad_gl_has_extension(exts, exts_i, "GL_NV_texture_barrier");
     GLAD_GL_NV_timeline_semaphore = glad_gl_has_extension(exts, exts_i, "GL_NV_timeline_semaphore");
     GLAD_GL_NV_viewport_array2 = glad_gl_has_extension(exts, exts_i, "GL_NV_viewport_array2");
     GLAD_GL_NV_viewport_swizzle = glad_gl_has_extension(exts, exts_i, "GL_NV_viewport_swizzle");
@@ -10804,7 +10836,6 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_EXT_draw_elements_base_vertex = glad_gl_has_extension(exts, exts_i, "GL_EXT_draw_elements_base_vertex");
     GLAD_GL_EXT_draw_transform_feedback = glad_gl_has_extension(exts, exts_i, "GL_EXT_draw_transform_feedback");
     GLAD_GL_EXT_float_blend = glad_gl_has_extension(exts, exts_i, "GL_EXT_float_blend");
-    GLAD_GL_EXT_fragment_shading_rate = glad_gl_has_extension(exts, exts_i, "GL_EXT_fragment_shading_rate");
     GLAD_GL_EXT_geometry_point_size = glad_gl_has_extension(exts, exts_i, "GL_EXT_geometry_point_size");
     GLAD_GL_EXT_geometry_shader = glad_gl_has_extension(exts, exts_i, "GL_EXT_geometry_shader");
     GLAD_GL_EXT_gpu_shader5 = glad_gl_has_extension(exts, exts_i, "GL_EXT_gpu_shader5");
@@ -10832,6 +10863,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_EXT_shader_pixel_local_storage = glad_gl_has_extension(exts, exts_i, "GL_EXT_shader_pixel_local_storage");
     GLAD_GL_EXT_shader_pixel_local_storage2 = glad_gl_has_extension(exts, exts_i, "GL_EXT_shader_pixel_local_storage2");
     GLAD_GL_EXT_shader_texture_lod = glad_gl_has_extension(exts, exts_i, "GL_EXT_shader_texture_lod");
+    GLAD_GL_EXT_shader_texture_samples = glad_gl_has_extension(exts, exts_i, "GL_EXT_shader_texture_samples");
     GLAD_GL_EXT_shadow_samplers = glad_gl_has_extension(exts, exts_i, "GL_EXT_shadow_samplers");
     GLAD_GL_EXT_sparse_texture = glad_gl_has_extension(exts, exts_i, "GL_EXT_sparse_texture");
     GLAD_GL_EXT_tessellation_point_size = glad_gl_has_extension(exts, exts_i, "GL_EXT_tessellation_point_size");
@@ -10854,6 +10886,8 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_EXT_texture_view = glad_gl_has_extension(exts, exts_i, "GL_EXT_texture_view");
     GLAD_GL_EXT_unpack_subimage = glad_gl_has_extension(exts, exts_i, "GL_EXT_unpack_subimage");
     GLAD_GL_FJ_shader_binary_GCCSO = glad_gl_has_extension(exts, exts_i, "GL_FJ_shader_binary_GCCSO");
+    GLAD_GL_HUAWEI_program_binary = glad_gl_has_extension(exts, exts_i, "GL_HUAWEI_program_binary");
+    GLAD_GL_HUAWEI_shader_binary = glad_gl_has_extension(exts, exts_i, "GL_HUAWEI_shader_binary");
     GLAD_GL_IMG_bindless_texture = glad_gl_has_extension(exts, exts_i, "GL_IMG_bindless_texture");
     GLAD_GL_IMG_framebuffer_downsample = glad_gl_has_extension(exts, exts_i, "GL_IMG_framebuffer_downsample");
     GLAD_GL_IMG_multisampled_render_to_texture = glad_gl_has_extension(exts, exts_i, "GL_IMG_multisampled_render_to_texture");
@@ -10967,6 +11001,7 @@ static int glad_gl_find_extensions_gles2(void) {
     GLAD_GL_QCOM_texture_lod_bias = glad_gl_has_extension(exts, exts_i, "GL_QCOM_texture_lod_bias");
     GLAD_GL_QCOM_tiled_rendering = glad_gl_has_extension(exts, exts_i, "GL_QCOM_tiled_rendering");
     GLAD_GL_QCOM_writeonly_rendering = glad_gl_has_extension(exts, exts_i, "GL_QCOM_writeonly_rendering");
+    GLAD_GL_QCOM_ycbcr_degamma = glad_gl_has_extension(exts, exts_i, "GL_QCOM_ycbcr_degamma");
     GLAD_GL_VIV_shader_binary = glad_gl_has_extension(exts, exts_i, "GL_VIV_shader_binary");
 
     glad_gl_free_extensions(exts_i);
@@ -11027,10 +11062,12 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_EXT_debug_marker(load, userptr);
     glad_gl_load_GL_EXT_draw_instanced(load, userptr);
     glad_gl_load_GL_EXT_external_buffer(load, userptr);
+    glad_gl_load_GL_EXT_fragment_shading_rate(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_blit_layers(load, userptr);
     glad_gl_load_GL_EXT_memory_object(load, userptr);
     glad_gl_load_GL_EXT_memory_object_fd(load, userptr);
     glad_gl_load_GL_EXT_memory_object_win32(load, userptr);
+    glad_gl_load_GL_EXT_mesh_shader(load, userptr);
     glad_gl_load_GL_EXT_multi_draw_arrays(load, userptr);
     glad_gl_load_GL_EXT_polygon_offset_clamp(load, userptr);
     glad_gl_load_GL_EXT_raster_multisample(load, userptr);
@@ -11068,6 +11105,7 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_NV_sample_locations(load, userptr);
     glad_gl_load_GL_NV_scissor_exclusive(load, userptr);
     glad_gl_load_GL_NV_shading_rate_image(load, userptr);
+    glad_gl_load_GL_NV_texture_barrier(load, userptr);
     glad_gl_load_GL_NV_timeline_semaphore(load, userptr);
     glad_gl_load_GL_NV_viewport_swizzle(load, userptr);
     glad_gl_load_GL_OVR_multiview(load, userptr);
@@ -11091,7 +11129,6 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_EXT_draw_buffers_indexed(load, userptr);
     glad_gl_load_GL_EXT_draw_elements_base_vertex(load, userptr);
     glad_gl_load_GL_EXT_draw_transform_feedback(load, userptr);
-    glad_gl_load_GL_EXT_fragment_shading_rate(load, userptr);
     glad_gl_load_GL_EXT_geometry_shader(load, userptr);
     glad_gl_load_GL_EXT_instanced_arrays(load, userptr);
     glad_gl_load_GL_EXT_map_buffer_range(load, userptr);
@@ -11124,6 +11161,7 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_NV_read_buffer(load, userptr);
     glad_gl_load_GL_NV_viewport_array(load, userptr);
     glad_gl_load_GL_OES_EGL_image(load, userptr);
+    glad_gl_load_GL_OES_EGL_image_external(load, userptr);
     glad_gl_load_GL_OES_copy_image(load, userptr);
     glad_gl_load_GL_OES_draw_buffers_indexed(load, userptr);
     glad_gl_load_GL_OES_draw_elements_base_vertex(load, userptr);

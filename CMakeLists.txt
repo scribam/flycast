@@ -1313,12 +1313,12 @@ if("x86" IN_LIST ARCHITECTURE OR "x86_64" IN_LIST ARCHITECTURE)
 endif()
 
 if((USE_OPENGL OR USE_GLES2 OR USE_GLES) AND NOT LIBRETRO)
-	add_library(glad STATIC core/deps/glad/src/gl.c)
+	add_library(glad STATIC external/glad/src/gl.c)
 	if(NOT APPLE AND NOT WIN32 AND NOT SDL2_FOUND)
 		# When SDL2 is not found, we can use EGL with ANativeWindow (Android) or X11
-		target_sources(glad PRIVATE core/deps/glad/src/egl.c)
+		target_sources(glad PRIVATE external/glad/src/egl.c)
 	endif()
-	target_include_directories(glad PUBLIC core/deps/glad/include)
+	target_include_directories(glad PUBLIC external/glad/include)
 	target_link_libraries(${PROJECT_NAME} PRIVATE glad)
 endif()
 
