@@ -4,9 +4,6 @@
 [submodule "core/deps/websocketpp"]
 	path = core/deps/websocketpp
 	url = https://github.com/zaphoyd/websocketpp.git
-[submodule "core/deps/tinygettext"]
-	path = core/deps/tinygettext
-	url = https://github.com/flyinghead/tinygettext
 [submodule "external/AltKit"]
 	path = external/AltKit
 	url = https://github.com/rileytestut/AltKit.git
@@ -93,3 +90,6 @@
 [submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb.git
+[submodule "external/tinygettext"]
+	path = external/tinygettext
+	url = https://github.com/flyinghead/tinygettext.git
