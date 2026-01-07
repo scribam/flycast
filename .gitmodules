@@ -23,9 +23,6 @@
 [submodule "core/deps/googletest"]
 	path = core/deps/googletest
 	url = https://github.com/google/googletest.git
-[submodule "core/deps/asio"]
-	path = core/deps/asio
-	url = https://github.com/flyinghead/asio.git
 [submodule "core/deps/xbyak"]
 	path = core/deps/xbyak
 	url = https://github.com/herumi/xbyak.git
@@ -65,3 +62,6 @@
 [submodule "external/VulkanMemoryAllocator"]
 	path = external/VulkanMemoryAllocator
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "external/asio"]
+	path = external/asio
+	url = https://github.com/flyinghead/asio.git
