@@ -30,7 +30,7 @@ jobs:
 
       - name: Set up dependencies
         run: |
-          vdpm curl-mbedtls kubridge libmathneon libpng libzip mbedtls SceShaccCgExt vitaShaRK taihen zlib zstd
+          vdpm asio curl-mbedtls kubridge libmathneon libpng libzip mbedtls SceShaccCgExt vitaShaRK taihen zlib zstd
           git clone --depth 1 https://github.com/Rinnegatamante/vitaGL.git
           make -C vitaGL CIRCULAR_VERTEX_POOL=2 DEPTH_STENCIL_HACK=1 HAVE_SHADER_CACHE=1 HAVE_WRAPPED_ALLOCATORS=1 NO_DEBUG=1 -j4 install
           git clone -b vitagl --depth 1 https://github.com/Northfear/SDL.git
