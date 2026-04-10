@@ -258,7 +258,7 @@ public:
 	{
 		pico_sock = pico_socket_open(PICO_PROTO_IPV4, PICO_PROTO_TCP, nullptr);
 		if (pico_sock == nullptr) {
-			INFO_LOG(NETWORK, "pico_socket_open failed: error %d", pico_err);
+			INFO_LOG(NETWORK, "pico_socket_open failed: error %d", fmt::underlying(pico_err));
 			return;
 		}
 		attachPicoSocket();
@@ -268,7 +268,7 @@ public:
 		pico_sock->local_port = htons(endpoint.port());
 		if (pico_socket_connect(pico_sock, &dcaddr.addr, htons(socket.local_endpoint().port())) != 0)
 		{
-			INFO_LOG(NETWORK, "pico_socket_connect failed: error %d", pico_err);
+			INFO_LOG(NETWORK, "pico_socket_connect failed: error %d", fmt::underlying(pico_err));
 			pico_socket_close(pico_sock);
 			return;
 		}
@@ -435,7 +435,7 @@ private:
 				pico.readInProgress = true;
 				int r = pico_socket_read(pico_sock, sendbuf, sizeof(sendbuf));
 				pico.readInProgress = false;
-				DEBUG_LOG(NETWORK, "TcpSocket[%s] read event: pico.state %d, %d bytes", name.c_str(), pico.state, r);
+				DEBUG_LOG(NETWORK, "TcpSocket[%s] read event: pico.state %d, %d bytes", name.c_str(), fmt::underlying(pico.state), r);
 				if (r > 0)
 				{
 					if (pico_sock->local_port == short_be(5011) && r >= 5 && sendbuf[0] == 1)
@@ -469,7 +469,7 @@ private:
 		{
 			if (pico.pendingWrite > 0)
 			{
-				DEBUG_LOG(NETWORK, "TcpSocket[%s] write event: pico.state %d, %d bytes", name.c_str(), pico.state, pico.pendingWrite);
+				DEBUG_LOG(NETWORK, "TcpSocket[%s] write event: pico.state %d, %d bytes", name.c_str(), fmt::underlying(pico.state), pico.pendingWrite);
 				if (pico.state == Connecting) {
 					pico.pendingEvent |= PICO_SOCK_EV_WR;
 				}

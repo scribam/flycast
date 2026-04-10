@@ -855,10 +855,12 @@ void gui_load_game()
 	create_task(picker->PickSingleFileAsync()).then([](StorageFile ^file) {
 		if (file)
 		{
-			NOTICE_LOG(COMMON, "Picked file: %S", file->Path->Data());
 			nowide::stackstring path;
 			if (path.convert(file->Path->Data()))
+			{
+				NOTICE_LOG(COMMON, "Picked file: %s", path.get());
 				gui_start_game(path.get());
+			}
 		}
 	});
 }

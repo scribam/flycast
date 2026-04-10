@@ -4,7 +4,6 @@
 #include "hw/mem/addrspace.h"
 #include "cfg/cfg.h"
 #include "cfg/option.h"
-#include "log/LogManager.h"
 #include "ui/gui.h"
 #include "oslib/oslib.h"
 #include "oslib/directory.h"
@@ -88,7 +87,6 @@ int flycast_init(int argc, char* argv[])
 		settings.naomi.drivingSimSlave = config::loadInt("naomi", "DrivingSimSlave");
 
 		config::Settings::instance().reset();
-		LogManager::Shutdown();
 		if (!config::open())
 		{
 			LogManager::Init();
@@ -108,9 +106,6 @@ int flycast_init(int argc, char* argv[])
 		if(config::GDB)
 			debugger::init(config::GDBPort);
 		lua::init();
-
-		if(config::ProfilerEnabled)
-			LogManager::GetInstance()->SetEnable(LogTypes::PROFILER, true);
 
 		return 0;
 	} catch (const std::exception& e) {
@@ -160,7 +155,8 @@ void SaveSettings()
 	void SaveAndroidSettings();
 	SaveAndroidSettings();
 #endif
-	LogManager::GetInstance()->UpdateConfig();
+
+	LogManager::Init();
 }
 
 void flycast_term()
@@ -357,7 +353,7 @@ void dc_loadstate(int index)
 	try {
 		Deserializer deser(data, total_size);
 		emu.loadstate(deser);
-	    NOTICE_LOG(SAVESTATE, "Loaded state ver %d from %s size %d", deser.version(), filename.c_str(), total_size);
+	    NOTICE_LOG(SAVESTATE, "Loaded state ver %d from %s size %d", fmt::underlying(deser.version()), filename.c_str(), total_size);
 		if (deser.size() != total_size)
 			// Note: this isn't true for RA savestates
 			WARN_LOG(SAVESTATE, "Savestate size %d but only %d bytes used", total_size, (int)deser.size());

@@ -409,7 +409,7 @@ size_t UnwindInfo::end(u32 offset, ptrdiff_t rwRxOffset)
 		registeredFrames.push_back(unwindInfoDest);
 #endif
 	}
-	DEBUG_LOG(DYNAREC, "RegisterFrame %p sz %d tables: %d", startAddr, (u32)(endAddr - startAddr), (u32)registeredFrames.size());
+	DEBUG_LOG(DYNAREC, "RegisterFrame %p sz %d tables: %d", fmt::ptr(startAddr), (u32)(endAddr - startAddr), (u32)registeredFrames.size());
 
 	return (unwindInfoDest + unwindInfo.size()) - endAddr;
 }

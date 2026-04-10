@@ -654,7 +654,7 @@ static void GD_HLE_Command(gd_command cc)
 		break;
 
 	default:
-		WARN_LOG(REIOS, "GDROM: Unknown GDROM CC:%X", cc);
+		WARN_LOG(REIOS, "GDROM: Unknown GDROM CC:%X", fmt::underlying(cc));
 		break;
 	}
 	if (gd_hle_state.status == GDC_BUSY)
@@ -678,7 +678,7 @@ void gdrom_hle_op()
 			//	r5 = pointer to parameter block for the command, can be NULL if the command does not take parameters
 			//
 			// Returns: a request id (>0) if successful, 0 if failed
-			debugf("GDROM: HLE REQ_CMD CC:%X  param ptr: %X bios status %d", r[4], r[5], gd_hle_state.status);
+			debugf("GDROM: HLE REQ_CMD CC:%X  param ptr: %X bios status %d", r[4], r[5], fmt::underlying(gd_hle_state.status));
 			if (gd_hle_state.status != GDC_OK)
 			{
 				r[0] = 0;
@@ -829,7 +829,7 @@ void gdrom_hle_op()
 				}
 				WriteMem32(r[4], (u32)status);
 				WriteMem32(r[4] + 4, discType);
-				debugf("GDROM: HLE GET_DRV_STAT r4:%X -> %x %x", r[4], status, discType);
+				debugf("GDROM: HLE GET_DRV_STAT r4:%X -> %x %x", r[4], fmt::underlying(status), discType);
 				r[0] = GDC_OK;
 			}
 			break;

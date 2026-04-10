@@ -980,7 +980,7 @@ void Emulator::start()
 	if (state == Running)
 		return;
 	if (state != Loaded) {
-		WARN_LOG(COMMON, "Unexpected emu state %d", state);
+		WARN_LOG(COMMON, "Unexpected emu state %d", fmt::underlying(state));
 		return;
 	}
 	state = Running;

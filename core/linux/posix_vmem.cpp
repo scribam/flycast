@@ -312,7 +312,7 @@ bool prepare_jit_block(void *code_area, size_t size, void **code_area_rw, ptrdif
 	*code_area_rw = ptr_rw;
 	*rx_offset = (char*)ptr_rx - (char*)ptr_rw;
 	close(fd);
-	INFO_LOG(DYNAREC, "Info: Using NO_RWX mode, rx ptr: %p, rw ptr: %p, offset: %ld", ptr_rx, ptr_rw, (long)*rx_offset);
+	INFO_LOG(DYNAREC, "Info: Using NO_RWX mode, rx ptr: %p, rw ptr: %p, offset: %ld", fmt::ptr(ptr_rx), fmt::ptr(ptr_rw), (long)*rx_offset);
 
 	return (ptr_rw != MAP_FAILED);
 }

@@ -20,7 +20,7 @@
 #include "gui.h"
 #include "IconsFontAwesome6.h"
 #include "mainui.h"
-#include "log/LogManager.h"
+#include "log/Log.h"
 #include "hw/maple/maple_if.h"
 #include "imgui_stdlib.h"
 #include "input/dreampotato.h"
@@ -141,36 +141,42 @@ static void gui_debug_tab()
 {
 	header("Logging");
 	{
-		LogManager *logManager = LogManager::GetInstance();
-		for (LogTypes::LOG_TYPE type = LogTypes::AICA; type < LogTypes::NUMBER_OF_LOGS; type = (LogTypes::LOG_TYPE)(type + 1))
+		for (LogManager::Type type = LogManager::Type::AICA; type < LogManager::NUMBER_OF_LOGGERS; type = static_cast<LogManager::Type>(type + 1))
 		{
-			bool enabled = logManager->IsEnabled(type, logManager->GetLogLevel());
-			std::string name = std::string(logManager->GetShortName(type)) + " - " + logManager->GetFullName(type);
-			if (ImGui::Checkbox(name.c_str(), &enabled) && logManager->GetLogLevel() > LogTypes::LWARNING) {
-				logManager->SetEnable(type, enabled);
-				config::saveBool("log", logManager->GetShortName(type), enabled);
+			auto logContainer = LogManager::GetLogContainer(type);
+			std::string name = logContainer.short_name + " - " + logContainer.long_name;
+			bool enabled = config::loadBool("log", logContainer.short_name, true);
+
+			if (ImGui::Checkbox(name.c_str(), &enabled))
+			{
+				// TODO: update logger verbosity, set to off if disabled, set to verbosity if enabled
+				config::saveBool("log", logContainer.long_name, enabled);
 			}
 		}
-		ImGui::Spacing();
 
-		static const char *levels[] = { "Notice", "Error", "Warning", "Info", "Debug" };
-		if (ImGui::BeginCombo("Log Verbosity", levels[logManager->GetLogLevel() - 1], ImGuiComboFlags_None))
+		spdlog::level::level_enum current_level = static_cast<spdlog::level::level_enum>(config::loadInt("log", "Verbosity", spdlog::level::debug));
+		if (ImGui::BeginCombo("Log Verbosity", spdlog::level::to_string_view(current_level).data(), ImGuiComboFlags_None))
 		{
-			for (std::size_t i = 0; i < std::size(levels); i++)
+			for (auto i = 0; i < spdlog::level::level_enum::n_levels; i++)
 			{
-				bool is_selected = logManager->GetLogLevel() - 1 == (int)i;
-				if (ImGui::Selectable(levels[i], &is_selected)) {
-					logManager->SetLogLevel((LogTypes::LOG_LEVELS)(i + 1));
-					config::saveInt("log", "Verbosity", i + 1);
+				const auto level = static_cast<spdlog::level::level_enum>(i);
+				bool is_selected = level == current_level;
+				if (ImGui::Selectable(spdlog::level::to_string_view(level).data(), &is_selected))
+				{
+					// TODO: update logger verbosity if not off
+					config::saveInt("log", "Verbosity", i);
 				}
 				if (is_selected)
+				{
 					ImGui::SetItemDefaultFocus();
+				}
 			}
 			ImGui::EndCombo();
 		}
-		InputText("Log Server", &config::LogServer.get(), ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_CallbackCharFilter, dnsCharFilter);
-        ImGui::SameLine();
-        ShowHelpMarker("Log to this hostname[:port] with UDP. Default port is 31667.");
+
+		ImGui::InputText("Log Server", &config::LogServer.get(), ImGuiInputTextFlags_CharsNoBlank, nullptr, nullptr);
+		ImGui::SameLine();
+		ShowHelpMarker("Log to this hostname[:port] with UDP. Default port is 31667.");
 	}
 #if FC_PROFILER
 	ImGui::Spacing();
@@ -194,6 +200,7 @@ static void gui_debug_tab()
 	}
 #endif
 }
+
 #endif
 
 static bool beginTabItem(const char *icon, const char *label) {

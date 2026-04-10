@@ -32,7 +32,6 @@
 #include "oslib/oslib.h"
 #include "stdclass.h"
 #include "cfg/cfg.h"
-#include "log/LogManager.h"
 #include "sdl/sdl.h"
 #include "emulator.h"
 #include "ui/mainui.h"
@@ -49,6 +48,7 @@
 #include <nowide/stackstring.hpp>
 #include <exception>
 
+#include <cstdarg>
 #include <windows.h>
 #include <windowsx.h>
 

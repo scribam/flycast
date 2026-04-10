@@ -119,7 +119,8 @@ int get(const std::string& url, std::vector<u8>& content, const Headers *reqHead
 	}
 	catch (Exception^ e)
 	{
-		WARN_LOG(COMMON, "http::get error %.*S", e->Message->Length(), e->Message->Data());
+		std::string exceptionMessage(e->Message->Begin(), e->Message->End());
+		WARN_LOG(COMMON, "http::get error %s", exceptionMessage);
 		return 500;
 	}
 }
@@ -173,7 +174,8 @@ int post(const std::string& url, const char *payload, const char *contentType, s
 	}
 	catch (Exception^ e)
 	{
-		WARN_LOG(COMMON, "http::post error %.*S", e->Message->Length(), e->Message->Data());
+		std::string exceptionMessage(e->Message->Begin(), e->Message->End());
+		WARN_LOG(COMMON, "http::post error %s", exceptionMessage);
 		return 500;
 	}
 }

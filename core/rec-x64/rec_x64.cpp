@@ -1346,7 +1346,7 @@ public:
 		try {
 			::mainloop();
 		} catch (const SH4ThrownException& ex) {
-			ERROR_LOG(DYNAREC, "SH4ThrownException in mainloop code %x", ex.expEvn);
+			ERROR_LOG(DYNAREC, "SH4ThrownException in mainloop code %x", fmt::underlying(ex.expEvn));
 			throw FlycastException("Fatal: Unhandled SH4 exception");
 		}
 	}

@@ -1890,7 +1890,7 @@ std::shared_ptr<maple_device> maple_Create(MapleDeviceType type)
 	case MDT_RFIDReaderWriter:	return RFIDReaderWriter::Create();
 
 	default:
-		ERROR_LOG(MAPLE, "Invalid device type %d", type);
+		ERROR_LOG(MAPLE, "Invalid device type %d", fmt::underlying(type));
 		die("Invalid maple device type");
 		break;
 	}

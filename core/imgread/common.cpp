@@ -324,7 +324,7 @@ u32 Disc::ReadSectors(u32 FAD, u32 count, u8* dst, u32 fmt, bool stopOnMiss, Loa
 			convertSector(temp, dst, 2448, fmt, FAD);
 		}
 		else {
-			WARN_LOG(GDROM, "ERROR: UNABLE TO CONVERT SECTOR. THIS IS FATAL. Format: %d Sector format: %d", fmt, secfmt);
+			WARN_LOG(GDROM, "ERROR: UNABLE TO CONVERT SECTOR. THIS IS FATAL. Format: %d Sector format: %d", fmt, fmt::underlying(secfmt));
 		}
 		dst += fmt;
 		FAD++;

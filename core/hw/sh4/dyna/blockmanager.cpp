@@ -214,7 +214,7 @@ void bm_AddBlock(RuntimeBlockInfo* blk)
 		all_temp_blocks.insert(block);
 	auto iter = blkmap.find((void*)blk->code);
 	if (iter != blkmap.end()) {
-		ERROR_LOG(DYNAREC, "DUP: %08X %p %08X %p", iter->second->addr, iter->second->code, block->addr, block->code);
+		ERROR_LOG(DYNAREC, "DUP: %08X %p %08X %p", iter->second->addr, fmt::ptr(iter->second->code), block->addr, fmt::ptr(block->code));
 		die("Duplicated block");
 	}
 	blkmap[(void*)block->code] = block;
@@ -593,7 +593,7 @@ void print_blocks()
 		f=fopen(get_writable_data_path("blkmap.lst").c_str(),"w");
 		print_stats=false;
 
-		INFO_LOG(DYNAREC, "Writing blocks to %p", f);
+		INFO_LOG(DYNAREC, "Writing blocks to %p", fmt::ptr(f));
 	}
 
 	for (const auto& [_, blk] : blkmap)

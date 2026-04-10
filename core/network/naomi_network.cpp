@@ -201,7 +201,7 @@ bool NaomiNetwork::startNetwork()
 
 bool NaomiNetwork::receive(const sockaddr_in *addr, const Packet *packet, u32 size)
 {
-	DEBUG_LOG(NETWORK, "Received port %d pckt %d size %x", ntohs(addr->sin_port), packet->type, size - (u32)packet->size(0));
+	DEBUG_LOG(NETWORK, "Received port %d pckt %d size %x", ntohs(addr->sin_port), fmt::underlying(packet->type), size - (u32)packet->size(0));
 	switch (packet->type)
 	{
 	case SyncReq:
@@ -289,7 +289,7 @@ bool NaomiNetwork::receive(const sockaddr_in *addr, const Packet *packet, u32 si
 		break;
 
 	default:
-		WARN_LOG(NETWORK, "Unknown packet type %d", packet->type);
+		WARN_LOG(NETWORK, "Unknown packet type %d", fmt::underlying(packet->type));
 		throw Exception("Unknown packet type ");
 		break;
 	}

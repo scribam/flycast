@@ -177,7 +177,7 @@ static void loadLibicu()
 	dl_u_strFromUTF8 = reinterpret_cast<u_strFromUTF8_t>(dlsym(hLibicu, "u_strFromUTF8"));
 	dl_ucol_strcollUTF8 = reinterpret_cast<ucol_strcollUTF8_t>(dlsym(hLibicu, "ucol_strcollUTF8"));
 	dl_ucol_getSortKey = reinterpret_cast<ucol_getSortKey_t>(dlsym(hLibicu, "ucol_getSortKey"));
-	NOTICE_LOG(COMMON, "libicu.so loaded. ucol_getSortKey is %p", dl_ucol_getSortKey);
+	NOTICE_LOG(COMMON, "libicu.so loaded. ucol_getSortKey is %p", fmt::ptr(dl_ucol_getSortKey));
 }
 
 void init(JNIEnv *env)
@@ -192,7 +192,7 @@ void init(JNIEnv *env)
 	UErrorCode status = U_ZERO_ERROR;
 	collator = ucol_open(getCurrentLocale().c_str(), &status);
 	if (U_FAILURE(status)) {
-		ERROR_LOG(COMMON, "Collator creation failed: %d", status);
+		ERROR_LOG(COMMON, "Collator creation failed: %d", fmt::underlying(status));
 		return;
 	}
 	available = true;

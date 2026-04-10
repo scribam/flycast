@@ -153,7 +153,7 @@ static LONG WINAPI exceptionHandler(EXCEPTION_POINTERS *ep)
 	}
 #endif
 
-	ERROR_LOG(COMMON, "[GPF] Thread:%s PC %p unhandled access to %p", getThreadName(), (void *)context.pc, address);
+	ERROR_LOG(COMMON, "[GPF] Thread:%s PC %p unhandled access to %p", getThreadName(), fmt::ptr((void *)context.pc), fmt::ptr(address));
 	if (prevExceptionHandler != nullptr)
 		prevExceptionHandler(ep);
 

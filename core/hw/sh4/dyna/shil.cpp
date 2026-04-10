@@ -52,7 +52,7 @@ u32 getRegOffset(Sh4RegType reg)
 	case reg_temp: return offsetof(Sh4Context, temp_reg);
 	case reg_sq_buffer: return offsetof(Sh4Context, sq_buffer);
 	default:
-		ERROR_LOG(SH4, "Unknown register ID %d", reg);
+		ERROR_LOG(SH4, "Unknown register ID %d", fmt::underlying(reg));
 		die("Invalid reg");
 		return 0;
 	}

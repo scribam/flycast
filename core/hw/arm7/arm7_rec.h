@@ -280,7 +280,7 @@ class ArmRegAlloc
 							}
 						}
 						verify(bestReg != (Arm7Reg)-1);
-						DEBUG_LOG(AICA_ARM, "Flushing dirty register r%d", bestReg);
+						DEBUG_LOG(AICA_ARM, "Flushing dirty register r%d", fmt::underlying(bestReg));
 					}
 					flushReg(allocs[bestReg]);
 				}
