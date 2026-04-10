@@ -29,7 +29,7 @@ endif()
 
 if(APPLE)
 	if(CMAKE_SYSTEM_NAME STREQUAL iOS)
-		set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum iOS deployment version")
+		set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum iOS deployment version")
 		set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "")
 	elseif(CMAKE_SYSTEM_NAME STREQUAL tvOS)
 		set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum tvOS deployment version")
@@ -1484,9 +1484,6 @@ if(NOT LIBRETRO)
 				COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/Payload
 				COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/Payload/*
 				COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>-${CMAKE_OSX_SYSROOT}/Flycast.app ${CMAKE_CURRENT_BINARY_DIR}/Payload
-				COMMAND for lib in ${CMAKE_CURRENT_BINARY_DIR}/Payload/Flycast.app/Frameworks/*.dylib
-				COMMAND do xcrun bitcode_strip -r $lib -o $lib
-				COMMAND done
 				COMMAND ldid -S${CMAKE_CURRENT_SOURCE_DIR}/shell/apple/emulator-ios/emulator/flycast.entitlements ${CMAKE_CURRENT_BINARY_DIR}/Payload/Flycast.app/Flycast
 				COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>-${CMAKE_OSX_SYSROOT}/Flycast.ipa" --format=zip ${CMAKE_CURRENT_BINARY_DIR}/Payload)
 		else()
