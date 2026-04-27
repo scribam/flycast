@@ -21,7 +21,7 @@
 #include "settings.h"
 #include "oslib/resources.h"
 #include "IconsFontAwesome6.h"
-#include "imgui/misc/freetype/imgui_freetype.h"
+#include "misc/freetype/imgui_freetype.h"
 
 ImFont *boldFont;
 
@@ -281,9 +281,9 @@ void gui_loadFonts()
 	boldFontConfig.Flags |= ImFontFlags_NoLoadError;
 	
 	ImFontConfig emojiConfig = fontConfig;
-	emojiConfig.FontLoaderFlags |= ImGuiFreeTypeLoaderFlags_LoadColor | ImGuiFreeTypeBuilderFlags_Bitmap;
+	emojiConfig.FontLoaderFlags |= ImGuiFreeTypeLoaderFlags_LoadColor | ImGuiFreeTypeLoaderFlags_Bitmap;
 	ImFontConfig emojiBoldConfig = boldFontConfig;
-	emojiBoldConfig.FontLoaderFlags |= ImGuiFreeTypeLoaderFlags_LoadColor | ImGuiFreeTypeBuilderFlags_Bitmap;
+	emojiBoldConfig.FontLoaderFlags |= ImGuiFreeTypeLoaderFlags_LoadColor | ImGuiFreeTypeLoaderFlags_Bitmap;
 	
 #ifdef _WIN32
 	// Windows
