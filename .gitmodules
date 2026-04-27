@@ -29,9 +29,6 @@
 [submodule "core/deps/tinygettext"]
 	path = core/deps/tinygettext
 	url = https://github.com/flyinghead/tinygettext
-[submodule "core/deps/freetype"]
-	path = core/deps/freetype
-	url = https://gitlab.freedesktop.org/freetype/freetype.git
 [submodule "external/AltKit"]
 	path = external/AltKit
 	url = https://github.com/rileytestut/AltKit.git
@@ -71,3 +68,6 @@
 [submodule "external/discord-rpc"]
 	path = external/discord-rpc
 	url = https://github.com/harmonytf/discord-rpc.git
+[submodule "external/freetype"]
+    path = external/freetype
+    url = https://github.com/freetype/freetype.git
