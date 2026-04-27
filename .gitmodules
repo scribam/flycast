@@ -63,7 +63,7 @@
 	url = https://github.com/bylaws/libadrenotools.git
 [submodule "external/libchdr"]
 	path = external/libchdr
-	url = https://github.com/rtissera/libchdr.git
+	url = https://github.com/scribam/libchdr.git
 	ignore = dirty
 [submodule "external/libjuice"]
 	path = external/libjuice
