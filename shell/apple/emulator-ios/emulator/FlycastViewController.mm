@@ -36,7 +36,6 @@
 #include "wsi/context.h"
 #include "ui/mainui.h"
 #include "emulator.h"
-#include "log/LogManager.h"
 #include "stdclass.h"
 #include "cfg/option.h"
 #include "ios_gamepad.h"

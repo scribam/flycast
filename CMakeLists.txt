@@ -922,6 +922,22 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE flycast::res)
 
+option(SPDLOG_DISABLE_DEFAULT_LOGGER "Disable default logger creation" ON)
+option(SPDLOG_NO_THREAD_ID "prevent spdlog from querying the thread id on each log call if thread id is not needed" ON)
+option(SPDLOG_NO_TZ_OFFSET "Omit %z timezone offset (use on platforms without tm_gmtoff)" ON)
+add_subdirectory(core/deps/spdlog)
+if(NINTENDO_SWITCH)
+	set_target_properties(spdlog PROPERTIES CXX_EXTENSIONS ON)
+endif()
+if(BUILD_TESTING)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_OFF)
+elseif(ENABLE_LOG)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG)
+else()
+	target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_ACTIVE_LEVEL=$<IF:$<CONFIG:Debug>,SPDLOG_LEVEL_DEBUG,SPDLOG_LEVEL_WARN>)
+endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+
 if(LIBRETRO)
 	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/libretro-common/include)
 	target_sources(${PROJECT_NAME} PRIVATE
@@ -956,8 +972,6 @@ if(LIBRETRO)
 		shell/libretro/libretro_core_options_intl.h
 		shell/libretro/libretro_core_options.h
 		shell/libretro/libretro.cpp
-		shell/libretro/LogManager.cpp
-		shell/libretro/LogManager.h
 		shell/libretro/option.cpp
 		shell/libretro/oslib.cpp
 		shell/libretro/storage.cpp

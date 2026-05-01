@@ -162,7 +162,7 @@ struct CdioDrive : public Disc
 				t.EndFAD = cdio_lsn_to_lba(last);
 			if (i == firstTrk)
 				sessions.front().StartFAD = t.StartFAD;
-			INFO_LOG(GDROM, "Track #%d: start %d end %d format %d copy %d", i, t.StartFAD, t.EndFAD, format, copy);
+			INFO_LOG(GDROM, "Track #%d: start %d end %d format %d copy %d", i, t.StartFAD, t.EndFAD, fmt::underlying(format), copy);
 			t.file = new CdioTrack(*this, format == TRACK_FORMAT_AUDIO);
 			tracks.push_back(t);
 		}

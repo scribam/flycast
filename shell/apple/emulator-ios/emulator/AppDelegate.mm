@@ -26,7 +26,7 @@
 #include <mach/task.h>
 #include <mach/mach_init.h>
 #include "emulator.h"
-#include "log/LogManager.h"
+#include "log/Log.h"
 #include "cfg/option.h"
 #include "ui/gui.h"
 

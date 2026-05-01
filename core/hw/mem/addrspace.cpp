@@ -423,7 +423,7 @@ void initMappings()
 	}
 	else {
 		NOTICE_LOG(VMEM, "Info: nvmem is enabled");
-		INFO_LOG(VMEM, "Info: p_sh4rcb: %p ram_base: %p", p_sh4rcb, ram_base);
+		INFO_LOG(VMEM, "Info: p_sh4rcb: %p ram_base: %p", fmt::ptr(p_sh4rcb), fmt::ptr(ram_base));
 		// Map the different parts of the memory file into the new memory range we got.
 		const virtmem::Mapping mem_mappings[] = {
 			{0x00000000, 0x00800000,                               0,         0, false},  // Area 0 -> unused
@@ -455,10 +455,10 @@ void initMappings()
 	vram.zero();
 	mem_b.zero();
 	NOTICE_LOG(VMEM, "BASE %p RAM(%d MB) %p VRAM64(%d MB) %p ARAM(%d MB) %p",
-			ram_base,
-			(u32)(RAM_SIZE / 1_MB), &mem_b[0],
-			(u32)(VRAM_SIZE / 1_MB), &vram[0],
-			(u32)(ARAM_SIZE / 1_MB), &aica::aica_ram[0]);
+			fmt::ptr(ram_base),
+			(u32)(RAM_SIZE / 1_MB), fmt::ptr(&mem_b[0]),
+			(u32)(VRAM_SIZE / 1_MB), fmt::ptr(&vram[0]),
+			(u32)(ARAM_SIZE / 1_MB), fmt::ptr(&aica::aica_ram[0]));
 }
 
 void release()

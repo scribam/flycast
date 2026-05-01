@@ -24,7 +24,7 @@
 #include "oslib/oslib.h"
 #include "oslib/http_client.h"
 #include "emulator.h"
-#include "log/LogManager.h"
+#include "log/Log.h"
 #include "ui/gui.h"
 #include "ui/gui_util.h"
 #include "stdclass.h"
@@ -43,27 +43,7 @@ namespace ice
 
 static void juiceLogHandler(juice_log_level_t jlevel, const char *message)
 {
-	LogTypes::LOG_LEVELS level;
-	switch (jlevel)
-	{
-	case JUICE_LOG_LEVEL_NONE:
-	case JUICE_LOG_LEVEL_VERBOSE:
-	case JUICE_LOG_LEVEL_DEBUG:
-	default:
-		level = LogTypes::LOG_LEVELS::LDEBUG;
-		break;
-	case JUICE_LOG_LEVEL_INFO:
-		level = LogTypes::LOG_LEVELS::LINFO;
-		break;
-	case JUICE_LOG_LEVEL_WARN:
-		level = LogTypes::LOG_LEVELS::LWARNING;
-		break;
-	case JUICE_LOG_LEVEL_ERROR:
-	case JUICE_LOG_LEVEL_FATAL:
-		level = LogTypes::LOG_LEVELS::LERROR;
-		break;
-	}
-	GenericLog(level, LogTypes::LOG_TYPE::NETWORK, __FILE__, __LINE__, "%s", message);
+	// TODO
 }
 
 class IcePipe;

@@ -360,7 +360,7 @@ public:
 			break;
 
 		default:
-			ERROR_LOG(DYNAREC, "Error, Relink() Block Type: %X", block->BlockType);
+			ERROR_LOG(DYNAREC, "Error, Relink() Block Type: %X", fmt::underlying(block->BlockType));
 			verify(false);
 			break;
 		}

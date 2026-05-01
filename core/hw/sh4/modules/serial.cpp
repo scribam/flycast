@@ -133,7 +133,7 @@ void SCIFSerialPort::updateBaudRate()
 	frameSize = 1 + 8 - SCIF_SCSMR2.CHR + SCIF_SCSMR2.PE + 1 + SCIF_SCSMR2.STOP;
 	int bauds = SH4_MAIN_CLOCK / 4 / (SCIF_SCBRR2 + 1) / 32 / (1 << (SCIF_SCSMR2.CKS * 2));
 	cyclesPerBit = SH4_MAIN_CLOCK / bauds;
-	INFO_LOG(SH4, "SCIF: Frame size %d cycles/bit %d (%d bauds) pipe %p", frameSize, cyclesPerBit, bauds, pipe);
+	INFO_LOG(SH4, "SCIF: Frame size %d cycles/bit %d (%d bauds) pipe %p", frameSize, cyclesPerBit, bauds, fmt::ptr(pipe));
 	sh4_sched_request(schedId, frameSize * cyclesPerBit);
 }
 

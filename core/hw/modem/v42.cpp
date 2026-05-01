@@ -628,7 +628,7 @@ void V42Protocol::handleXid(std::vector<u8> rxFrame)
 				}
 				break;
 			default:
-				WARN_LOG(MODEM, "Unexpected PI %d (size %x, group id %x)", paramId, paramSize, gid);
+				WARN_LOG(MODEM, "Unexpected PI %d (size %x, group id %x)", paramId, paramSize, fmt::underlying(gid));
 				break;
 			}
 			i += paramSize;

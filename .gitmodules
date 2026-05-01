@@ -62,3 +62,6 @@
 [submodule "core/deps/freetype"]
 	path = core/deps/freetype
 	url = https://gitlab.freedesktop.org/freetype/freetype.git
+[submodule "core/deps/spdlog"]
+	path = core/deps/spdlog
+	url = https://github.com/gabime/spdlog.git

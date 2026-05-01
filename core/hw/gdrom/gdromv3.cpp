@@ -950,7 +950,7 @@ static void gd_process_spi_cmd()
 				die("SPI_CD_PLAY: unknown parameter");
 
 			DEBUG_LOG(GDROM, "CDDA StartAddr=%d EndAddr=%d repeats=%d status=%d CurrAddr=%d",cdda.StartAddr.FAD,
-					cdda.EndAddr.FAD, cdda.repeats, cdda.status, cdda.CurrAddr.FAD);
+					cdda.EndAddr.FAD, cdda.repeats, fmt::underlying(cdda.status), cdda.CurrAddr.FAD);
 
 			gd_set_state(gds_procpacketdone);
 		}
@@ -999,7 +999,7 @@ static void gd_process_spi_cmd()
 				die("SPI_CD_SEEK  : not known parameter..");
 
 			DEBUG_LOG(GDROM, "CDDA StartAddr=%d EndAddr=%d repeats=%d status=%d CurrAddr=%d",cdda.StartAddr.FAD,
-					cdda.EndAddr.FAD, cdda.repeats, cdda.status, cdda.CurrAddr.FAD);
+					cdda.EndAddr.FAD, cdda.repeats, fmt::underlying(cdda.status), cdda.CurrAddr.FAD);
 
 			gd_set_state(gds_procpacketdone);
 		}
