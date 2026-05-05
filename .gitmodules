@@ -89,3 +89,6 @@
 [submodule "external/libretro-common"]
 	path = external/libretro-common
 	url = https://github.com/libretro/libretro-common.git
+[submodule "external/libzip"]
+	path = external/libzip
+	url = https://github.com/nih-at/libzip.git
