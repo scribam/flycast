@@ -165,9 +165,7 @@ if(NINTENDO_SWITCH)
 
 	if(LIBRETRO)
 		add_library(${PROJECT_NAME} STATIC core/emulator.cpp)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRETRO HAVE_LIBNX HAVE_OPENGL HAVE_OIT)
-		find_path(GLEXT_H_INCLUDE_DIR NAMES GL/glext.h REQUIRED)
-		target_include_directories(${PROJECT_NAME} PRIVATE ${GLEXT_H_INCLUDE_DIR})
+		target_compile_definitions(${PROJECT_NAME} PRIVATE LIBRETRO HAVE_OIT)
 		set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "flycast_libretro_libnx")
 		set(CMAKE_STATIC_LIBRARY_PREFIX "")
 	else()
@@ -209,34 +207,18 @@ elseif(LIBRETRO)
 		target_link_libraries(${PROJECT_NAME} PRIVATE ${FOUNDATION})
 	endif()
 	if(ANDROID OR USE_GLES)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES3 HAVE_OPENGLES HAVE_OPENGLES3 HAVE_OIT)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES3 HAVE_OIT)
     elseif(IOS)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES3 HAVE_OPENGLES HAVE_OPENGLES3)
-		find_library(OPENGLES OpenGLES)
-		find_library(GLKIT GLKit)
-		target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGLES} ${GLKIT})
+		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES3)
 	elseif(USE_GLES2)
-		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES2 HAVE_OPENGLES HAVE_OPENGLES2)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES2)
 		if(USE_VIDEOCORE)
 			target_compile_definitions(${PROJECT_NAME} PRIVATE TARGET_NO_STENCIL)
 			target_link_libraries(${PROJECT_NAME} PRIVATE "-lbrcmGLESv2")
 			target_link_directories(${PROJECT_NAME} PRIVATE "/opt/vc/lib")
-		else()
-			target_link_libraries(${PROJECT_NAME} PRIVATE "-lGLESv2")
 		endif()
 	elseif(USE_OPENGL)
-		if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD|OpenBSD|NetBSD")
-			find_package(OpenGL REQUIRED)
-			if(CMAKE_VERSION VERSION_LESS 3.29.0)
-				target_include_directories(${PROJECT_NAME} PRIVATE ${OPENGL_INCLUDE_DIR})
-			else()
-				target_include_directories(${PROJECT_NAME} PRIVATE ${OPENGL_INCLUDE_DIRS})
-			endif()
-		endif()
-		target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_OPENGL)
-		if(APPLE)
-			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-framework,OpenGL")
-		else()
+		if(NOT APPLE)
 			target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_OIT)
 		endif()
 	endif()
@@ -984,32 +966,51 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE flycast::res)
 
 if(LIBRETRO)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/libretro-common/include)
-	target_sources(${PROJECT_NAME} PRIVATE
-		core/deps/libretro-common/memmap/memalign.c
-		core/deps/libretro-common/file/file_path.c
-		core/deps/libretro-common/file/file_path_io.c
-		core/deps/libretro-common/vfs/vfs_implementation.c
-		core/deps/libretro-common/encodings/encoding_utf.c
-		core/deps/libretro-common/compat/compat_strl.c
-		core/deps/libretro-common/compat/fopen_utf8.c
-		core/deps/libretro-common/compat/compat_strcasestr.c
-		core/deps/libretro-common/file/retro_dirent.c
-		core/deps/libretro-common/streams/file_stream.c
-		core/deps/libretro-common/time/rtime.c
-		core/deps/libretro-common/string/stdstring.c)
-	if(USE_OPENGL)
-		target_sources(${PROJECT_NAME} PRIVATE
-			core/deps/libretro-common/glsm/glsm.c
-			core/deps/libretro-common/glsym/rglgen.c)
-		if(ANDROID OR IOS OR USE_GLES)
-			target_sources(${PROJECT_NAME} PRIVATE core/deps/libretro-common/glsym/glsym_es3.c)
-		elseif(USE_GLES2)
-			target_sources(${PROJECT_NAME} PRIVATE core/deps/libretro-common/glsym/glsym_es2.c)
-		else()
-			target_sources(${PROJECT_NAME} PRIVATE core/deps/libretro-common/glsym/glsym_gl.c)
-		endif()
+	add_library(libretro-common STATIC
+		external/libretro-common/compat/compat_strcasestr.c
+		external/libretro-common/compat/compat_strl.c
+		external/libretro-common/compat/fopen_utf8.c
+		external/libretro-common/encodings/encoding_utf.c
+		external/libretro-common/file/file_path.c
+		external/libretro-common/file/file_path_io.c
+		external/libretro-common/file/retro_dirent.c
+		external/libretro-common/memmap/memalign.c
+		external/libretro-common/streams/file_stream.c
+		external/libretro-common/string/stdstring.c
+		external/libretro-common/time/rtime.c
+		external/libretro-common/vfs/vfs_implementation.c)
+	if(NINTENDO_SWITCH)
+		target_compile_definitions(libretro-common PRIVATE HAVE_LIBNX)
 	endif()
+	target_include_directories(libretro-common PUBLIC external/libretro-common/include)
+
+	if(USE_OPENGL)
+		find_package(OpenGL REQUIRED)
+
+		target_sources(libretro-common PRIVATE external/libretro-common/glsym/rglgen.c)
+		if(ANDROID OR IOS OR USE_GLES)
+			target_compile_definitions(libretro-common PUBLIC HAVE_OPENGLES HAVE_OPENGLES3)
+			target_sources(libretro-common PRIVATE external/libretro-common/glsym/glsym_es3.c)
+			target_link_libraries(libretro-common PRIVATE OpenGL::GLES3)
+		elseif(USE_GLES2)
+			target_compile_definitions(libretro-common PUBLIC HAVE_OPENGLES HAVE_OPENGLES2)
+			target_sources(libretro-common PRIVATE external/libretro-common/glsym/glsym_es2.c)
+			target_link_libraries(libretro-common PRIVATE OpenGL::GLES2)
+		else()
+			target_compile_definitions(libretro-common PUBLIC HAVE_OPENGL HAVE_OPENGL_CORE)
+			target_sources(libretro-common PRIVATE external/libretro-common/glsym/glsym_gl.c)
+			target_link_libraries(libretro-common PUBLIC OpenGL::GL)
+		endif()
+
+		target_include_directories(libretro-common PUBLIC shell/libretro/libretro-common/include)
+		target_sources(libretro-common PRIVATE shell/libretro/libretro-common/glsm/glsm.c)
+	endif()
+	if(USE_VULKAN)
+		target_compile_definitions(libretro-common PUBLIC HAVE_VULKAN)
+	endif()
+
+	target_link_libraries(${PROJECT_NAME} PRIVATE libretro-common)
+
 	target_sources(${PROJECT_NAME} PRIVATE
 		shell/libretro/audiostream.cpp
 		shell/libretro/keyboard_map.h
@@ -1199,7 +1200,7 @@ if(USE_VULKAN)
 		target_link_libraries(${PROJECT_NAME} PRIVATE adrenotools)
 	endif()
 
-	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_VULKAN HAVE_VULKAN)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_VULKAN)
 	target_sources(${PROJECT_NAME} PRIVATE
 			core/rend/vulkan/oit/oit_buffer.h
 			core/rend/vulkan/oit/oit_drawer.cpp
