@@ -71,3 +71,6 @@
 [submodule "external/breakpad"]
 	path = external/breakpad
 	url = https://github.com/flyinghead/mingw-breakpad
+[submodule "external/dirent"]
+	path = external/dirent
+	url = https://github.com/tronkko/dirent.git
