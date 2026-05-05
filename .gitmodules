@@ -62,3 +62,6 @@
 [submodule "core/deps/freetype"]
 	path = core/deps/freetype
 	url = https://gitlab.freedesktop.org/freetype/freetype.git
+[submodule "external/7zip"]
+	path = external/7zip
+	url = https://github.com/ip7z/7zip.git
