@@ -506,12 +506,12 @@ if(NOT LIBRETRO)
 					endif()
 				endif()
 				# libusb
-				add_subdirectory(core/deps/DreamPicoPort-API/ext/libusb-cmake)
+				add_subdirectory(external/DreamPicoPort-API/ext/libusb-cmake)
 			endif()
 
 			# DreamPicoPort-API
 			option(DREAMPICOPORT_ADD_LIBUSB "Add internal libusb library" OFF) # Already included above, when applicable
-			add_subdirectory(core/deps/DreamPicoPort-API EXCLUDE_FROM_ALL)
+			add_subdirectory(external/DreamPicoPort-API EXCLUDE_FROM_ALL)
 			target_link_libraries(${PROJECT_NAME} PRIVATE dream_pico_port_api)
 		endif()
 
