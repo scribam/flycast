@@ -714,6 +714,9 @@ target_sources(${PROJECT_NAME} PRIVATE
 		core/deps/chdpsr/cdipsr.cpp
 		core/deps/chdpsr/cdipsr.h)
 
+add_subdirectory(external/ELFIO)
+target_link_libraries(${PROJECT_NAME} PRIVATE elfio::elfio)
+
 add_subdirectory(core/deps/nowide EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PRIVATE nowide::nowide)
 
@@ -901,8 +904,6 @@ target_compile_definitions(7zip PRIVATE _7ZIP_ST)
 target_include_directories(7zip PUBLIC external/7zip/C)
 target_link_libraries(${PROJECT_NAME} PRIVATE 7zip)
 
-add_subdirectory(core/deps/libelf)
-target_link_libraries(${PROJECT_NAME} PRIVATE elf)
 if(NOT LIBRETRO)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE
 		IMGUI_DISABLE_DEMO_WINDOWS
@@ -1647,7 +1648,6 @@ if(NINTENDO_SWITCH)
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:xxHash::xxhash>
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:chdr-static>
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:zip>
-			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:elf>
 			COMMAND ${CMAKE_AR} -x $<TARGET_FILE:flycast::res>
 			COMMAND ${CMAKE_AR} -rs flycast_libretro_libnx.a *.o
 			COMMAND rm *.o
