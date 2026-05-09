@@ -1,9 +1,6 @@
 [submodule "core/deps/xbyak"]
 	path = core/deps/xbyak
 	url = https://github.com/herumi/xbyak.git
-[submodule "core/deps/websocketpp"]
-	path = core/deps/websocketpp
-	url = https://github.com/zaphoyd/websocketpp.git
 [submodule "external/7zip"]
 	path = external/7zip
 	url = https://github.com/ip7z/7zip.git
@@ -105,3 +102,6 @@
 [submodule "external/vixl"]
 	path = external/vixl
 	url = https://gitlab.arm.com/runtimes/vixl.git
+[submodule "external/websocketpp"]
+	path = external/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
