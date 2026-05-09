@@ -153,7 +153,7 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 		};
 
 	// Required swapchain extension
-	tryAddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+	tryAddDeviceExtension(vk::KHRSwapchainExtensionName);
 
 	// Enable VK_KHR_dedicated_allocation if available
 	if (physicalDeviceProperties.apiVersion >= VK_API_VERSION_1_1)
@@ -163,10 +163,10 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 	}
 	else
 	{
-		const bool getMemReq2Supported = tryAddDeviceExtension(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+		const bool getMemReq2Supported = tryAddDeviceExtension(vk::KHRGetMemoryRequirements2ExtensionName);
 		if (getMemReq2Supported)
 		{
-			VulkanContext::Instance()->dedicatedAllocationSupported = tryAddDeviceExtension(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+			VulkanContext::Instance()->dedicatedAllocationSupported = tryAddDeviceExtension(vk::KHRDedicatedAllocationExtensionName);
 		}
 	}
 
@@ -174,12 +174,12 @@ bool VkCreateDevice(retro_vulkan_context* context, VkInstance instance, VkPhysic
 	// Core as of Vulkan 1.1
 	const bool getPhysicalDeviceProperties2Supported =
 		(physicalDeviceProperties.apiVersion >= VK_API_VERSION_1_1)
-		? true : tryAddDeviceExtension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+		? true : tryAddDeviceExtension(vk::KHRGetPhysicalDeviceProperties2ExtensionName);
 
 	if (getPhysicalDeviceProperties2Supported)
 	{
 		// Enable VK_EXT_provoking_vertex if available
-		VulkanContext::Instance()->provokingVertexSupported = tryAddDeviceExtension(VK_EXT_PROVOKING_VERTEX_EXTENSION_NAME);
+		VulkanContext::Instance()->provokingVertexSupported = tryAddDeviceExtension(vk::EXTProvokingVertexExtensionName);
 	}
 
 	// Get device features
@@ -419,7 +419,7 @@ void VulkanContext::PresentFrame(vk::Image image, vk::ImageView imageView, const
 
 	retro_image.image_view = (VkImageView)colorAttachments[GetCurrentImageIndex()]->GetImageView();
 	retro_image.create_info.image = (VkImage)colorAttachments[GetCurrentImageIndex()]->GetImage();
-	retro_render_if->set_image(retro_render_if->handle, &retro_image, 0, nullptr, VK_QUEUE_FAMILY_IGNORED);
+	retro_render_if->set_image(retro_render_if->handle, &retro_image, 0, nullptr, vk::QueueFamilyIgnored);
 }
 
 void VulkanContext::beginFrame(vk::Extent2D extent, vk::Image barrierImage)
