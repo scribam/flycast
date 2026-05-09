@@ -27,6 +27,41 @@
 #include <glsm/glsm.h>
 #include <glsm/glsmsym.h>
 
+#ifdef glEnable
+#undef glEnable
+
+inline void rglEnableExt(GLenum cap)
+{
+#ifdef GL_PRIMITIVE_RESTART
+	if (cap == SGL_PRIMITIVE_RESTART)
+	{
+#ifdef GLSM_DEBUG
+		log_cb(RETRO_LOG_INFO, "glEnable.\n");
+#endif
+		glsm_ctl(GLSM_CTL_IMM_VBO_DRAW, NULL);
+		glEnable(GL_PRIMITIVE_RESTART);
+		return;
+	}
+#endif
+
+#ifdef GL_PRIMITIVE_RESTART_FIXED_INDEX
+	if (cap == SGL_PRIMITIVE_RESTART_FIXED_INDEX)
+	{
+#ifdef GLSM_DEBUG
+		log_cb(RETRO_LOG_INFO, "glEnable.\n");
+#endif
+		glsm_ctl(GLSM_CTL_IMM_VBO_DRAW, NULL);
+		glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+		return;
+	}
+#endif
+
+	rglEnable(cap);
+}
+
+#define glEnable(T) rglEnableExt(S##T)
+#endif
+
 #ifndef GL_MAJOR_VERSION
 #define GL_MAJOR_VERSION                  0x821B
 #endif

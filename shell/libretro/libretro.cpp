@@ -2113,7 +2113,7 @@ static bool set_dx11_hw_render()
 {
 #ifdef HAVE_D3D11
 	retro_hw_render_callback hw_render_{};
-	hw_render_.context_type = RETRO_HW_CONTEXT_DIRECT3D;
+	hw_render_.context_type = RETRO_HW_CONTEXT_D3D11;
 	hw_render_.version_major = 11;
 	hw_render_.version_minor = 0;
 	hw_render_.context_reset = dx11_context_reset;
@@ -2288,7 +2288,7 @@ bool retro_load_game(const struct retro_game_info *game)
 	{
 		foundRenderApi = set_vulkan_hw_render();
 	}
-	else if (preferred == RETRO_HW_CONTEXT_DIRECT3D)
+	else if (preferred == RETRO_HW_CONTEXT_D3D11)
 	{
 		foundRenderApi = set_dx11_hw_render();
 	}
