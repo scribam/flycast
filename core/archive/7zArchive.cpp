@@ -19,9 +19,9 @@
     along with reicast.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "7zArchive.h"
-#include "lzma/7z.h"
-#include "lzma/7zCrc.h"
-#include "lzma/Alloc.h"
+#include <7z.h>
+#include <7zCrc.h>
+#include <Alloc.h>
 
 #include <cstring>
 
@@ -31,14 +31,14 @@ static bool crc_tables_generated;
 
 SRes SzArchive::ArchiveStream::Read(const ISeekInStream *p, void *buf, size_t *size)
 {
-	auto file_archive = CONTAINER_FROM_VTBL(p, ArchiveStream, vt);
+	auto file_archive = Z7_CONTAINER_FROM_VTBL(p, ArchiveStream, vt);
 	*size = file_archive->file->read(buf, 1, *size);
 	return file_archive->file->error() ? SZ_ERROR_READ : SZ_OK;
 }
 
 SRes SzArchive::ArchiveStream::Seek(const ISeekInStream *p, Int64 *pos, ESzSeek origin)
 {
-	auto file_archive = CONTAINER_FROM_VTBL(p, ArchiveStream, vt);
+	auto file_archive = Z7_CONTAINER_FROM_VTBL(p, ArchiveStream, vt);
 	return file_archive->file->seek(*pos, origin) != 0 ? SZ_ERROR_FAIL : SZ_OK;
 }
 
@@ -61,7 +61,7 @@ bool SzArchive::Open(hostfs::File *file)
 	}
 	lookStream.bufSize = kInputBufSize;
 	lookStream.realStream = &archiveStream.vt;
-	LookToRead2_Init(&lookStream);
+	LookToRead2_INIT(&lookStream);
 
 	if (!crc_tables_generated)
 	{
