@@ -39,6 +39,11 @@ typedef bool (*StringCallback)(bool cancelled, std::string selection);
 void select_file_popup(const char *prompt, StringCallback callback,
 		bool selectFile = false, const std::string& extension = "");
 
+enum ImGuiWindowCustomFlags
+{
+	ImGuiWindowFlags_DragScrolling = 1 << 21,  // Allow scrolling by dragging content
+};
+
 void scrollWhenDraggingOnVoid(ImGuiMouseButton mouse_button = ImGuiMouseButton_Left);
 
 // Helper to display a little (?) mark which shows a tooltip when hovered.
