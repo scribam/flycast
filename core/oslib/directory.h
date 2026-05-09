@@ -17,7 +17,7 @@
     along with Flycast.  If not, see <https://www.gnu.org/licenses/>.
 */
 #pragma once
-#include "nowide/config.hpp"
+#include <nowide/config.hpp>
 #include <dirent.h>
 #include <sys/stat.h>
 
