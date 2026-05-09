@@ -65,3 +65,6 @@
 [submodule "external/7zip"]
 	path = external/7zip
 	url = https://github.com/ip7z/7zip.git
+[submodule "external/AltKit"]
+	path = external/AltKit
+	url = https://github.com/rileytestut/AltKit.git
