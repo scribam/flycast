@@ -1,9 +1,10 @@
 class Libomp < Formula
   desc "LLVM's OpenMP runtime library"
   homepage "https://openmp.llvm.org/"
-  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.1/openmp-21.1.1.src.tar.xz"
-  sha256 "eb10379045844c2d2f1b89a15fd1beaf9cd0de524180c6648e9ea17a0661ece2"
+  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-22.1.7/llvm-project-22.1.7.src.tar.xz"
+  sha256 "5cc4a3f12bba50b6bdfb4b61bdc852117a0ff2517807c3902fc13267fb93562e"
   license "MIT"
+  compatibility_version 1
 
   livecheck do
     url :stable
@@ -11,45 +12,32 @@ class Libomp < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_tahoe:   "9cb33c9a98f8641ee9a93e73599a76f8818da51a4af97c69a0681d4dd58430d7"
-    sha256 cellar: :any,                 arm64_sequoia: "5204e2053f959a16ed6edfff053f003087a0b83c987327c3c6232cb1a7798578"
-    sha256 cellar: :any,                 arm64_sonoma:  "afb6e5bc3a861eaeef2b99efbff1826445d2632c8057146ecb338e79bdf8d533"
-    sha256 cellar: :any,                 arm64_ventura: "9beb2682487c5d6a7539ea3c9edabb37a06e41f145615bb7ce16bf4316ce11c9"
-    sha256 cellar: :any,                 sonoma:        "d5f577174311174ad4f980fb7a7e721f029f9c7bec0adc5d917298e9c3eedfbd"
-    sha256 cellar: :any,                 ventura:       "c0c00008299a9156df71d4421ae52354944cf686ad2711aeeb8e45ad4f91c444"
-    sha256 cellar: :any_skip_relocation, arm64_linux:   "597261ad147b32f06ed8b25e22447c6a47514b04dc8f794405e6c03e344bbeb3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:  "02160edec57a67db8722e046033aee4f12311dd065dd7452c09da87b5a98b00f"
+    sha256 cellar: :any, arm64_tahoe:   "63bb07512b3e108f119d4f959409843e71b2bf46c6f95c7429db5bf7fe013c43"
+    sha256 cellar: :any, arm64_sequoia: "5c2a5bffae13c7215d7f89d234368a0f69c1bb83337aaca2f09ddbcaa485a609"
+    sha256 cellar: :any, arm64_sonoma:  "457e0779d42826a5fe496638cda70277142a554236123987b1ae94982c809bb8"
+    sha256 cellar: :any, sonoma:        "fdb842ee69f23ae417c71441fb90f958063dbbf105364bddec8a58dc2cd2f08d"
+    sha256 cellar: :any, arm64_linux:   "82c27b4efd83c5c144c60913373ff477cdbc2cf9c81f0bb2e25c2967a9c1a00c"
+    sha256 cellar: :any, x86_64_linux:  "336dc6e985fd8cc1fff4605f90a698bf61723d2b500f84d2ca88684cc0160e43"
   end
 
   # Ref: https://github.com/Homebrew/homebrew-core/issues/112107
   keg_only "it can override GCC headers and result in broken builds"
 
   depends_on "cmake" => :build
-  depends_on "lit" => :build
   uses_from_macos "llvm" => :build
 
   on_linux do
-    depends_on "python@3.13"
-  end
-
-  resource "cmake" do
-    url "https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.1/cmake-21.1.1.src.tar.xz"
-    sha256 "9c0b9064b7d0f2a3004f1d034aadf84d2af4e5dca2135ebf697b0a1eb85ef769"
-
-    livecheck do
-      formula :parent
-    end
+    depends_on "python@3.14"
   end
 
   def install
-    odie "cmake resource needs to be updated" if version != resource("cmake").version
-
-    (buildpath/"src").install buildpath.children
-    (buildpath/"cmake").install resource("cmake")
-
     # Disable LIBOMP_INSTALL_ALIASES, otherwise the library is installed as
     # libgomp alias which can conflict with GCC's libgomp.
-    args = ["-DLIBOMP_INSTALL_ALIASES=OFF"]
+    args = %w[
+      -DLIBOMP_INSTALL_ALIASES=OFF
+      -DLLVM_ENABLE_RUNTIMES=openmp
+      -DOPENMP_ENABLE_OMPT_TOOLS=OFF
+    ]
     args << "-DOPENMP_ENABLE_LIBOMPTARGET=OFF" if OS.linux?
 
     # Build universal binary     #Flycast
@@ -58,13 +46,13 @@ class Libomp < Formula
     args << "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
     args << "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15"
 
-    # system "cmake", "-S", "src", "-B", "build/shared", *std_cmake_args, *args
+    # system "cmake", "-S", "runtimes", "-B", "build/shared", *args, *std_cmake_args
     # system "cmake", "--build", "build/shared"
     # system "cmake", "--install", "build/shared"
 
-    system "cmake", "-S", "src", "-B", "build/static",
+    system "cmake", "-S", "runtimes", "-B", "build/static",
                     "-DLIBOMP_ENABLE_SHARED=OFF",
-                    *std_cmake_args, *args
+                    *args, *std_cmake_args
     system "cmake", "--build", "build/static"
     system "cmake", "--install", "build/static"
   end
