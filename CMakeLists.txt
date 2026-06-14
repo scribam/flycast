@@ -67,7 +67,7 @@ if(CMAKE_CXX_COMPILER MATCHES "webos" OR
 endif()
 
 set(USE_HOST_SDL_DEFAULT OFF)
-if(NOT APPLE AND (NOT UNIX OR CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|OpenBSD|NetBSD|Haiku"))
+if(NOT APPLE AND (NOT UNIX OR CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|MidnightBSD|OpenBSD|NetBSD|Haiku"))
 	set(USE_HOST_SDL_DEFAULT ON)
 endif()
 
@@ -229,7 +229,7 @@ elseif(LIBRETRO)
 			target_link_libraries(${PROJECT_NAME} PRIVATE "-lGLESv2")
 		endif()
 	elseif(USE_OPENGL)
-		if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD|OpenBSD|NetBSD")
+		if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD|MidnightBSD|OpenBSD|NetBSD")
 			find_package(OpenGL REQUIRED)
 			if(CMAKE_VERSION VERSION_LESS 3.29.0)
 				target_include_directories(${PROJECT_NAME} PRIVATE ${OPENGL_INCLUDE_DIR})
@@ -494,7 +494,7 @@ if(NOT LIBRETRO)
 			if (WINDOWS_STORE)
 				# Use winrt implementation of the DreamPicoPort-API
 				option(DREAMPICOPORT_WITH_LIBUSB "Use libusb to access DreamPicoPort-API" OFF)
-			elseif (CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|NetBSD|OpenBSD|Haiku")
+			elseif (CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|MidnightBSD|NetBSD|OpenBSD|Haiku")
 				find_package(PkgConfig REQUIRED)
    	 			pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
