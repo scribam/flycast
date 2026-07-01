@@ -61,7 +61,7 @@ public:
 		 * The intention behind setting the range to 1 byte in BDA mode is to make it easier to spot any missing or invalid USE_BDA defines in shader sources.
 		 * If USE_BDA is missing or invalid, the shader will access PixelBuffer as an SSBO, and if it's this tiny, it should result in obvious graphical glitches.
 		 */
-		pixelBufferInfo.range = pixelBufferAddress ? 1 : VK_WHOLE_SIZE;
+		pixelBufferInfo.range = pixelBufferAddress ? 1 : vk::WholeSize;
 		writeDescSets.emplace_back(descSet, 7, 0, vk::DescriptorType::eStorageBuffer, nullptr, pixelBufferInfo);
 		static vk::DescriptorBufferInfo pixelCounterBufferInfo({}, 0, 4);
 		pixelCounterBufferInfo.buffer = *pixelCounter->buffer;
