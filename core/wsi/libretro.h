@@ -19,6 +19,44 @@
 #pragma once
 #if defined(LIBRETRO) && (defined(HAVE_OPENGL) || defined(HAVE_OPENGLES))
 #include "gl_context.h"
+#include <libretro.h>
+#include <glsm/glsm.h>
+#include <glsm/glsmsym.h>
+
+#ifdef glEnable
+#undef glEnable
+
+inline void rglEnableExt(GLenum cap)
+{
+#ifdef GL_PRIMITIVE_RESTART
+	if (cap == SGL_PRIMITIVE_RESTART)
+	{
+#ifdef GLSM_DEBUG
+		log_cb(RETRO_LOG_INFO, "glEnable.\n");
+#endif
+		glsm_ctl(GLSM_CTL_IMM_VBO_DRAW, NULL);
+		glEnable(GL_PRIMITIVE_RESTART);
+		return;
+	}
+#endif
+
+#ifdef GL_PRIMITIVE_RESTART_FIXED_INDEX
+	if (cap == SGL_PRIMITIVE_RESTART_FIXED_INDEX)
+	{
+#ifdef GLSM_DEBUG
+		log_cb(RETRO_LOG_INFO, "glEnable.\n");
+#endif
+		glsm_ctl(GLSM_CTL_IMM_VBO_DRAW, NULL);
+		glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+		return;
+	}
+#endif
+
+	rglEnable(cap);
+}
+
+#define glEnable(T) rglEnableExt(S##T)
+#endif
 
 class LibretroGraphicsContext : public GLGraphicsContext
 {
