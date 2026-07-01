@@ -1457,8 +1457,13 @@ if(NOT LIBRETRO)
 				target_compile_definitions(${PROJECT_NAME} PRIVATE VIDEO_ROUTING)
 			endif()
 
+			if(NOT $ENV{MSYSTEM} STREQUAL "CLANGARM64")
+				# TODO: check if required for Visual Studio
+				target_link_libraries(${PROJECT_NAME} PRIVATE xinput9_1_0)
+			endif()
+
 			target_sources(${PROJECT_NAME} PRIVATE shell/windows/flycast.rc)
-			target_link_libraries(${PROJECT_NAME} PRIVATE dsound winmm ws2_32 wsock32 xinput9_1_0 cfgmgr32 wininet psapi setupapi)
+			target_link_libraries(${PROJECT_NAME} PRIVATE dsound winmm ws2_32 wsock32 cfgmgr32 wininet psapi setupapi)
 		endif()
 	endif()
 endif()
