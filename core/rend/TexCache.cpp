@@ -15,11 +15,11 @@
     along with Flycast.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "TexCache.h"
-#include "xbrz/xbrz.h"
 #include "hw/pvr/pvr_mem.h"
 #include "hw/mem/addrspace.h"
 
 #include <mutex>
+#include <xbrz.h>
 #include <xxhash.h>
 
 #ifdef _OPENMP
