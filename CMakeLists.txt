@@ -916,20 +916,27 @@ target_include_directories(7zip PUBLIC external/7zip/C)
 target_link_libraries(${PROJECT_NAME} PRIVATE 7zip)
 
 if(NOT LIBRETRO)
+	set(IMGUI_BACKENDS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/backends")
 	target_compile_definitions(${PROJECT_NAME} PRIVATE
 		IMGUI_DISABLE_DEMO_WINDOWS
 		IMGUI_DISABLE_DEBUG_TOOLS
-		IMGUI_DEFINE_MATH_OPERATORS)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/imgui core/deps/imgui/backends)
+		IMGUI_DEFINE_MATH_OPERATORS
+		IMGUI_ENABLE_FREETYPE
+		IMGUI_USE_WCHAR32)
+	if(NINTENDO_SWITCH)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DISABLE_DEFAULT_SHELL_FUNCTIONS IMGUI_IMPL_OPENGL_LOADER_CUSTOM IMGUI_INCLUDE_IMGUI_USER_H)
+	endif()
+	target_include_directories(${PROJECT_NAME} PRIVATE external/imgui external/imgui/misc/cpp external/imgui/backends)
 	target_sources(${PROJECT_NAME} PRIVATE
-		core/deps/imgui/imgui.cpp
-		core/deps/imgui/imgui_demo.cpp
-		core/deps/imgui/imgui_draw.cpp
-		core/deps/imgui/imgui_cjk.cpp
-		core/deps/imgui/imgui_stdlib.cpp
-		core/deps/imgui/imgui_tables.cpp
-		core/deps/imgui/imgui_widgets.cpp
-		core/deps/imgui/misc/freetype/imgui_freetype.cpp)
+		external/imgui/misc/cpp/imgui_stdlib.cpp
+		external/imgui/misc/freetype/imgui_freetype.cpp
+		external/imgui/imgui.cpp
+		# FIXME
+		#external/imgui/imgui_cjk.cpp
+		external/imgui/imgui_demo.cpp
+		external/imgui/imgui_draw.cpp
+		external/imgui/imgui_tables.cpp
+		external/imgui/imgui_widgets.cpp)
 
 	set(FT_DISABLE_BZIP2 ON CACHE BOOL "" FORCE)
 	set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
@@ -1104,8 +1111,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 		core/stdclass.h
 		core/types.h
 		core/debug/gdb_server.h)
-
-set(IMGUI_BACKENDS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/core/deps/imgui/backends")
 
 if(USE_VULKAN)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC VK_ENABLE_BETA_EXTENSIONS VK_NO_PROTOTYPES)
@@ -1287,7 +1292,8 @@ if(NOT LIBRETRO)
 	if(ANDROID)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE GLES GLES3)
 		add_subdirectory(shell/android-studio/flycast/src/main/jni/src)
-		target_link_libraries(${PROJECT_NAME} PRIVATE android log)
+		target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_IMPL_OPENGL_ES2)
+		target_link_libraries(${PROJECT_NAME} PRIVATE android GLESv2 log)
 
 		set(GAMESDK_THREAD_CHECKS 0)
 		add_subdirectory(external/gamesdk/games-frame-pacing EXCLUDE_FROM_ALL)
