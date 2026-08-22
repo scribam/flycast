@@ -21,7 +21,7 @@
 #pragma once
 
 #include "archive.h"
-#include "lzma/7z.h"
+#include <7z.h>
 
 #include <algorithm>
 #include <cstring>
