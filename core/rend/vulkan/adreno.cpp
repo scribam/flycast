@@ -22,7 +22,7 @@
 #include <dlfcn.h>
 #include "cfg/option.h"
 #include <adrenotools/driver.h>
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 using namespace nlohmann;
 #include "archive/ZipArchive.h"
 #include "oslib/directory.h"
