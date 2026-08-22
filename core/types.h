@@ -36,13 +36,13 @@ typedef float f32;
 typedef double f64;
 
 #ifndef TARGET_UWP
-#include "nowide/cstdlib.hpp"
-#include "nowide/cstdio.hpp"
+#include <nowide/cstdlib.hpp>
+#include <nowide/cstdio.hpp>
 #else
-#include "nowide/config.hpp"
-#include "nowide/convert.hpp"
-#include "nowide/cstdlib.hpp"
-#include "nowide/stackstring.hpp"
+#include <nowide/config.hpp>
+#include <nowide/convert.hpp>
+#include <nowide/cstdlib.hpp>
+#include <nowide/stackstring.hpp>
 
 #include <cstdio>
 namespace nowide {
