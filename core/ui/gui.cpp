@@ -925,7 +925,7 @@ static void gui_display_content()
 			dc_exit();
 		ImGui::SameLine();
 #else
-		ImGui::SameLine(ImGui::GetContentRegionMax().x - settingsBtn.width());
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - settingsBtn.width());
 #endif
 		if (settingsBtn.realize())
 			gui_setState(GuiState::Settings);
@@ -933,7 +933,7 @@ static void gui_display_content()
     else
     {
     	IconButton cancelBtn(T("Cancel"));
-		ImGui::SameLine(ImGui::GetContentRegionMax().x - cancelBtn.width());
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - cancelBtn.width());
 		if (cancelBtn.realize())
 			gui_setState(GuiState::Commands);
     }
@@ -944,7 +944,7 @@ static void gui_display_content()
 	// Only if Filter and Settings aren't focused... ImGui::SetNextWindowFocus();
 	ImGui::BeginChild(ImGui::GetID("library"), ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_DragScrolling);
     {
-		const float totalWidth = ImGui::GetContentRegionMax().x - (!ImGui::GetCurrentWindow()->ScrollbarY ? ImGui::GetStyle().ScrollbarSize : 0);
+		const float totalWidth = ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - (!ImGui::GetCurrentWindow()->ScrollbarY ? ImGui::GetStyle().ScrollbarSize : 0);
 		const int itemsPerLine = std::max<int>(totalWidth / (uiScaled(150) + ImGui::GetStyle().ItemSpacing.x), 1);
 		const float responsiveBoxSize = totalWidth / itemsPerLine - ImGui::GetStyle().FramePadding.x * 2;
 		const ImVec2 responsiveBoxVec2 = ImVec2(responsiveBoxSize, responsiveBoxSize);
@@ -1039,7 +1039,7 @@ static void gui_display_content()
 			const char *label = T("Your game list is empty");
 			// center horizontally
 			const float w = ImGui::GetFont()->CalcTextSizeA(uiLargeFontSize(), FLT_MAX, -1.f, label).x + ImGui::GetStyle().FramePadding.x * 2;
-			ImGui::SameLine((ImGui::GetContentRegionMax().x - w) / 2);
+			ImGui::SameLine((ImGui::GetContentRegionAvail().x + ImGui::GetCursorScreenPos().x - ImGui::GetWindowPos().x - w) / 2);
 			if (ImGui::BeginChild("empty", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_NavFlattened))
 			{
 				ImGui::PushFont(nullptr, uiLargeFontSize());
