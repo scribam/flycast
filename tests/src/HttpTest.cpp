@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 #include "oslib/http_client.h"
-#include "json.hpp"
 #include <vector>
 #include <curl/curl.h>
+#include <nlohmann/json.hpp>
 
 using namespace nlohmann;
 
