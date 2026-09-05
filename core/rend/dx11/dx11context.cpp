@@ -32,7 +32,7 @@
 #include <gamingdeviceinformation.h>
 #endif
 
-#include "nowide/stackstring.hpp"
+#include <nowide/stackstring.hpp>
 
 void DX11Context::Create(void *window, void *display) {
 	new DX11Context(window, display);
