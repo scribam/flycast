@@ -46,7 +46,7 @@ static void addCheat()
 
 			const char *cancelLbl = T("Cancel");
 			const char *okLbl = T("OK");
-			ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize(cancelLbl).x - ImGui::GetStyle().FramePadding.x * 4.f
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(cancelLbl).x - ImGui::GetStyle().FramePadding.x * 4.f
 				- ImGui::CalcTextSize(okLbl).x - ImGui::GetStyle().ItemSpacing.x);
 			if (ImGui::Button(cancelLbl))
 				ImGui::CloseCurrentPopup();
@@ -66,7 +66,7 @@ static void addCheat()
 			ImGui::Unindent(uiScaled(10));
 		}
 
-		ImGui::BeginChild(ImGui::GetID("input"), ImVec2(0, 0), ImGuiChildFlags_Borders, ImGuiChildFlags_NavFlattened);
+		ImGui::BeginChild(ImGui::GetID("input"), ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened);
 		{
 			InputText(T("Name"), cheatName, sizeof(cheatName));
 			InputTextMultiline(T("Code"), cheatCode, sizeof(cheatCode), ImVec2(0, ImGui::GetTextLineHeight() * 16));
@@ -102,7 +102,7 @@ void gui_cheats()
 		const char *addLbl = T("Add");
 		const char *closeLbl = T("Close");
 		const char *loadLbl = T("Load");
-		ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize(addLbl).x  - ImGui::CalcTextSize(closeLbl).x - ImGui::GetStyle().FramePadding.x * 6.f
+		ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(addLbl).x  - ImGui::CalcTextSize(closeLbl).x - ImGui::GetStyle().FramePadding.x * 6.f
 			- ImGui::CalcTextSize(loadLbl).x - ImGui::GetStyle().ItemSpacing.x * 2);
 		if (ImGui::Button(addLbl))
 			ImGui::OpenPopup("addCheat");
@@ -131,7 +131,7 @@ void gui_cheats()
 			return true;
 		}, true, "cht");
 
-	ImGui::BeginChild(ImGui::GetID("cheats"), ImVec2(0, 0), ImGuiChildFlags_Borders, ImGuiWindowFlags_DragScrolling | ImGuiChildFlags_NavFlattened);
+	ImGui::BeginChild(ImGui::GetID("cheats"), ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_DragScrolling);
     {
 		if (cheatManager.cheatCount() == 0)
 			ImGui::Text("%s", T("(No cheat loaded)"));
