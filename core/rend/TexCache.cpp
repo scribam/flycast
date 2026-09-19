@@ -15,13 +15,13 @@
     along with Flycast.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "TexCache.h"
-#include "xbrz/xbrz.h"
 #include "hw/pvr/pvr_mem.h"
 #include "hw/mem/addrspace.h"
 
 #include <mutex>
 #include <new>
 #include <type_traits>
+#include <xbrz.h>
 #include <xxhash.h>
 
 #if HOST_CPU == CPU_ARM64
