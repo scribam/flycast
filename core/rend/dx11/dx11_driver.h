@@ -23,6 +23,15 @@
 #include "ui/gui.h"
 #include <unordered_map>
 
+struct ID3D11ShaderResourceView;
+
+// ImTextureID should be a pointer to this struct
+struct ImTextureDX11
+{
+	ID3D11ShaderResourceView *shaderResourceView;
+	bool pointSampling;
+};
+
 class DX11Driver final : public ImGuiDriver
 {
 public:
