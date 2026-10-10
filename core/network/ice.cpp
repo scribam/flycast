@@ -19,7 +19,7 @@
 #include "ice.h"
 #include "types.h"
 #include "oslib/http_client.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include <future>
 
 namespace ice
