@@ -68,3 +68,6 @@
 [submodule "core/deps/basis_universal"]
 	path = core/deps/basis_universal
 	url = https://github.com/BinomialLLC/basis_universal.git
+[submodule "external/7zip"]
+	path = external/7zip
+	url = https://github.com/ip7z/7zip.git
