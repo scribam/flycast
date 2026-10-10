@@ -10,17 +10,15 @@ fun gitVersionName(): String {
 
 android {
     namespace = "com.flycast.emulator"
-    ndkVersion = "29.0.14206865"
+    ndkVersion = "30.0.16248370"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(37)
     }
 
     defaultConfig {
         applicationId = "com.flycast.emulator"
         minSdk = 21
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 8
         versionName = gitVersionName()
         vectorDrawables.useSupportLibrary = true
@@ -51,11 +49,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            optimization {
+                enable = true
+                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
+            }
             signingConfig = signingConfigs.getByName("release")
         }
     }
