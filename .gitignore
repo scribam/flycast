@@ -16,7 +16,6 @@ cmake-build-*/
 
 # Dependencies from .gitmodules
 external/breakpad/
-core/deps/glslang/
 .cache/
 compile_commands.json
 CMakeUserPresets.json
