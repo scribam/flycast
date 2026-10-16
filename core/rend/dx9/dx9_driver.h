@@ -22,6 +22,15 @@
 #include "dxcontext.h"
 #include <unordered_map>
 
+struct IDirect3DTexture9;
+
+// ImTextureID should be a pointer to this struct
+struct ImTextureDX9
+{
+	IDirect3DTexture9 *d3dTexture;
+	bool pointSampling;
+};
+
 class DX9Driver final : public ImGuiDriver
 {
 public:
