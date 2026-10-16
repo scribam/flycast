@@ -19,7 +19,7 @@
 #include "directory.h"
 #ifdef NOWIDE_WINDOWS
 #include "types.h"
-#include "nowide/stackstring.hpp"
+#include <nowide/stackstring.hpp>
 #include <string>
 #include <cstring>
 
