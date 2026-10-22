@@ -74,6 +74,10 @@ jobs:
         run: ${{ matrix.pkginstall }}
         shell: cpa.sh {0}
 
+      - name: Reboot the VM
+        run: cpa.sh --reboot
+        if: matrix.operating_system == 'haiku'
+
       - name: CMake
         run: |
           cmake -B build -DUSE_LIBCDIO=ON -DCMAKE_BUILD_TYPE=Release -G Ninja -DLIBRETRO=${{ matrix.libretro }} ${{ matrix.cmake_extra_args }}
