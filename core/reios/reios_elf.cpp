@@ -1,21 +1,20 @@
 #include "reios.h"
-
-extern "C" {
-#include <elf/elf.h>
-}
-
 #include "hw/sh4/sh4_mem.h"
+
+#include <fstream>
+
+#include <elfio/elfio.hpp>
 
 // True if a PT_LOAD segment already copied [addr, addr + size) in. Tested
 // against file size, not memory size: the gap between them is only zero-filled.
-static bool isLoadedBySegment(const elf_t *elfFile, uint64_t addr, size_t size)
+static bool isLoadedBySegment(const ELFIO::elfio& reader, uint64_t addr, size_t size)
 {
-	for (size_t i = 0; i < elf_getNumProgramHeaders(elfFile); i++)
+	for (const auto& segment : reader.segments)
 	{
-		if (elf_getProgramHeaderType(elfFile, i) != PT_LOAD)
+		if (segment->get_type() != ELFIO::PT_LOAD)
 			continue;
-		uint64_t start = elf_getProgramHeaderVaddr(elfFile, i);
-		uint64_t end = start + elf_getProgramHeaderFileSize(elfFile, i);
+		ELFIO::Elf64_Addr start = segment->get_virtual_address();
+		ELFIO::Elf_Xword end = start + segment->get_file_size();
 		if (addr >= start && addr + size <= end)
 			return true;
 	}
@@ -23,56 +22,44 @@ static bool isLoadedBySegment(const elf_t *elfFile, uint64_t addr, size_t size)
 }
 
 bool reios_loadElf(const std::string& elf) {
-
-	FILE* f = nowide::fopen(elf.c_str(), "rb");
-	if (!f)
+	/**
+	 * TODO: use nowide::fstream and fix the following errors
+	 * nowide.lib(cstdio.obj) : error LNK2005: "struct _iobuf * __cdecl nowide::fopen(char const *,char const *)" (?fopen@nowide@@YAPEAU_iobuf@@PEBD0@Z) already defined in winmain.obj [D:\a\flycast\flycast\build\flycast.vcxproj]
+     * nowide.lib(cstdio.obj) : error LNK2005: "int __cdecl nowide::remove(char const *)" (?remove@nowide@@YAHPEBD@Z) already defined in winmain.obj [D:\a\flycast\flycast\build\flycast.vcxproj]
+     * D:\a\flycast\flycast\build\Release\flycast.exe : fatal error LNK1169: one or more multiply defined symbols found [D:\a\flycast\flycast\build\flycast.vcxproj]
+	 */
+	std::ifstream ifs(elf, std::ios::in | std::ios::binary);
+	if (!ifs)
 		return false;
 
-	std::fseek(f, 0, SEEK_END);
-	size_t size = std::ftell(f);
+	ifs.seekg(0, std::ios::end);
+	std::size_t size = ifs.tellg();
 
 	if (size == 0 || size > 16_MB) {
-		std::fclose(f);
 		return false;
 	}
 
-	void* elfF = malloc(size);
-	if (elfF == nullptr) {
-		std::fclose(f);
-		return false;
-	}
+	ifs.seekg(0, std::ios::beg);
 
-	std::fseek(f, 0, SEEK_SET);
-	size_t nread = std::fread(elfF, 1, size, f);
-	std::fclose(f);
-
-	elf_t elfFile;
-	if (nread != size || elf_newFile(elfF, nread, &elfFile) != 0)
-	{
-		free(elfF);
-		return false;
-	}
-
-	Elf32_Ehdr const *header = (const Elf32_Ehdr *)elfFile.elfFile;
-	if (header->e_machine != EM_SH)
-		WARN_LOG(REIOS, "Elf file is not for Hitachi SH: machine %d", header->e_machine);
+	ELFIO::elfio reader;
+	reader.load(ifs);
+	if (reader.get_machine() != ELFIO::EM_SH)
+		WARN_LOG(REIOS, "Elf file is not for Hitachi SH: machine %d", reader.get_machine());
 
 	unsigned loaded = 0;
 
-	for (size_t i = 0; i < elf_getNumProgramHeaders(&elfFile); i++)
+	for (const auto &segment : reader.segments)
 	{
-		uint32_t type = elf_getProgramHeaderType(&elfFile, i);
-		if (type != PT_LOAD) {
-			DEBUG_LOG(REIOS, "Ignoring section %d type %d", (int)i, type);
+		if (segment->get_type() != ELFIO::PT_LOAD) {
+			DEBUG_LOG(REIOS, "Ignoring section %d type %d", segment->get_index(), segment->get_type());
 			continue;
 		}
 		// Load/initialize that section
-		uint64_t dest = elf_getProgramHeaderVaddr(&elfFile, i);
-		size_t len = elf_getProgramHeaderFileSize(&elfFile, i);
-		void *src = (u8 *)(elfFile.elfFile) + elf_getProgramHeaderOffset(&elfFile, i);
-		size_t memsize = elf_getProgramHeaderMemorySize(&elfFile, i);
+		ELFIO::Elf64_Addr dest = segment->get_virtual_address();
+		ELFIO::Elf_Xword len = segment->get_file_size();
+		ELFIO::Elf_Xword memsize = segment->get_memory_size();
 		if (memsize < len) {
-			WARN_LOG(REIOS, "Invalid memory size for section %d: %lx", (int)i, (long)memsize);
+			WARN_LOG(REIOS, "Invalid memory size for section %d: %lx", segment->get_index(), (long)memsize);
 			continue;
 		}
 		if (memsize == 0)
@@ -80,11 +67,11 @@ bool reios_loadElf(const std::string& elf) {
 		u8* ptr = GetMemPtr(dest, memsize);
 		if (ptr == nullptr)
 		{
-			WARN_LOG(REIOS, "Invalid load address or size for section %d: %08lx size %lx", (int)i, (long)dest, (long)memsize);
+			WARN_LOG(REIOS, "Invalid load address or size for section %d: %08lx size %lx", (int)segment->get_index(), (long)dest, (long)memsize);
 			continue;
 		}
-		DEBUG_LOG(REIOS, "Loading section %d to %08lx - %08lx", (int)i, (long)dest, (long)(dest + memsize - 1));
-		memcpy(ptr, src, len);
+		DEBUG_LOG(REIOS, "Loading section %d to %08lx - %08lx", segment->get_index(), (long)dest, (long)(dest + memsize - 1));
+		memcpy(ptr, segment->get_data(), len);
 		memset(ptr + len, 0, memsize - len);
 		loaded++;
 	}
@@ -92,34 +79,34 @@ bool reios_loadElf(const std::string& elf) {
 	// Sections added after linking (objcopy --add-section) have no program
 	// header. Load those the loop above missed, after it so its zero-fill
 	// doesn't clobber them.
-	for (size_t i = 0; i < elf_getNumSections(&elfFile); i++)
+	for (const auto& section : reader.sections)
 	{
-		if ((elf_getSectionFlags(&elfFile, i) & SHF_ALLOC) == 0
-				|| elf_getSectionType(&elfFile, i) == SHT_NOBITS)
+		if ((section->get_flags() & ELFIO::SHF_ALLOC) == 0
+				|| section->get_type() == ELFIO::SHT_NOBITS)
 			continue;
-		uint64_t dest = elf_getSectionAddr(&elfFile, i);
-		size_t len = elf_getSectionSize(&elfFile, i);
-		if (dest == 0 || len == 0 || isLoadedBySegment(&elfFile, dest, len))
+
+		ELFIO::Elf64_Addr dest = section->get_address();
+		ELFIO::Elf_Xword len = section->get_size();
+		if (dest == 0 || len == 0 || isLoadedBySegment(reader, dest, len))
 			continue;
-		size_t offset = elf_getSectionOffset(&elfFile, i);
-		if (offset + len > nread) {
-			WARN_LOG(REIOS, "Section %s extends past end of file", elf_getSectionName(&elfFile, i));
+		ELFIO::Elf64_Off offset = section->get_offset();
+		if (offset + len > size)
+		{
+			WARN_LOG(REIOS, "Section %s extends past end of file", section->get_name().c_str());
 			continue;
 		}
 		u8* ptr = GetMemPtr(dest, len);
 		if (ptr == nullptr)
 		{
 			WARN_LOG(REIOS, "Invalid load address or size for section %s: %08lx size %lx",
-					elf_getSectionName(&elfFile, i), (long)dest, (long)len);
+			         section->get_name().c_str(), (long)dest, (long)len);
 			continue;
 		}
 		DEBUG_LOG(REIOS, "Loading section %s to %08lx - %08lx",
-				elf_getSectionName(&elfFile, i), (long)dest, (long)(dest + len - 1));
-		memcpy(ptr, (u8 *)(elfFile.elfFile) + offset, len);
+		          section->get_name().c_str(), (long)dest, (long)(dest + len - 1));
+		memcpy(ptr, section->get_data(), len);
 		loaded++;
 	}
-
-	free(elfF);
 
 	if (loaded == 0) {
 		WARN_LOG(REIOS, "Elf file has nothing to load");
