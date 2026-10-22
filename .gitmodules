@@ -2,9 +2,6 @@
 	path = core/deps/libchdr
 	url = https://github.com/flyinghead/libchdr.git
 	ignore = dirty
-[submodule "core/deps/breakpad"]
-	path = core/deps/breakpad
-	url = https://github.com/flyinghead/mingw-breakpad
 [submodule "core/deps/glslang"]
 	path = core/deps/glslang
 	url = https://github.com/KhronosGroup/glslang.git
@@ -77,3 +74,6 @@
 [submodule "external/basis_universal"]
 	path = external/basis_universal
 	url = https://github.com/BinomialLLC/basis_universal.git
+[submodule "external/breakpad"]
+	path = external/breakpad
+	url = https://github.com/flyinghead/mingw-breakpad
