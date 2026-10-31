@@ -874,7 +874,7 @@ endif()
 
 # tinygettext
 set(TINYGETTEXT_WO_ICONV ON)
-add_subdirectory(core/deps/tinygettext EXCLUDE_FROM_ALL)
+add_subdirectory(external/tinygettext EXCLUDE_FROM_ALL)
 if(MSVC)
 	# language.cpp holds the native language names as non-ASCII literals. MSVC
 	# decodes sources without a BOM using the active code page, so on a non-UTF-8
@@ -882,7 +882,7 @@ if(MSVC)
 	# already passes /utf-8; this dependency needs it too.
 	target_compile_options(tinygettext PRIVATE /utf-8)
 endif()
-target_include_directories(${PROJECT_NAME} PRIVATE core/deps/tinygettext/include)
+target_include_directories(${PROJECT_NAME} PRIVATE external/tinygettext/include)
 target_link_libraries(${PROJECT_NAME} PRIVATE tinygettext::tinygettext)
 
 target_include_directories(${PROJECT_NAME} PRIVATE core/deps/picotcp/include core/deps/picotcp/modules)
