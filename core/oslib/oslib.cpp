@@ -20,7 +20,7 @@
 #include "stdclass.h"
 #include "cfg/cfg.h"
 #include "cfg/option.h"
-#include "nowide/fstream.hpp"
+#include <nowide/fstream.hpp>
 #include "storage.h"
 #ifndef _WIN32
 #include <unistd.h>
