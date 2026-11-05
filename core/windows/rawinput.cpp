@@ -23,7 +23,7 @@
 #include <initguid.h>
 #include <devpkey.h>
 #include "hw/maple/maple_devs.h"
-#include "nowide/stackstring.hpp"
+#include <nowide/stackstring.hpp>
 
 #include <algorithm>
 #include <cstring>
