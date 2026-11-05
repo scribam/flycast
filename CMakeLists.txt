@@ -828,7 +828,7 @@ if(USE_LIBCDIO)
 endif()
 
 if(WIN32)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/dirent)
+	target_include_directories(${PROJECT_NAME} PRIVATE external/dirent/include)
 endif()
 
 # libjuice
