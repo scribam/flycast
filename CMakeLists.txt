@@ -1454,7 +1454,7 @@ if(NOT LIBRETRO)
 			# The app's main() lives in SDLApplicationDelegate.mm; the test binary
 			# gets its main() from gtest_main and stubs the rest (tests/src/test_stubs.cpp).
 			if(NOT BUILD_TESTING)
-				add_subdirectory(core/deps/Syphon)
+				add_subdirectory(external/Syphon-Framework)
 				target_link_libraries(${PROJECT_NAME} PRIVATE Syphon)
 				add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy ${SYPHON_METALLIB}
