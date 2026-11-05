@@ -1,9 +1,3 @@
-option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
-option(INSTALL_GTEST "Enable installation of googletest. (Projects embedding googletest may want to turn this OFF.)" OFF)
-if(WIN32)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-endif()
-
 target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest_main)
 
 # HttpTest drives libcurl directly. The core only links curl where it is the
