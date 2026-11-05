@@ -22,7 +22,7 @@
 #include "oslib/directory.h"
 #include "oslib/http_server.h"
 #include "hw/sh4/sh4_mem.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "hw/naomi/netdimm.h"
 #include "rend/texconv.h"
 #include <stb_image_write.h>
