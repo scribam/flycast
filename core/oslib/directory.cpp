@@ -20,7 +20,7 @@
 #include "types.h"
 #include <string>
 #ifdef NOWIDE_WINDOWS
-#include "nowide/stackstring.hpp"
+#include <nowide/stackstring.hpp>
 #include <cstring>
 
 #include <windows.h>
