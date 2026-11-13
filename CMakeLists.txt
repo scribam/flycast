@@ -860,7 +860,7 @@ endif()
 
 # websocket++
 if(NOT LIBRETRO AND NOT NINTENDO_SWITCH)
-	target_include_directories(${PROJECT_NAME} PRIVATE core/deps/websocketpp)
+	target_include_directories(${PROJECT_NAME} PRIVATE external/websocketpp)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE ASIO_STANDALONE USE_WEBSOCKET)
 	if (MSVC)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE
