@@ -108,40 +108,8 @@ public:
 			vkTex.texture->SetCommandBuffer(getCommandBuffer());
 			vkTex.texture->UploadToGPU(width, height, data, false);
 			vkTex.texture->SetCommandBuffer(nullptr);
-			VkSampler sampler;
-			if (nearestSampling)
-			{
-				if (!pointSampler)
-				{
-					pointSampler = getContext()->GetDevice().createSamplerUnique(
-							vk::SamplerCreateInfo(vk::SamplerCreateFlags(),
-									vk::Filter::eNearest, vk::Filter::eNearest,
-									vk::SamplerMipmapMode::eNearest,
-									vk::SamplerAddressMode::eClampToBorder,
-									vk::SamplerAddressMode::eClampToBorder,
-									vk::SamplerAddressMode::eClampToBorder, 0.0f, false,
-									0.f, false, vk::CompareOp::eNever, 0.0f, vk::LodClampNone,
-									vk::BorderColor::eFloatTransparentBlack));
-				}
-				sampler = (VkSampler)*pointSampler;
-			}
-			else
-			{
-				if (!linearSampler)
-				{
-					linearSampler = getContext()->GetDevice().createSamplerUnique(
-							vk::SamplerCreateInfo(vk::SamplerCreateFlags(),
-									vk::Filter::eLinear, vk::Filter::eLinear,
-									vk::SamplerMipmapMode::eLinear,
-									vk::SamplerAddressMode::eClampToBorder,
-									vk::SamplerAddressMode::eClampToBorder,
-									vk::SamplerAddressMode::eClampToBorder, 0.0f, false,
-									0.f, false, vk::CompareOp::eNever, 0.0f, vk::LodClampNone,
-									vk::BorderColor::eFloatTransparentBlack));
-				}
-				sampler = (VkSampler)*linearSampler;
-			}
-			ImTextureID texId = vkTex.textureId = (ImTextureID)ImGui_ImplVulkan_AddTexture(sampler, (VkImageView)vkTex.texture->GetImageView(),
+
+			ImTextureID texId = vkTex.textureId = (ImTextureID)ImGui_ImplVulkan_AddTexture((VkImageView)vkTex.texture->GetImageView(),
 					VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 			// TODO update existing texture
 			//auto it = textures.find(name);
