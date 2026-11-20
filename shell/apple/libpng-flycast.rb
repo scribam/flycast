@@ -1,9 +1,10 @@
 class LibpngFlycast < Formula
   desc "Library for manipulating PNG images"
-  homepage "http://www.libpng.org/pub/png/libpng.html"
-  url "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.55/libpng-1.6.55.tar.gz"
-  sha256 "4b0abab6d219e95690ebe4db7fc9aa95f4006c83baaa022373c0c8442271283d"
+  homepage "https://www.libpng.org/pub/png/libpng.html"
+  url "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.59/libpng-1.6.59.tar.xz"
+  sha256 "d80dd2a38a37f803cb9b6ac7b14bd6e74ddc3b654780a8380bdf93523fdb4389"
   license "libpng-2.0"
+  compatibility_version 1
 
   depends_on "cmake" => :build
   uses_from_macos "zlib"
@@ -31,8 +32,12 @@ class LibpngFlycast < Formula
   test do
     (testpath/"test.c").write <<~C
       #include <png.h>
-      int main() {
-        fprintf(stderr, "libpng version: %s\\n", PNG_LIBPNG_VER_STRING);
+
+      int main(void)
+      {
+        png_structp png_ptr;
+        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
         return 0;
       }
     C
